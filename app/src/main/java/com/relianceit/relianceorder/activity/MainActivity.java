@@ -40,7 +40,7 @@ public class MainActivity extends ActionBarActivity {
             public void onDailyUpdateSuccess() {
                 loadHome();
             }
-
+//guguygugu
             @Override
             public void onDailyUpdateErrorResponse(VolleyError error) {
 
