@@ -11,4 +11,5 @@ public class AppURLs {
     public static String CUSTOMER_LIST_ENDPOINT = BASE_URL + "/api/customer/get";
     public static String STOCK_LIST_ENDPOINT = BASE_URL + "/api/stock/get";
     public static String NEW_ORDER_SYNC_ENDPOINT = BASE_URL + "/api/order/add";
+    public static String TEST_ENDPOINT = BASE_URL + "test_endpoint";
 }
