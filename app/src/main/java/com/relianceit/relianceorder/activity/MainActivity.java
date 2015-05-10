@@ -30,6 +30,8 @@ import java.util.Date;
 public class MainActivity extends ActionBarActivity {
     public static final String TAG = MainActivity.class.getSimpleName();
 
+    public static final int LOGIN_REQUEST_CODE = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,40 +43,84 @@ public class MainActivity extends ActionBarActivity {
 
         String logged = AppDataManager.getData(this, Constants.DM_LOGGED_KEY);
         if (logged != null && logged.equalsIgnoreCase("yes")) {
-            //loadHome();
+            if (shouldShowDailySync()) {
+                downloadDailyData();
+            }else {
+                loadHome();
+            }
         }else {
-            //loadLogin();
+            loadLogin();
         }
+    }
 
-        loadLogin();
-
-        //downloadDailyData();
+    private void dailyDownloadFailed(int errorCode) {
+        AppUtils.dismissProgressDialog();
+        if (errorCode == 401) {
+            AppUtils.showAlertDialog(this, "Oops!", "Login session expired. Please login again.");
+            logout();
+        }else {
+            AppUtils.showAlertDialog(this, "Sync Failed!", "Data syncing failed due to Server error. Please try again.");
+        }
     }
 
     private void downloadDailyData(){
-        GeneralServiceHandler generalServiceHandler = new GeneralServiceHandler(this);
-        generalServiceHandler.doDailyContentUpdate(TAG, new GeneralServiceHandler.DailyUpdateListener() {
-            @Override
-            public void onDailyUpdateSuccess() {
-                loadHome();
-            }
 
-            @Override
-            public void onDailyUpdateErrorResponse(VolleyError error) {
+        if (!ConnectionDetector.isConnected(this)) {
+            AppUtils.showAlertDialog(this, Constants.MSG_NO_INTERNET_TITLE, Constants.MSG_NO_INTERNET_MSG);
+        }else {
+            GeneralServiceHandler generalServiceHandler = new GeneralServiceHandler(this);
+            generalServiceHandler.doDailyContentUpdate(TAG, new GeneralServiceHandler.DailyUpdateListener() {
+                @Override
+                public void onDailyUpdateSuccess() {
+                    AppUtils.dismissProgressDialog();
+                    loadHome();
+                }
 
-            }
-        });
+                @Override
+                public void onDailyUpdateErrorResponse(VolleyError error) {
+                    dailyDownloadFailed(error.networkResponse != null ? error.networkResponse.statusCode : 500);
+                }
+            });
+            AppUtils.showProgressDialog(this);
+        }
     }
+
     private void loadHome() {
-        Intent intent = new Intent(getApplicationContext(),
-                HomeActivity.class);
+        Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
         startActivity(intent);
     }
 
     private void loadLogin() {
         Intent intent = new Intent(getApplicationContext(),
                 LoginActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent, LOGIN_REQUEST_CODE);
+    }
+
+    public void logout() {
+        AppDataManager.saveData(getApplicationContext(), Constants.DM_ACCESS_TOKEN_KEY, "");
+        AppDataManager.saveData(getApplicationContext(), Constants.DM_USERNAME_KEY, "");
+        AppDataManager.saveData(getApplicationContext(), Constants.DM_LOGGED_KEY, "no");
+
+        ROSDbHelper dbHelper = new ROSDbHelper(this);
+        dbHelper.clearCustomerTable(this);
+        dbHelper.clearStockTable(this);
+        dbHelper.clearNewOrderItemTable(this);
+        dbHelper.clearNewOrderTable(this);
+        dbHelper.clearReturnOrderItemTable(this);
+        dbHelper.clearReturnOrderTable(this);
+        dbHelper.clearProductTable(this);
+
+        loadLogin();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == LOGIN_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                downloadDailyData();
+            }
+        }
     }
 
     @Override
@@ -166,10 +212,8 @@ public class MainActivity extends ActionBarActivity {
     private ArrayList<ROSReturnOrder> pendingRetOrders = null;
     private void doSyncPendingOrders() {
 
-        ConnectionDetector connectionDetector = new ConnectionDetector(this);
-        if (!connectionDetector.isConnectingToInternet()) {
-            //TODO show no connectivity message
-            AppUtils.showAlertDialog(this, "Title", "Message");
+        if (!ConnectionDetector.isConnected(this)) {
+            AppUtils.showAlertDialog(this, Constants.MSG_NO_INTERNET_TITLE, Constants.MSG_NO_INTERNET_MSG);
         }else {
             ROSDbHelper dbHelper = new ROSDbHelper(this);
             this.pendingNewOrders = dbHelper.getNewOrdersPending(this);
