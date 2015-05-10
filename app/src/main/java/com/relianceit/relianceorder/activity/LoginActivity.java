@@ -22,8 +22,10 @@ import com.relianceit.relianceorder.models.ROSCustomer;
 import com.relianceit.relianceorder.models.ROSStock;
 import com.relianceit.relianceorder.models.ROSUser;
 import com.relianceit.relianceorder.services.GeneralServiceHandler;
+import com.relianceit.relianceorder.services.NewOrderServiceHandler;
 import com.relianceit.relianceorder.util.AppDataManager;
 import com.relianceit.relianceorder.util.AppURLs;
+import com.relianceit.relianceorder.util.AppUtils;
 import com.relianceit.relianceorder.util.Constants;
 
 import org.json.JSONException;
@@ -80,7 +82,12 @@ public class LoginActivity extends ActionBarActivity {
 //        startActivity(intent);
 
         //sendLoginRequest();
+        //loginCompleted("f87d868d-df7f-4e98-aa79-0e795c61a19f");
 
+        //testDownloadContent();
+    }
+
+    private void testDownloadContent() {
         GeneralServiceHandler generalServiceHandler = new GeneralServiceHandler(this);
         generalServiceHandler.doDailyContentUpdate(TAG, new GeneralServiceHandler.DailyUpdateListener() {
             @Override
@@ -110,6 +117,11 @@ public class LoginActivity extends ActionBarActivity {
             ROSStock stock = stocks.get(i);
             stock.print();
         }
+    }
+
+    private void testNewOrder() {
+        NewOrderServiceHandler newOrderServiceHandler = new NewOrderServiceHandler(this);
+        newOrderServiceHandler.testSyncNewOrder();
     }
 
     private void sendLoginRequest() {

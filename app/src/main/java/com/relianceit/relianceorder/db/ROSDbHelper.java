@@ -13,6 +13,7 @@ import com.relianceit.relianceorder.models.ROSProduct;
 import com.relianceit.relianceorder.models.ROSReturnOrder;
 import com.relianceit.relianceorder.models.ROSReturnOrderItem;
 import com.relianceit.relianceorder.models.ROSStock;
+import com.relianceit.relianceorder.util.Constants;
 
 import java.util.ArrayList;
 
@@ -337,17 +338,18 @@ public class ROSDbHelper extends SQLiteOpenHelper {
             }
 
             c.close();
-            db.close();
         }
+
+        db.close();
 
         return  orderList;
     }
 
-    public ArrayList<ROSNewOrder> getNewOrders(Context context, int orderStatus) {
+    public ArrayList<ROSNewOrder> getNewOrdersPending(Context context) {
         SQLiteDatabase db = getReadableDb(context);
 
         final String SQL_SELECT_NEW_ORDERS = "SELECT * FROM " + ROSDbConstants.NewOrder.TABLE_NAME +
-                " WHERE " + ROSDbConstants.NewOrder.CL_NAME_ORDER_STATUS + " = " + orderStatus + ";";
+                " WHERE " + ROSDbConstants.NewOrder.CL_NAME_ORDER_STATUS + " = " + Constants.OrderStatus.PENDING + ";";
         Cursor c = db.rawQuery(SQL_SELECT_NEW_ORDERS, null);
 
         ArrayList<ROSNewOrder> orderList = new ArrayList<ROSNewOrder>();
@@ -367,8 +369,9 @@ public class ROSDbHelper extends SQLiteOpenHelper {
             }
 
             c.close();
-            db.close();
         }
+
+        db.close();
 
         for (int i = 0; i < orderList.size(); i++) {
             ROSNewOrder order = orderList.get(i);
@@ -376,6 +379,25 @@ public class ROSDbHelper extends SQLiteOpenHelper {
         }
 
         return  orderList;
+    }
+
+    public int getNewOrderCountPending(Context context) {
+        SQLiteDatabase db = getReadableDb(context);
+
+        final String SQL_SELECT_NEW_ORDERS = "SELECT * FROM " + ROSDbConstants.NewOrder.TABLE_NAME +
+                " WHERE " + ROSDbConstants.NewOrder.CL_NAME_ORDER_STATUS + " = " + Constants.OrderStatus.PENDING + ";";
+        Cursor c = db.rawQuery(SQL_SELECT_NEW_ORDERS, null);
+
+        int count = 0;
+
+        if (c != null) {
+            count = c.getCount();
+            c.close();
+        }
+
+        db.close();
+
+        return  count;
     }
 
     public ROSNewOrder getNewOrder(Context context, String orderId) {
@@ -411,11 +433,11 @@ public class ROSDbHelper extends SQLiteOpenHelper {
         return order;
     }
 
-    public void updateNewOrderStatus(Context context, String orderId, int orderStatus) {
+    public void updateNewOrderStatusToSynced(Context context, String orderId) {
         SQLiteDatabase db = getWritableDb(context);
 
         final String SQL_UPDATE_ORDER_STATUS = "UPDATE " + ROSDbConstants.NewOrder.TABLE_NAME +
-                " SET " + ROSDbConstants.NewOrder.CL_NAME_ORDER_STATUS + " = " + orderStatus +
+                " SET " + ROSDbConstants.NewOrder.CL_NAME_ORDER_STATUS + " = " + Constants.OrderStatus.SYNCED +
                 " WHERE " + ROSDbConstants.NewOrder.CL_NAME_ORDER_ID + " = '" + orderId + "';";
         db.execSQL(SQL_UPDATE_ORDER_STATUS);
         db.close();
@@ -431,7 +453,7 @@ public class ROSDbHelper extends SQLiteOpenHelper {
         values.put(ROSDbConstants.NewOrder.CL_NAME_DISCOUNT_VALUE, order.getDiscountValue());
         values.put(ROSDbConstants.NewOrder.CL_NAME_GROSS_VALUE, order.getGrossValue());
         values.put(ROSDbConstants.NewOrder.CL_NAME_ORDER_VALUE, order.getOrderValue());
-        values.put(ROSDbConstants.NewOrder.CL_NAME_ORDER_STATUS, order.getOrderStatus());
+        values.put(ROSDbConstants.NewOrder.CL_NAME_ORDER_STATUS, Constants.OrderStatus.PENDING);
 
         long orderId = db.insert(ROSDbConstants.NewOrder.TABLE_NAME, null, values);
         db.close();
@@ -602,17 +624,17 @@ public class ROSDbHelper extends SQLiteOpenHelper {
             }
 
             c.close();
-            db.close();
         }
+        db.close();
 
         return  orderList;
     }
 
-    public ArrayList<ROSReturnOrder> getReturnOrders(Context context, int orderStatus) {
+    public ArrayList<ROSReturnOrder> getReturnOrdersPending(Context context) {
         SQLiteDatabase db = getReadableDb(context);
 
         final String SQL_SELECT_RETURN_ORDERS = "SELECT * FROM " + ROSDbConstants.ReturnOrder.TABLE_NAME +
-                " WHERE " + ROSDbConstants.ReturnOrder.CL_NAME_ORDER_STATUS + " = " + orderStatus + ";";
+                " WHERE " + ROSDbConstants.ReturnOrder.CL_NAME_ORDER_STATUS + " = " + Constants.OrderStatus.PENDING + ";";
         Cursor c = db.rawQuery(SQL_SELECT_RETURN_ORDERS, null);
 
         ArrayList<ROSReturnOrder> orderList = new ArrayList<ROSReturnOrder>();
@@ -633,8 +655,9 @@ public class ROSDbHelper extends SQLiteOpenHelper {
             }
 
             c.close();
-            db.close();
         }
+
+        db.close();
 
         for (int i = 0; i < orderList.size(); i++) {
             ROSReturnOrder order = orderList.get(i);
@@ -642,6 +665,25 @@ public class ROSDbHelper extends SQLiteOpenHelper {
         }
 
         return  orderList;
+    }
+
+    public int getReturnOrderCountPending(Context context) {
+        SQLiteDatabase db = getReadableDb(context);
+
+        final String SQL_SELECT_NEW_ORDERS = "SELECT * FROM " + ROSDbConstants.ReturnOrder.TABLE_NAME +
+                " WHERE " + ROSDbConstants.ReturnOrder.CL_NAME_ORDER_STATUS + " = " + Constants.OrderStatus.PENDING + ";";
+        Cursor c = db.rawQuery(SQL_SELECT_NEW_ORDERS, null);
+
+        int count = 0;
+
+        if (c != null) {
+            count = c.getCount();
+            c.close();
+        }
+
+        db.close();
+
+        return  count;
     }
 
     public ROSReturnOrder getReturnOrder(Context context, String orderId) {
@@ -678,11 +720,11 @@ public class ROSDbHelper extends SQLiteOpenHelper {
         return order;
     }
 
-    public void updateReturnOrderStatus(Context context, String orderId, int orderStatus) {
+    public void updateReturnOrderStatusToSynced(Context context, String orderId) {
         SQLiteDatabase db = getWritableDb(context);
 
         final String SQL_UPDATE_ORDER_STATUS = "UPDATE " + ROSDbConstants.ReturnOrder.TABLE_NAME +
-                " SET " + ROSDbConstants.ReturnOrder.CL_NAME_ORDER_STATUS + " = " + orderStatus +
+                " SET " + ROSDbConstants.ReturnOrder.CL_NAME_ORDER_STATUS + " = " + Constants.OrderStatus.SYNCED +
                 " WHERE " + ROSDbConstants.ReturnOrder.CL_NAME_ORDER_ID + " = '" + orderId + "';";
         db.execSQL(SQL_UPDATE_ORDER_STATUS);
         db.close();
@@ -698,7 +740,7 @@ public class ROSDbHelper extends SQLiteOpenHelper {
         values.put(ROSDbConstants.ReturnOrder.CL_NAME_DISCOUNT_VALUE, order.getDiscountValue());
         values.put(ROSDbConstants.ReturnOrder.CL_NAME_GROSS_VALUE, order.getGrossValue());
         values.put(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_VALUE, order.getOrderValue());
-        values.put(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_STATUS, order.getOrderStatus());
+        values.put(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_STATUS, Constants.OrderStatus.PENDING);
         values.put(ROSDbConstants.ReturnOrder.CL_NAME_INVOICE_NO, order.getInvoiceNo());
 
         long orderId = db.insert(ROSDbConstants.ReturnOrder.TABLE_NAME, null, values);
