@@ -1,9 +1,9 @@
 package com.relianceit.relianceorder.util;
 
-import java.io.File;
-
 import android.content.Context;
 import android.os.Environment;
+
+import java.io.File;
 
 public class AppUtils {
 
@@ -17,7 +17,7 @@ public class AppUtils {
 		return path;
 	}
 
-
+///
 }
 
 //test pull
