@@ -18,13 +18,16 @@ import com.relianceit.relianceorder.models.ROSCustomer;
 import com.relianceit.relianceorder.models.ROSProduct;
 import com.relianceit.relianceorder.models.ROSStock;
 import com.relianceit.relianceorder.models.ROSUser;
+import com.relianceit.relianceorder.util.AppDataManager;
 import com.relianceit.relianceorder.util.AppURLs;
+import com.relianceit.relianceorder.util.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -70,6 +73,8 @@ public class GeneralServiceHandler {
         } else if (!productListDownloaded) {
             downloadProductsList(requestTag, listener);
         } else if (customerListDownloaded && stockListDownloaded && productListDownloaded) {
+            Date now = new Date();
+            AppDataManager.saveDataLong(context, Constants.DM_DAILY_SYNC_TIME_KEY, now.getTime());
             this.context = null;
             listener.onDailyUpdateSuccess();
         }
