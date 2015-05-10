@@ -56,7 +56,7 @@
     <string name="tbl_label_new_order_batch">Batch</string>
     <string name="tbl_label_new_order_qty">Qty</string>
     <string name="tbl_label_new_order_price">Price</string>
-    <string name="tbl_label_new_order_disc">Disc</string>
+    <string name="tbl_label_new_order_disc">Disc (%)</string>
     <string name="tbl_label_new_order_fi">FI</string>
     <string name="tbl_label_new_order_value">Value</string>
 
