@@ -1,0 +1,223 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="com.relianceit.relianceorder.activity.ViewOrderActivity">
+
+    <ScrollView
+        android:id="@+id/scrollView1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="10dp"
+            android:orientation="vertical"
+            android:id="@+id/order_table"
+            >
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"
+                >
+                <TextView
+                    android:id="@+id/order_no_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:layout_weight="1"
+                    android:text="Order No : "
+                    android:textSize="@dimen/tb_header_text_size"/>
+                <TextView
+                    android:id="@+id/order_no"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="left"
+                    android:layout_weight="1"
+                    android:text="00001"
+                    android:textSize="@dimen/tb_header_text_size"/>
+
+                <TextView
+                    android:id="@+id/total_outstanding_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:layout_weight="1"
+                    android:text="Date : "
+                    android:textSize="@dimen/tb_header_text_size"/>
+                <TextView
+                    android:id="@+id/total_outstanding"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="left"
+                    android:layout_weight="1"
+                    android:text="01/01/2014"
+                    android:textSize="@dimen/tb_header_text_size"/>
+                <TextView
+                    android:id="@+id/customer_name_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="right"
+                    android:layout_weight="1"
+                    android:text="Customer : "
+                    android:textSize="@dimen/tb_header_text_size"/>
+                <TextView
+                    android:id="@+id/customer_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="left"
+                    android:layout_weight="1"
+                    android:text="Customer 2"
+                    android:textSize="@dimen/tb_header_text_size"/>
+
+            </TableRow>
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:background="@color/app_base_color"
+                android:layout_marginBottom="10dp"
+
+                >
+                <TextView android:text="@string/tbl_label_new_order_product"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:textStyle="bold"
+                    android:layout_margin="1px"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/tb_header_text_size"/>
+                <TextView android:text="@string/tbl_label_new_order_batch"
+                    android:layout_weight="1"
+
+                    android:gravity="center_horizontal"
+                    android:textStyle="bold"
+                    android:layout_margin="1px"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/tb_header_text_size"/>
+                <TextView android:text="@string/tbl_label_new_order_qty"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:textStyle="bold"
+                    android:layout_margin="1px"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/tb_header_text_size"/>
+                <TextView android:text="@string/tbl_label_new_order_price"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:textStyle="bold"
+                    android:layout_margin="1px"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/tb_header_text_size"/>
+                <TextView android:text="@string/tbl_label_new_order_disc"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:textStyle="bold"
+                    android:layout_margin="1px"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/tb_header_text_size"/>
+                <TextView android:text="@string/tbl_label_new_order_fi"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:textStyle="bold"
+                    android:layout_margin="1px"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/tb_header_text_size"/>
+                <TextView android:text="@string/tbl_label_new_order_value"
+                    android:layout_weight="1"
+                    android:gravity="center_horizontal"
+                    android:textStyle="bold"
+                    android:layout_margin="1px"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginBottom="5dp"
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/tb_header_text_size"/>
+
+            </TableRow>
+
+
+            <TableRow
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                >
+                <TextView android:text="@string/tbl_label_gross_value"
+                    android:layout_weight="1"
+                    android:layout_margin="3px"
+                    android:textColor="@android:color/black"
+                    android:gravity="right"
+                    android:layout_gravity="center_vertical"
+                    android:textSize="@dimen/common_text_size"/>
+                <TextView android:id="@+id/gross_value"
+                    android:layout_weight="1"
+                    android:layout_margin="3px"
+                    android:textColor="@android:color/black"
+                    android:gravity="left"
+                    android:layout_gravity="center_vertical"
+                    android:textSize="@dimen/common_text_size"/>
+                <TextView android:text="@string/tbl_label_overall_dis"
+                    android:layout_weight="1"
+                    android:layout_margin="3px"
+                    android:textColor="@android:color/black"
+                    android:gravity="right"
+                    android:layout_gravity="center_vertical"
+                    android:textSize="@dimen/common_text_size"/>
+                <TextView android:id="@+id/overall_dis"
+                    android:layout_weight="1"
+                    android:layout_margin="3px"
+                    android:gravity="left"
+                    android:layout_gravity="center_vertical"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/common_text_size"/>
+                <TextView android:text="@string/tbl_label_discount_value"
+                    android:layout_weight="1"
+                    android:layout_margin="3px"
+                    android:textColor="@android:color/black"
+                    android:gravity="right"
+                    android:layout_gravity="center_vertical"
+                    android:textSize="@dimen/common_text_size"/>
+                <TextView android:id="@+id/discount_value"
+                    android:layout_weight="1"
+                    android:layout_margin="3px"
+                    android:gravity="left"
+                    android:layout_gravity="center_vertical"
+                    android:textColor="@android:color/black"
+                    android:textSize="@dimen/common_text_size"/>
+                <TextView
+                    android:id="@+id/order_value_label"
+                    android:text="@string/tbl_label_order_value"
+                    android:layout_weight="1"
+                    android:layout_margin="3px"
+                    android:textColor="@android:color/black"
+                    android:gravity="right"
+                    android:layout_gravity="center_vertical"
+                    android:textSize="@dimen/common_text_size"/>
+                <TextView android:id="@+id/order_value"
+                    android:layout_weight="1"
+                    android:layout_margin="3px"
+                    android:textColor="@android:color/black"
+                    android:gravity="left"
+                    android:layout_gravity="center_vertical"
+                    android:textSize="@dimen/common_text_size"/>
+
+            </TableRow>
+
+
+        </TableLayout>
+    </ScrollView>
+
+
+</RelativeLayout>

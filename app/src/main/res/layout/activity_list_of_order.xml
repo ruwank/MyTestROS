@@ -1,0 +1,144 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context="com.relianceit.relianceorder.activity.ListOfOrderActivity">
+
+    <ScrollView
+        android:id="@+id/scrollView1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="10dp"
+        android:orientation="vertical"
+        android:id="@+id/order_list_table"
+        >
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            >
+            <TextView
+                android:id="@+id/customer_name_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="right"
+                android:text="Customer: "
+                android:textSize="@dimen/tb_header_text_size"/>
+            <TextView
+                android:id="@+id/customer_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:text="Customer 2"
+                android:textSize="@dimen/tb_header_text_size"/>
+
+        </TableRow>
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            >
+            <TextView
+                android:id="@+id/from_date_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:gravity="right"
+                android:text="From Date: "
+                android:textSize="@dimen/tb_header_text_size"/>
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:layout_gravity="center_vertical"
+
+                android:layout_marginLeft="20dp"
+                android:id="@+id/from_date"
+                android:textSize="@dimen/tb_header_text_size"/>
+
+            <TextView
+                android:id="@+id/to_date_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="right"
+                android:layout_gravity="center_vertical"
+
+                android:text="To Date: "
+                android:textSize="@dimen/tb_header_text_size"/>
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="20dp"
+                android:layout_gravity="center_vertical"
+
+                android:gravity="left"
+                android:id="@+id/to_date"
+                android:textSize="@dimen/tb_header_text_size"/>
+
+                <Button
+                    android:id="@+id/btnGetOrder"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="100dp"
+                    android:layout_height="40dp"
+                    android:background="@drawable/button_bg"
+                    android:text="Update"
+                    android:textColor="#fff"
+                    android:textStyle="bold"
+                    android:textSize="@dimen/tb_header_text_size"/>
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            android:background="@color/app_base_color"
+
+            >
+        <TextView
+            android:id="@+id/tbl_header_col1"
+            android:text="@string/tbl_label_new_order_product"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:textStyle="bold"
+            android:layout_margin="1px"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/tb_header_text_size"></TextView>
+        <TextView
+            android:id="@+id/tbl_header_col2"
+            android:text="@string/tbl_label_new_order_batch"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:textStyle="bold"
+            android:layout_margin="1px"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/tb_header_text_size"></TextView>
+        <TextView
+            android:id="@+id/tbl_header_col3"
+            android:text="@string/tbl_label_new_order_qty"
+            android:layout_weight="1"
+            android:gravity="center_horizontal"
+            android:textStyle="bold"
+            android:layout_margin="1px"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:textColor="@android:color/white"
+            android:textSize="@dimen/tb_header_text_size"></TextView>
+        </TableRow>
+        </TableLayout>
+    </ScrollView>
+
+
+
+</RelativeLayout>

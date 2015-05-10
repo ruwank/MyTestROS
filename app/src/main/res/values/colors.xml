@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="app_base_color">#1993b9</color> <!--#F5F8FA-->
+    <color name="app_base_color_2">#196173</color><!--#E7EDF0-->
+    <color name="app_bg_color">#E2E9ED</color><!--#E7EDF0-->
+    <color name="btn_normal_color">#1993b9</color>
+    <color name="btn_active_color">#196173</color>
+    <color name="color_white">#ffffff</color>
+    <color name="color_black">#000000</color>
+    <color name="color_transparent">#00000000</color>
+
+</resources>

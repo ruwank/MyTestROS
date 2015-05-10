@@ -1,0 +1,72 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/table_horizontal_margin"
+    android:paddingRight="@dimen/table_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="@color/app_bg_color"
+    tools:context="com.relianceit.relianceorder.HomeActivity$PlaceholderFragment" >
+
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:orientation="vertical"
+        android:id="@+id/outstanding_table_header">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@color/background_floating_material_dark"
+
+            >
+            <TextView android:text="@string/tbl_label_customer_name" android:layout_weight="1.5"
+                android:gravity="center_horizontal"
+                android:textStyle="bold"
+                android:width="0dp"
+                android:layout_margin="1px"
+                android:background="@color/app_bg_color"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:textSize="@dimen/tb_header_text_size" />
+
+            <TextView android:text="@string/tbl_label_town" android:layout_weight="1.5"
+                android:gravity="center_horizontal"
+                android:textStyle="bold"
+                android:layout_margin="1px"
+                android:width="0dp"
+                android:background="@color/app_bg_color"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:textSize="@dimen/tb_header_text_size"/>
+            <TextView android:text="@string/tbl_label_outstanding" android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:textStyle="bold"
+                android:layout_margin="1px"
+                android:width="0dp"
+                android:background="@color/app_bg_color"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:textSize="@dimen/tb_header_text_size"/>
+            </TableRow>
+
+    </TableLayout>
+    <ScrollView
+        android:id="@+id/scrollView1"
+        android:layout_below="@+id/outstanding_table_header"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TableLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:id="@+id/customer_outstanding_table"
+            >
+
+        </TableLayout>
+    </ScrollView>
+</RelativeLayout>

@@ -1,0 +1,517 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/activity_vertical_margin"
+    tools:context="com.relianceit.relianceorder.activity.NewOrderActivity" >
+
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:orientation="vertical"
+        android:id="@+id/new_order_table_header"
+        >
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:id="@+id/add_order_top_row"
+            >
+            <TextView
+                android:id="@+id/customer_name_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="right"
+                android:layout_weight="1"
+                android:text="Customer : "
+                android:textSize="@dimen/tb_header_text_size" />
+            <TextView
+                android:id="@+id/customer_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:layout_weight="1"
+                android:text="Customer 2"
+                android:textSize="@dimen/tb_header_text_size" />
+
+            <TextView
+                android:id="@+id/top_second_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="right"
+                android:layout_weight="1"
+                android:text="Total outstanding : "
+                android:textSize="@dimen/tb_header_text_size" />
+            <EditText
+                android:id="@+id/invoice_value"
+                android:layout_width="60dp"
+                android:layout_height="40dp"
+                android:textColor="@android:color/black"
+                android:background="@drawable/border"
+                android:textSize="@dimen/tb_header_text_size" />
+            <TextView
+                android:id="@+id/total_outstanding"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:layout_weight="1"
+                android:text="Rs. 50,000"
+                android:textSize="@dimen/tb_header_text_size" />
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:background="@color/app_base_color"
+
+            >
+            <TextView android:text="@string/tbl_label_new_order_product"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:textStyle="bold"
+                android:layout_margin="1px"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/tb_header_text_size" />
+            <TextView android:text="@string/tbl_label_new_order_batch"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:textStyle="bold"
+                android:layout_margin="1px"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/tb_header_text_size" />
+            <TextView android:text="@string/tbl_label_new_order_qty"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:textStyle="bold"
+                android:layout_margin="1px"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/tb_header_text_size" />
+            <TextView android:text="@string/tbl_label_new_order_price"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:textStyle="bold"
+                android:layout_margin="1px"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/tb_header_text_size" />
+            <TextView android:text="@string/tbl_label_new_order_disc"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:textStyle="bold"
+                android:layout_margin="1px"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/tb_header_text_size" />
+            <TextView android:text="@string/tbl_label_new_order_fi"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:textStyle="bold"
+                android:layout_margin="1px"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/tb_header_text_size" />
+            <TextView android:text="@string/tbl_label_new_order_value"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:textStyle="bold"
+                android:layout_margin="1px"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/tb_header_text_size" />
+            <LinearLayout
+                android:layout_width="40dp"
+                android:layout_height="match_parent" />
+        </TableRow>
+        <TableRow
+            android:layout_marginTop="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            >
+            <Spinner
+                android:id="@+id/product_spinner"
+                android:layout_width="80dp"
+                android:layout_weight="1"
+                android:layout_margin="5px"
+                android:spinnerMode="dropdown" />
+            <Spinner
+                android:id="@+id/batch_spinner"
+                android:layout_width="80dp"
+                android:layout_weight="1"
+                android:textColor="@android:color/black"
+                android:layout_margin="5dp"
+                android:spinnerMode="dropdown" />
+            <EditText
+                android:id="@+id/order_quantity"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:layout_width="80dp"
+                android:layout_height="fill_parent"
+                android:layout_margin="5px"
+                android:textColor="@android:color/black"
+                android:background="@drawable/border"
+                android:textSize="@dimen/common_text_size" />
+            <EditText
+                android:id="@+id/order_price"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:layout_width="80dp"
+                android:layout_height="fill_parent"
+                android:layout_margin="5px"
+                android:textColor="@android:color/black"
+                android:background="@drawable/border"
+                android:textSize="@dimen/common_text_size" />
+            <EditText
+                android:id="@+id/order_discount"
+                android:layout_weight="1"
+                android:layout_width="80dp"
+                android:layout_height="fill_parent"
+                android:gravity="center_horizontal"
+                android:layout_margin="5px"
+                android:textColor="@android:color/black"
+                android:background="@drawable/border"
+                android:textSize="@dimen/common_text_size" />
+            <EditText
+                android:id="@+id/order_free_item"
+                android:layout_weight="1"
+                android:layout_width="80dp"
+                android:layout_height="fill_parent"
+                android:gravity="center_horizontal"
+                android:layout_margin="5px"
+                android:textColor="@android:color/black"
+                android:background="@drawable/border"
+                android:textSize="@dimen/common_text_size" />
+            <TextView
+                android:id="@+id/order_total_amount"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:editable="false"
+                android:layout_width="80dp"
+                android:layout_height="fill_parent"
+                android:layout_margin="5px"
+                android:textColor="@android:color/black"
+                android:textSize="@dimen/common_text_size" />
+
+            <ImageButton
+                android:id="@+id/btnAddOrder"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:src="@mipmap/btn_add_item"
+                android:background="@android:color/transparent" />
+
+        </TableRow>
+    </TableLayout>
+
+    <ScrollView
+        android:id="@+id/scrollView1"
+        android:layout_below="@+id/new_order_table_header"
+        android:layout_above="@+id/bottom_table"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="10dp"
+        android:orientation="vertical"
+        android:id="@+id/new_order_table"
+        >
+
+            <!--<TableRow-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_marginBottom="10dp"-->
+                <!--android:id="@+id/add_order_top_row"-->
+                <!-->-->
+                <!--<TextView-->
+                    <!--android:id="@+id/customer_name_label"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:gravity="right"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:text="Customer : " />-->
+                <!--<TextView-->
+                    <!--android:id="@+id/customer_name"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:gravity="left"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:text="Customer 2" />-->
+
+                <!--<TextView-->
+                    <!--android:id="@+id/top_second_label"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:gravity="right"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:text="Total outstanding : " />-->
+                <!--<EditText-->
+                    <!--android:id="@+id/invoice_value"-->
+                    <!--android:layout_width="60dp"-->
+                    <!--android:layout_height="40dp"-->
+                    <!--android:textColor="@android:color/black"-->
+                    <!--android:background="@drawable/border"/>-->
+                <!--<TextView-->
+                    <!--android:id="@+id/total_outstanding"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:gravity="left"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:text="Rs. 50,000" />-->
+
+                <!--</TableRow>-->
+
+        <!--<TableRow-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="60dp"-->
+            <!--android:background="@color/app_base_color"-->
+
+            <!-->-->
+            <!--<TextView android:text="@string/tbl_label_new_order_product"-->
+                <!--android:layout_weight="1"-->
+                <!--android:gravity="center_horizontal"-->
+                <!--android:textStyle="bold"-->
+                <!--android:layout_margin="1px"-->
+                <!--android:layout_marginTop="5dp"-->
+                <!--android:layout_marginBottom="5dp"-->
+                <!--android:textColor="@android:color/white"/>-->
+            <!--<TextView android:text="@string/tbl_label_new_order_batch"-->
+                <!--android:layout_weight="1"-->
+                <!--android:gravity="center_horizontal"-->
+                <!--android:textStyle="bold"-->
+                <!--android:layout_margin="1px"-->
+                <!--android:layout_marginTop="5dp"-->
+                <!--android:layout_marginBottom="5dp"-->
+                <!--android:textColor="@android:color/white"/>-->
+            <!--<TextView android:text="@string/tbl_label_new_order_qty"-->
+                <!--android:layout_weight="1"-->
+                <!--android:gravity="center_horizontal"-->
+                <!--android:textStyle="bold"-->
+                <!--android:layout_margin="1px"-->
+                <!--android:layout_marginTop="5dp"-->
+                <!--android:layout_marginBottom="5dp"-->
+                <!--android:textColor="@android:color/white"/>-->
+            <!--<TextView android:text="@string/tbl_label_new_order_price"-->
+                <!--android:layout_weight="1"-->
+                <!--android:gravity="center_horizontal"-->
+                <!--android:textStyle="bold"-->
+                <!--android:layout_margin="1px"-->
+                <!--android:layout_marginTop="5dp"-->
+                <!--android:layout_marginBottom="5dp"-->
+                <!--android:textColor="@android:color/white"/>-->
+            <!--<TextView android:text="@string/tbl_label_new_order_disc"-->
+                <!--android:layout_weight="1"-->
+                <!--android:gravity="center_horizontal"-->
+                <!--android:textStyle="bold"-->
+                <!--android:layout_margin="1px"-->
+                <!--android:layout_marginTop="5dp"-->
+                <!--android:layout_marginBottom="5dp"-->
+                <!--android:textColor="@android:color/white"/>-->
+            <!--<TextView android:text="@string/tbl_label_new_order_fi"-->
+                <!--android:layout_weight="1"-->
+                <!--android:gravity="center_horizontal"-->
+                <!--android:textStyle="bold"-->
+                <!--android:layout_margin="1px"-->
+                <!--android:layout_marginTop="5dp"-->
+                <!--android:layout_marginBottom="5dp"-->
+                <!--android:textColor="@android:color/white"/>-->
+            <!--<TextView android:text="@string/tbl_label_new_order_value"-->
+                <!--android:layout_weight="1"-->
+                <!--android:gravity="center_horizontal"-->
+                <!--android:textStyle="bold"-->
+                <!--android:layout_margin="1px"-->
+                <!--android:layout_marginTop="5dp"-->
+                <!--android:layout_marginBottom="5dp"-->
+                <!--android:textColor="@android:color/white"/>-->
+            <!--<LinearLayout-->
+                <!--android:layout_width="40dp"-->
+                <!--android:layout_height="match_parent" />-->
+        <!--</TableRow>-->
+        <!--<TableRow-->
+            <!--android:layout_marginTop="5dp"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="80dp"-->
+           <!-->-->
+            <!--<Spinner-->
+                <!--android:id="@+id/product_spinner"-->
+                <!--android:layout_width="80dp"-->
+                <!--android:layout_weight="1"-->
+                <!--android:layout_margin="5px"-->
+                <!--android:spinnerMode="dropdown" />-->
+            <!--<Spinner-->
+                <!--android:id="@+id/batch_spinner"-->
+                <!--android:layout_width="80dp"-->
+                <!--android:layout_weight="1"-->
+                <!--android:textColor="@android:color/black"-->
+                <!--android:layout_margin="5dp"-->
+                <!--android:spinnerMode="dropdown" />-->
+            <!--<EditText-->
+                <!--android:id="@+id/order_quantity"-->
+                <!--android:layout_weight="1"-->
+                <!--android:gravity="center_horizontal"-->
+                <!--android:layout_width="80dp"-->
+                <!--android:layout_height="fill_parent"-->
+                <!--android:layout_margin="5px"-->
+                <!--android:textColor="@android:color/black"-->
+                <!--android:background="@drawable/border"/>-->
+            <!--<EditText-->
+                <!--android:id="@+id/order_price"-->
+                <!--android:layout_weight="1"-->
+                <!--android:gravity="center_horizontal"-->
+                <!--android:layout_width="80dp"-->
+                <!--android:layout_height="fill_parent"-->
+                <!--android:layout_margin="5px"-->
+                <!--android:textColor="@android:color/black"-->
+                <!--android:background="@drawable/border"/>-->
+            <!--<EditText-->
+                <!--android:id="@+id/order_discount"-->
+                <!--android:layout_weight="1"-->
+                <!--android:layout_width="80dp"-->
+                <!--android:layout_height="fill_parent"-->
+                <!--android:gravity="center_horizontal"-->
+                <!--android:layout_margin="5px"-->
+                <!--android:textColor="@android:color/black"-->
+                <!--android:background="@drawable/border"/>-->
+            <!--<EditText-->
+                <!--android:id="@+id/order_free_item"-->
+                <!--android:layout_weight="1"-->
+                <!--android:layout_width="80dp"-->
+                <!--android:layout_height="fill_parent"-->
+                <!--android:gravity="center_horizontal"-->
+                <!--android:layout_margin="5px"-->
+                <!--android:textColor="@android:color/black"-->
+                <!--android:background="@drawable/border"/>-->
+            <!--<TextView-->
+                <!--android:id="@+id/order_total_amount"-->
+                <!--android:layout_weight="1"-->
+                <!--android:gravity="center_horizontal"-->
+                <!--android:editable="false"-->
+                <!--android:layout_width="80dp"-->
+                <!--android:layout_height="fill_parent"-->
+                <!--android:layout_margin="5px"-->
+                <!--android:textColor="@android:color/black"-->
+                <!--></TextView>-->
+
+            <!--<ImageButton-->
+                <!--android:id="@+id/btnAddOrder"-->
+                <!--android:layout_width="80dp"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:layout_gravity="center"-->
+                <!--android:src="@mipmap/btn_add_item"-->
+                <!--android:background="@android:color/transparent" />-->
+
+        <!--</TableRow>-->
+        </TableLayout>
+    </ScrollView>
+    <TableLayout
+        android:id="@+id/bottom_table"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+        <TableRow
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            >
+            <TextView android:text="@string/tbl_label_gross_value"
+                android:layout_weight="1"
+                android:layout_margin="3px"
+                android:textColor="@android:color/black"
+                android:gravity="right"
+                android:layout_gravity="center_vertical"
+                android:textSize="@dimen/common_text_size" />
+            <TextView android:id="@+id/gross_value"
+                android:layout_weight="1"
+                android:layout_margin="3px"
+                android:textColor="@android:color/black"
+                android:gravity="left"
+                android:layout_gravity="center_vertical"
+                android:textSize="@dimen/common_text_size" />
+            <TextView android:text="@string/tbl_label_overall_dis"
+                android:layout_weight="1"
+                android:layout_margin="3px"
+                android:textColor="@android:color/black"
+                android:gravity="right"
+                android:layout_gravity="center_vertical"
+                android:textSize="@dimen/common_text_size" />
+            <EditText android:id="@+id/overall_dis"
+                android:layout_weight="1"
+                android:layout_margin="3px"
+                android:gravity="left"
+                android:layout_gravity="center_vertical"
+                android:textColor="@android:color/black"
+                android:background="@drawable/border"
+                android:textSize="@dimen/common_text_size" />
+            <TextView android:text="@string/tbl_label_discount_value"
+                android:layout_weight="1"
+                android:layout_margin="3px"
+                android:textColor="@android:color/black"
+                android:gravity="right"
+                android:layout_gravity="center_vertical"
+                android:textSize="@dimen/common_text_size" />
+            <EditText android:id="@+id/discount_value"
+                android:layout_weight="1"
+                android:layout_margin="3px"
+                android:gravity="left"
+                android:layout_gravity="center_vertical"
+                android:textColor="@android:color/black"
+                android:background="@drawable/border"
+                android:textSize="@dimen/common_text_size" />
+            <TextView android:id="@+id/order_value_label"
+                android:text="@string/tbl_label_order_value"
+                android:layout_weight="1"
+                android:layout_margin="3px"
+                android:textColor="@android:color/black"
+                android:gravity="right"
+                android:layout_gravity="center_vertical"
+                android:textSize="@dimen/common_text_size" />
+            <TextView android:text="@+id/order_value"
+                android:layout_weight="1"
+                android:layout_margin="3px"
+                android:textColor="@android:color/black"
+                android:gravity="left"
+                android:layout_gravity="center_vertical"
+                android:textSize="@dimen/common_text_size" />
+
+        </TableRow>
+            <TableRow
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dp"
+                >
+                <LinearLayout
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center">
+                <Button
+                    android:id="@+id/btnSaveOrder"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_width="150dp"
+                    android:layout_height="50dp"
+                    android:background="@drawable/button_bg"
+                    android:text="Save"
+                    android:textColor="#fff"
+                    android:textStyle="bold" />
+                </LinearLayout>
+
+                </TableRow>
+
+    </TableLayout>
+
+
+</RelativeLayout>
