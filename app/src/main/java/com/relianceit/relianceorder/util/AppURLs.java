@@ -5,11 +5,11 @@ package com.relianceit.relianceorder.util;
  */
 public class AppURLs {
 
-    public static String BASE_URL = "http://reliancereldiz_user.com.lk";
+    public static String BASE_URL = "http://reliancereldiz.com.lk";
 
     public static String LOGIN_ENDPOINT = BASE_URL + "/api/authenticate/authenticate";
     public static String CUSTOMER_LIST_ENDPOINT = BASE_URL + "/api/customer/get";
     public static String STOCK_LIST_ENDPOINT = BASE_URL + "/api/stock/get";
     public static String NEW_ORDER_SYNC_ENDPOINT = BASE_URL + "/api/order/add";
-    public static String TEST_ENDPOINT = BASE_URL + "test_endpoint";
+    public static String PRODUCT_LIST_ENDPOINT = BASE_URL + "/api/stock/productlist";
 }

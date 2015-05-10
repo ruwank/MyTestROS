@@ -25,7 +25,8 @@ public class ROSStock {
     @Expose private String CompCode = null;
     @Expose private String DistributorCode = null;
     @Expose private double UnitPrice = 0.0;
-
+    @Expose private String SuppCode = null;
+    @Expose private String StockLocationCode = null;
 
     public ROSStock() {
         this.availableQuantity = 0;
@@ -42,6 +43,8 @@ public class ROSStock {
         this.DistributorCode = null;
         this.CompCode = null;
         this.UnitPrice = 0.0;
+        this.SuppCode = null;
+        this.StockLocationCode = null;
     }
 
     public void print() {
@@ -57,6 +60,8 @@ public class ROSStock {
                 status + " " +
                 availableQuantity + " " +
                 CompCode + " " +
+                SuppCode + " " +
+                StockLocationCode + " " +
                 UnitPrice);
     }
 
@@ -170,5 +175,21 @@ public class ROSStock {
 
     public void setUnitPrice(double unitPrice) {
         UnitPrice = unitPrice;
+    }
+
+    public String getSuppCode() {
+        return SuppCode;
+    }
+
+    public void setSuppCode(String suppCode) {
+        SuppCode = suppCode;
+    }
+
+    public String getStockLocationCode() {
+        return StockLocationCode;
+    }
+
+    public void setStockLocationCode(String stockLocationCode) {
+        StockLocationCode = stockLocationCode;
     }
 }

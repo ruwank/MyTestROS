@@ -22,7 +22,7 @@ import java.util.ArrayList;
 public class ROSDbHelper extends SQLiteOpenHelper {
 
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 4;
+    public static final int DATABASE_VERSION = 5;
     public static final String DATABASE_NAME = "ROS.db";
 
     private static final String TEXT_TYPE = " TEXT";
@@ -75,7 +75,9 @@ public class ROSDbHelper extends SQLiteOpenHelper {
             ROSDbConstants.NewOrderItem.CL_NAME_PRICE + DECIMAL_TYPE + COMMA_SEP +
             ROSDbConstants.NewOrderItem.CL_NAME_DISCOUNT + DECIMAL_TYPE + COMMA_SEP +
             ROSDbConstants.NewOrderItem.CL_NAME_FREE_ISSUES + INT_TYPE + COMMA_SEP +
-            ROSDbConstants.NewOrderItem.CL_NAME_ITEM_VALUE + DECIMAL_TYPE +
+            ROSDbConstants.NewOrderItem.CL_NAME_ITEM_VALUE + DECIMAL_TYPE + COMMA_SEP +
+            ROSDbConstants.NewOrderItem.CL_NAME_SUPP_CODE + TEXT_TYPE + COMMA_SEP +
+            ROSDbConstants.NewOrderItem.CL_NAME_LOCATION_CODE + TEXT_TYPE +
             ")";
 
     private static final String SQL_CREATE_RETURN_ORDER = "CREATE TABLE " + ROSDbConstants.ReturnOrder.TABLE_NAME +
@@ -122,7 +124,9 @@ public class ROSDbHelper extends SQLiteOpenHelper {
             ROSDbConstants.Stock.CL_NAME_PRODUCT_CODE + TEXT_TYPE + COMMA_SEP +
             ROSDbConstants.Stock.CL_NAME_COMP_CODE + TEXT_TYPE + COMMA_SEP +
             ROSDbConstants.Stock.CL_NAME_DISTRIB_CODE + TEXT_TYPE + COMMA_SEP +
-            ROSDbConstants.Stock.CL_NAME_UNIT_PRICE + DECIMAL_TYPE +
+            ROSDbConstants.Stock.CL_NAME_UNIT_PRICE + DECIMAL_TYPE + COMMA_SEP +
+            ROSDbConstants.Stock.CL_NAME_SUPP_CODE + TEXT_TYPE + COMMA_SEP +
+            ROSDbConstants.Stock.CL_NAME_LOCATION_CODE + TEXT_TYPE +
             ")";
 
     private static final String SQL_CREATE_PRODUCT = "CREATE TABLE " + ROSDbConstants.Product.TABLE_NAME +
@@ -138,7 +142,8 @@ public class ROSDbHelper extends SQLiteOpenHelper {
             ROSDbConstants.Product.CL_NAME_PRODUCT_CODE + TEXT_TYPE + COMMA_SEP +
             ROSDbConstants.Product.CL_NAME_COMP_CODE + TEXT_TYPE + COMMA_SEP +
             ROSDbConstants.Product.CL_NAME_DISTRIB_CODE + TEXT_TYPE + COMMA_SEP +
-            ROSDbConstants.Product.CL_NAME_UNIT_PRICE + DECIMAL_TYPE +
+            ROSDbConstants.Product.CL_NAME_UNIT_PRICE + DECIMAL_TYPE + COMMA_SEP +
+            ROSDbConstants.Product.CL_NAME_SUPP_CODE + TEXT_TYPE +
             ")";
 
     private static final String SQL_DELETE_CUSTOMER =
@@ -490,6 +495,7 @@ public class ROSDbHelper extends SQLiteOpenHelper {
         if (c != null) {
             while (c.moveToNext()){
                 ROSNewOrderItem orderItem = new ROSNewOrderItem();
+
                 orderItem.setItemId(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_ITEM_ID)));
                 orderItem.setOrderId(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_ORDER_ID)));
                 orderItem.setProductCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_PRODUCT_ID)));
@@ -500,6 +506,9 @@ public class ROSDbHelper extends SQLiteOpenHelper {
                 orderItem.setEffPrice(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_ITEM_VALUE)));
                 orderItem.setQtyOrdered(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_QUANTITY)));
                 orderItem.setQtyBonus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_FREE_ISSUES)));
+                orderItem.setSuppCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_SUPP_CODE)));
+                orderItem.setStockLocationCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_LOCATION_CODE)));
+
                 orderItemList.add(orderItem);
             }
 
@@ -520,6 +529,7 @@ public class ROSDbHelper extends SQLiteOpenHelper {
             ROSNewOrderItem orderItem = items.get(i);
 
             ContentValues values = new ContentValues();
+
             values.put(ROSDbConstants.NewOrderItem.CL_NAME_ORDER_ID, orderId);
             values.put(ROSDbConstants.NewOrderItem.CL_NAME_PRODUCT_ID, orderItem.getProductCode());
             values.put(ROSDbConstants.NewOrderItem.CL_NAME_PRODUCT_NAME, orderItem.getProductDescription());
@@ -529,6 +539,8 @@ public class ROSDbHelper extends SQLiteOpenHelper {
             values.put(ROSDbConstants.NewOrderItem.CL_NAME_ITEM_VALUE, orderItem.getEffPrice());
             values.put(ROSDbConstants.NewOrderItem.CL_NAME_QUANTITY, orderItem.getQtyOrdered());
             values.put(ROSDbConstants.NewOrderItem.CL_NAME_FREE_ISSUES, orderItem.getQtyBonus());
+            values.put(ROSDbConstants.NewOrderItem.CL_NAME_SUPP_CODE, orderItem.getSuppCode());
+            values.put(ROSDbConstants.NewOrderItem.CL_NAME_LOCATION_CODE, orderItem.getStockLocationCode());
 
             long itemId = db.insert(ROSDbConstants.NewOrderItem.TABLE_NAME, null, values);
             if (itemId == -1) {
@@ -822,6 +834,83 @@ public class ROSDbHelper extends SQLiteOpenHelper {
     /*
     Stock section
      */
+    public ArrayList<String> getProductNamesForSale(Context context) {
+        SQLiteDatabase db = getReadableDb(context);
+
+        final String SQL_SELECT_STOCK = "SELECT DISTINCT " + ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME + " FROM " + ROSDbConstants.Stock.TABLE_NAME +
+                " WHERE "+ ROSDbConstants.Stock.CL_NAME_AVAILABLE_QTY + " > 0;";
+        Cursor c = db.rawQuery(SQL_SELECT_STOCK, null);
+
+        ArrayList<String> productNames = new ArrayList<String>();
+
+        if (c != null) {
+            while (c.moveToNext()) {
+                productNames.add(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME)));
+            }
+            c.close();
+            db.close();
+        }
+
+        return productNames;
+    }
+
+    public ArrayList<String> getBatchNamesForSale(Context context, String productName) {
+        SQLiteDatabase db = getReadableDb(context);
+
+        final String SQL_SELECT_STOCK = "SELECT DISTINCT " + ROSDbConstants.Stock.CL_NAME_BATCH_NAME + " FROM " + ROSDbConstants.Stock.TABLE_NAME +
+                " WHERE " + ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME + "='" + productName + "';";
+        Cursor c = db.rawQuery(SQL_SELECT_STOCK, null);
+
+        ArrayList<String> batchNames = new ArrayList<String>();
+
+        if (c != null) {
+            while (c.moveToNext()) {
+                batchNames.add(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BATCH_NAME)));
+            }
+            c.close();
+            db.close();
+        }
+
+        return batchNames;
+    }
+
+    public ROSStock getStockForSale(Context context, String productName, String batchName) {
+        SQLiteDatabase db = getReadableDb(context);
+
+        final String SQL_SELECT_STOCK = "SELECT * FROM " + ROSDbConstants.Stock.TABLE_NAME +
+                " WHERE " + ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME + "='" + productName +
+                "' AND " + ROSDbConstants.Stock.CL_NAME_BATCH_NAME + "='" + batchName +"';";
+        Cursor c = db.rawQuery(SQL_SELECT_STOCK, null);
+
+        ROSStock stock = null;
+
+        if (c != null) {
+            c.moveToFirst();
+            stock = new ROSStock();
+
+            stock.setProductDescription(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME)));
+            stock.setProductBatchCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BATCH_NAME)));
+            stock.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BRAND_NAME)));
+            stock.setAgenName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_AGENCY_NAME)));
+            stock.setQuntityInStock(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_ALLOCATED_QTY)));
+            stock.setAvailableQuantity(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_AVAILABLE_QTY)));
+            stock.setStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_STATUS)));
+            stock.setAgenCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_AGENT_CODE)));
+            stock.setBrandCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BRAND_CODE)));
+            stock.setProductCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_CODE)));
+            stock.setCompCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_COMP_CODE)));
+            stock.setDistributorCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_DISTRIB_CODE)));
+            stock.setUnitPrice(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_UNIT_PRICE)));
+            stock.setSuppCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_SUPP_CODE)));
+            stock.setStockLocationCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_LOCATION_CODE)));
+
+            c.close();
+        }
+        db.close();
+
+        return stock;
+    }
+
     public ArrayList<ROSStock> getStocks(Context context) {
 
         SQLiteDatabase db = getReadableDb(context);
@@ -847,116 +936,8 @@ public class ROSDbHelper extends SQLiteOpenHelper {
                 stock.setCompCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_COMP_CODE)));
                 stock.setDistributorCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_DISTRIB_CODE)));
                 stock.setUnitPrice(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_UNIT_PRICE)));
-
-                stockList.add(stock);
-            }
-            c.close();
-            db.close();
-        }
-
-        return stockList;
-    }
-
-    public ArrayList<String> getStockProductNames(Context context) {
-        SQLiteDatabase db = getReadableDb(context);
-
-        final String SQL_SELECT_STOCK = "SELECT DISTINCT " + ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME + " FROM " + ROSDbConstants.Stock.TABLE_NAME + ";";
-        Cursor c = db.rawQuery(SQL_SELECT_STOCK, null);
-
-        ArrayList<String> productNames = new ArrayList<String>();
-
-        if (c != null) {
-            while (c.moveToNext()) {
-                productNames.add(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME)));
-            }
-            c.close();
-            db.close();
-        }
-
-        return productNames;
-    }
-
-    public ArrayList<String> getStockBatchNames(Context context, String productName) {
-        SQLiteDatabase db = getReadableDb(context);
-
-        final String SQL_SELECT_STOCK = "SELECT DISTINCT " + ROSDbConstants.Stock.CL_NAME_BATCH_NAME + " FROM " + ROSDbConstants.Stock.TABLE_NAME +
-                " WHERE " + ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME + "='" + productName + "';";
-        Cursor c = db.rawQuery(SQL_SELECT_STOCK, null);
-
-        ArrayList<String> batchNames = new ArrayList<String>();
-
-        if (c != null) {
-            while (c.moveToNext()) {
-                batchNames.add(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BATCH_NAME)));
-            }
-            c.close();
-            db.close();
-        }
-
-        return batchNames;
-    }
-
-    public ROSStock getStock(Context context, String productName, String batchName) {
-        SQLiteDatabase db = getReadableDb(context);
-
-        final String SQL_SELECT_STOCK = "SELECT * FROM " + ROSDbConstants.Stock.TABLE_NAME +
-                " WHERE " + ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME + "='" + productName +
-                "' AND " + ROSDbConstants.Stock.CL_NAME_BATCH_NAME + "='" + batchName +"';";
-        Cursor c = db.rawQuery(SQL_SELECT_STOCK, null);
-
-        ROSStock stock = null;
-
-        if (c != null) {
-            c.moveToFirst();
-            stock = new ROSStock();
-            stock.setProductDescription(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME)));
-            stock.setProductBatchCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BATCH_NAME)));
-            stock.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BRAND_NAME)));
-            stock.setAgenName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_AGENCY_NAME)));
-            stock.setQuntityInStock(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_ALLOCATED_QTY)));
-            stock.setAvailableQuantity(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_AVAILABLE_QTY)));
-            stock.setStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_STATUS)));
-            stock.setAgenCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_AGENT_CODE)));
-            stock.setBrandCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BRAND_CODE)));
-            stock.setProductCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_CODE)));
-            stock.setCompCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_COMP_CODE)));
-            stock.setDistributorCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_DISTRIB_CODE)));
-            stock.setUnitPrice(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_UNIT_PRICE)));
-
-            c.close();
-        }
-        db.close();
-
-        return stock;
-    }
-
-    public ArrayList<ROSStock> getStocksForSale(Context context) {
-
-        SQLiteDatabase db = getReadableDb(context);
-
-        final String SQL_SELECT_STOCK = "SELECT * FROM " + ROSDbConstants.Stock.TABLE_NAME +
-                " WHERE " + ROSDbConstants.Stock.CL_NAME_AVAILABLE_QTY + " > 0 AND " +
-                ROSDbConstants.Stock.CL_NAME_STATUS + " = 0;";
-        Cursor c = db.rawQuery(SQL_SELECT_STOCK, null);
-
-        ArrayList<ROSStock> stockList = new ArrayList<ROSStock>();
-
-        if (c != null) {
-            while (c.moveToNext()) {
-                ROSStock stock = new ROSStock();
-                stock.setProductDescription(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME)));
-                stock.setProductBatchCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BATCH_NAME)));
-                stock.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BRAND_NAME)));
-                stock.setAgenName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_AGENCY_NAME)));
-                stock.setQuntityInStock(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_ALLOCATED_QTY)));
-                stock.setAvailableQuantity(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_AVAILABLE_QTY)));
-                stock.setStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_STATUS)));
-                stock.setAgenCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_AGENT_CODE)));
-                stock.setBrandCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BRAND_CODE)));
-                stock.setProductCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_CODE)));
-                stock.setCompCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_COMP_CODE)));
-                stock.setDistributorCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_DISTRIB_CODE)));
-                stock.setUnitPrice(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_UNIT_PRICE)));
+                stock.setSuppCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_SUPP_CODE)));
+                stock.setStockLocationCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_LOCATION_CODE)));
 
                 stockList.add(stock);
             }
@@ -980,6 +961,7 @@ public class ROSDbHelper extends SQLiteOpenHelper {
         if (c != null) {
             while (c.moveToNext()) {
                 ROSStock stock = new ROSStock();
+
                 stock.setProductDescription(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME)));
                 stock.setProductBatchCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BATCH_NAME)));
                 stock.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BRAND_NAME)));
@@ -993,6 +975,9 @@ public class ROSDbHelper extends SQLiteOpenHelper {
                 stock.setCompCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_COMP_CODE)));
                 stock.setDistributorCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_DISTRIB_CODE)));
                 stock.setUnitPrice(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_UNIT_PRICE)));
+                stock.setSuppCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_SUPP_CODE)));
+                stock.setStockLocationCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_LOCATION_CODE)));
+
                 stockList.add(stock);
             }
             c.close();
@@ -1009,6 +994,7 @@ public class ROSDbHelper extends SQLiteOpenHelper {
             ROSStock stock = stocks.get(i);
 
             ContentValues values = new ContentValues();
+
             values.put(ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME, stock.getProductDescription());
             values.put(ROSDbConstants.Stock.CL_NAME_BATCH_NAME, stock.getProductBatchCode());
             values.put(ROSDbConstants.Stock.CL_NAME_BRAND_NAME, stock.getBrandName());
@@ -1022,6 +1008,8 @@ public class ROSDbHelper extends SQLiteOpenHelper {
             values.put(ROSDbConstants.Stock.CL_NAME_COMP_CODE, stock.getCompCode());
             values.put(ROSDbConstants.Stock.CL_NAME_DISTRIB_CODE, stock.getDistributorCode());
             values.put(ROSDbConstants.Stock.CL_NAME_UNIT_PRICE, stock.getUnitPrice());
+            values.put(ROSDbConstants.Stock.CL_NAME_SUPP_CODE, stock.getSuppCode());
+            values.put(ROSDbConstants.Stock.CL_NAME_LOCATION_CODE, stock.getStockLocationCode());
 
             db.insert(ROSDbConstants.Stock.TABLE_NAME, null, values);
         }
@@ -1033,6 +1021,7 @@ public class ROSDbHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDb(context);
 
         ContentValues values = new ContentValues();
+
         values.put(ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME, stock.getProductDescription());
         values.put(ROSDbConstants.Stock.CL_NAME_BATCH_NAME, stock.getProductBatchCode());
         values.put(ROSDbConstants.Stock.CL_NAME_BRAND_NAME, stock.getBrandName());
@@ -1046,6 +1035,8 @@ public class ROSDbHelper extends SQLiteOpenHelper {
         values.put(ROSDbConstants.Stock.CL_NAME_COMP_CODE, stock.getCompCode());
         values.put(ROSDbConstants.Stock.CL_NAME_DISTRIB_CODE, stock.getDistributorCode());
         values.put(ROSDbConstants.Stock.CL_NAME_UNIT_PRICE, stock.getUnitPrice());
+        values.put(ROSDbConstants.Stock.CL_NAME_SUPP_CODE, stock.getSuppCode());
+        values.put(ROSDbConstants.Stock.CL_NAME_LOCATION_CODE, stock.getStockLocationCode());
 
         db.insert(ROSDbConstants.Stock.TABLE_NAME, null, values);
         db.close();
@@ -1067,19 +1058,22 @@ public class ROSDbHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDb(context);
 
         ContentValues values = new ContentValues();
+
         values.put(ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME, stock.getProductDescription());
         values.put(ROSDbConstants.Stock.CL_NAME_BATCH_NAME, stock.getProductBatchCode());
         values.put(ROSDbConstants.Stock.CL_NAME_BRAND_NAME, stock.getBrandName());
         values.put(ROSDbConstants.Stock.CL_NAME_AGENCY_NAME, stock.getAgenName());
         values.put(ROSDbConstants.Stock.CL_NAME_ALLOCATED_QTY, stock.getQuntityInStock());
         values.put(ROSDbConstants.Stock.CL_NAME_AVAILABLE_QTY, stock.getAvailableQuantity());
-        values.put(ROSDbConstants.Stock.CL_NAME_STATUS, 1);
+        values.put(ROSDbConstants.Stock.CL_NAME_STATUS, stock.getStatus());
         values.put(ROSDbConstants.Stock.CL_NAME_AGENT_CODE, stock.getAgenCode());
         values.put(ROSDbConstants.Stock.CL_NAME_BRAND_CODE, stock.getBrandCode());
         values.put(ROSDbConstants.Stock.CL_NAME_PRODUCT_CODE, stock.getProductCode());
         values.put(ROSDbConstants.Stock.CL_NAME_COMP_CODE, stock.getCompCode());
         values.put(ROSDbConstants.Stock.CL_NAME_DISTRIB_CODE, stock.getDistributorCode());
         values.put(ROSDbConstants.Stock.CL_NAME_UNIT_PRICE, stock.getUnitPrice());
+        values.put(ROSDbConstants.Stock.CL_NAME_SUPP_CODE, stock.getSuppCode());
+        values.put(ROSDbConstants.Stock.CL_NAME_LOCATION_CODE, stock.getStockLocationCode());
 
         db.insert(ROSDbConstants.Stock.TABLE_NAME, null, values);
         db.close();
@@ -1108,6 +1102,7 @@ public class ROSDbHelper extends SQLiteOpenHelper {
         if (c != null) {
             while (c.moveToNext()) {
                 ROSProduct product = new ROSProduct();
+
                 product.setProductDescription(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME)));
                 product.setProductBatchCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BATCH_NAME)));
                 product.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BRAND_NAME)));
@@ -1119,6 +1114,8 @@ public class ROSDbHelper extends SQLiteOpenHelper {
                 product.setCompCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_COMP_CODE)));
                 product.setDistributorCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_DISTRIB_CODE)));
                 product.setUnitPrice(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_UNIT_PRICE)));
+                product.setSuppCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_SUPP_CODE)));
+
                 productList.add(product);
             }
             c.close();
@@ -1126,6 +1123,80 @@ public class ROSDbHelper extends SQLiteOpenHelper {
         }
 
         return productList;
+    }
+
+    public ArrayList<String> getProductNamesForReturns(Context context) {
+        SQLiteDatabase db = getReadableDb(context);
+
+        final String SQL_SELECT_PRODUCT_NAMES = "SELECT DISTINCT " + ROSDbConstants.Product.CL_NAME_PRODUCT_NAME + " FROM " + ROSDbConstants.Product.TABLE_NAME + ";";
+        Cursor c = db.rawQuery(SQL_SELECT_PRODUCT_NAMES, null);
+
+        ArrayList<String> productNames = new ArrayList<String>();
+
+        if (c != null) {
+            while (c.moveToNext()) {
+                productNames.add(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_PRODUCT_NAME)));
+            }
+            c.close();
+            db.close();
+        }
+
+        return productNames;
+    }
+
+    public ArrayList<String> getBatchNamesForReturns(Context context, String productName) {
+        SQLiteDatabase db = getReadableDb(context);
+
+        final String SQL_SELECT_PRODUCT_BATCHES = "SELECT DISTINCT " + ROSDbConstants.Product.CL_NAME_BATCH_NAME + " FROM " + ROSDbConstants.Product.TABLE_NAME +
+                " WHERE " + ROSDbConstants.Product.CL_NAME_PRODUCT_NAME + "='" + productName + "';";
+        Cursor c = db.rawQuery(SQL_SELECT_PRODUCT_BATCHES, null);
+
+        ArrayList<String> batchNames = new ArrayList<String>();
+
+        if (c != null) {
+            while (c.moveToNext()) {
+                batchNames.add(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BATCH_NAME)));
+            }
+            c.close();
+            db.close();
+        }
+
+        return batchNames;
+    }
+
+    public ROSProduct getProductForReturns(Context context, String productName, String batchName) {
+
+        SQLiteDatabase db = getReadableDb(context);
+
+        final String SQL_SELECT_PRODUCT = "SELECT * FROM " + ROSDbConstants.Product.TABLE_NAME +
+                " WHERE " + ROSDbConstants.Product.CL_NAME_PRODUCT_NAME + "='" + productName +
+                "' AND " + ROSDbConstants.Product.CL_NAME_BATCH_NAME + "='" + batchName +"';";
+        Cursor c = db.rawQuery(SQL_SELECT_PRODUCT, null);
+
+        ROSProduct product = null;
+
+        if (c != null) {
+            c.moveToFirst();
+            product = new ROSProduct();
+
+            product.setProductDescription(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME)));
+            product.setProductBatchCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BATCH_NAME)));
+            product.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BRAND_NAME)));
+            product.setAgenName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_AGENCY_NAME)));
+            product.setQuntityInStock(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_ALLOCATED_QTY)));
+            product.setAgenCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_AGENT_CODE)));
+            product.setBrandCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BRAND_CODE)));
+            product.setProductCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_CODE)));
+            product.setCompCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_COMP_CODE)));
+            product.setDistributorCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_DISTRIB_CODE)));
+            product.setUnitPrice(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_UNIT_PRICE)));
+            product.setSuppCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_SUPP_CODE)));
+
+            c.close();
+        }
+        db.close();
+
+        return product;
     }
 
     public void insertProducts(Context context, ArrayList<ROSProduct> products) {
@@ -1146,6 +1217,7 @@ public class ROSDbHelper extends SQLiteOpenHelper {
             values.put(ROSDbConstants.Stock.CL_NAME_COMP_CODE, product.getCompCode());
             values.put(ROSDbConstants.Stock.CL_NAME_DISTRIB_CODE, product.getDistributorCode());
             values.put(ROSDbConstants.Stock.CL_NAME_UNIT_PRICE, product.getUnitPrice());
+            values.put(ROSDbConstants.Stock.CL_NAME_SUPP_CODE, product.getSuppCode());
 
             db.insert(ROSDbConstants.Product.TABLE_NAME, null, values);
         }
