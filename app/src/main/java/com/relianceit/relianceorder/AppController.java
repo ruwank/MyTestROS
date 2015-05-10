@@ -9,7 +9,7 @@ import android.util.Log;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
-import com.relianceit.relianceorder.db.ROSDbHelper;
+import com.relianceit.relianceorder.models.ROSCustomer;
 import com.relianceit.relianceorder.models.ROSUser;
 import com.relianceit.relianceorder.util.AppDataManager;
 import com.relianceit.relianceorder.util.Constants;
@@ -24,6 +24,7 @@ public class AppController extends Application {
     private RequestQueue mRequestQueue;
 
     private static AppController mInstance;
+    private ROSCustomer rosCustomer;
  
     @Override
     public void onCreate() {
@@ -103,4 +104,12 @@ public class AppController extends Application {
 
        user.setDeviceToken(getDeviceId());
    }
+
+    public ROSCustomer getRosCustomer() {
+        return rosCustomer;
+    }
+
+    public void setRosCustomer(ROSCustomer rosCustomer) {
+        this.rosCustomer = rosCustomer;
+    }
 }

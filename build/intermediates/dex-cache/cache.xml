@@ -2,53 +2,53 @@
 <items version="2" >
 
     <item
-        jar="/Users/sura/Documents/Development/Android/SOS/ROS/app/build/intermediates/exploded-aar/com.google.android.gms/play-services/6.5.87/classes.jar"
-        jumboMode="false"
-        revision="21.1.2"
-        sha1="dd9247ea0fabe8ee479638c4b4a23e93752be256">
-        <dex dex="/Users/sura/Documents/Development/Android/SOS/ROS/app/build/intermediates/pre-dexed/debug/classes-c8a0e84976d23cf59c9df7c325798cb072a11437.jar" />
-    </item>
-    <item
-        jar="/Applications/Android/android-sdk-mac_x86/extras/android/m2repository/com/android/support/support-annotations/21.0.3/support-annotations-21.0.3.jar"
-        jumboMode="false"
-        revision="21.1.2"
-        sha1="4b74cefe1f0c1b819e7260c8627a14674e37fd35">
-        <dex dex="/Users/sura/Documents/Development/Android/SOS/ROS/app/build/intermediates/pre-dexed/debug/support-annotations-21.0.3-5bf5dd3b84ded2f72b2ebcff670a55f93c905035.jar" />
-    </item>
-    <item
-        jar="/Users/sura/Documents/Development/Android/SOS/ROS/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/21.0.3/classes.jar"
-        jumboMode="false"
-        revision="21.1.2"
-        sha1="81d42bf983a8741f4888a6e333e454e4a5e0eeb7">
-        <dex dex="/Users/sura/Documents/Development/Android/SOS/ROS/app/build/intermediates/pre-dexed/debug/classes-efc1dd00da2b77bb57a29178e946dbf60966731a.jar" />
-    </item>
-    <item
-        jar="/Users/sura/Documents/Development/Android/SOS/ROS/app/libs/gson-2.3.1.jar"
-        jumboMode="false"
-        revision="21.1.2"
-        sha1="ecb6e1f8e4b0e84c4b886c2f14a1500caf309757">
-        <dex dex="/Users/sura/Documents/Development/Android/SOS/ROS/app/build/intermediates/pre-dexed/debug/gson-2.3.1-f0abcef3829d27a80c675eb9dab781fa404ff79b.jar" />
-    </item>
-    <item
-        jar="/Users/sura/Documents/Development/Android/SOS/ROS/app/libs/volley.jar"
+        jar="/Users/Rasika/Documents/Project/Rtech/Reliance/src/1.0.2/MyTestROS/app/libs/volley.jar"
         jumboMode="false"
         revision="21.1.2"
         sha1="d4aaa36e04ee71a83444f8367c97a46fda662d2c">
-        <dex dex="/Users/sura/Documents/Development/Android/SOS/ROS/app/build/intermediates/pre-dexed/debug/volley-e0efd0c39938d64d228c36745a5ce8157e5f7d77.jar" />
+        <dex dex="/Users/Rasika/Documents/Project/Rtech/Reliance/src/1.0.2/MyTestROS/app/build/intermediates/pre-dexed/debug/volley-5dde0984e94172f94b6b24e568503d72eb1fa279.jar" />
     </item>
     <item
-        jar="/Users/sura/Documents/Development/Android/SOS/ROS/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/classes.jar"
+        jar="/Users/Rasika/Documents/Project/Rtech/Reliance/src/1.0.2/MyTestROS/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/classes.jar"
         jumboMode="false"
         revision="21.1.2"
         sha1="2c91c949a45a21cdecf26e03951e46c7beec9ad8">
-        <dex dex="/Users/sura/Documents/Development/Android/SOS/ROS/app/build/intermediates/pre-dexed/debug/classes-feac5c841d7b0a190b1a9bcf0ebeff97859d14fd.jar" />
+        <dex dex="/Users/Rasika/Documents/Project/Rtech/Reliance/src/1.0.2/MyTestROS/app/build/intermediates/pre-dexed/debug/classes-19ec6ae8d9ef4e68014a43516e1d3cf1ad0bba1e.jar" />
     </item>
     <item
-        jar="/Users/sura/Documents/Development/Android/SOS/ROS/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/libs/internal_impl-21.0.3.jar"
+        jar="/Users/Rasika/Library/Android/sdk/extras/android/m2repository/com/android/support/support-annotations/21.0.3/support-annotations-21.0.3.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="4b74cefe1f0c1b819e7260c8627a14674e37fd35">
+        <dex dex="/Users/Rasika/Documents/Project/Rtech/Reliance/src/1.0.2/MyTestROS/app/build/intermediates/pre-dexed/debug/support-annotations-21.0.3-db74b392e807e1d6d5725a8f4140c96a39169009.jar" />
+    </item>
+    <item
+        jar="/Users/Rasika/Documents/Project/Rtech/Reliance/src/1.0.2/MyTestROS/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.3/libs/internal_impl-21.0.3.jar"
         jumboMode="false"
         revision="21.1.2"
         sha1="01ec05bfbafcc07646ba813000bf2ef11742dd03">
-        <dex dex="/Users/sura/Documents/Development/Android/SOS/ROS/app/build/intermediates/pre-dexed/debug/internal_impl-21.0.3-c04583ac6937ad07c7aaa2c401ae1bc1ffaa562c.jar" />
+        <dex dex="/Users/Rasika/Documents/Project/Rtech/Reliance/src/1.0.2/MyTestROS/app/build/intermediates/pre-dexed/debug/internal_impl-21.0.3-08af72412d4a37f32b8214e7f9968c608ffaaedc.jar" />
+    </item>
+    <item
+        jar="/Users/Rasika/Documents/Project/Rtech/Reliance/src/1.0.2/MyTestROS/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/21.0.3/classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="81d42bf983a8741f4888a6e333e454e4a5e0eeb7">
+        <dex dex="/Users/Rasika/Documents/Project/Rtech/Reliance/src/1.0.2/MyTestROS/app/build/intermediates/pre-dexed/debug/classes-f2cbbfd46e64402a7aea5f33cf7a16fa242b3269.jar" />
+    </item>
+    <item
+        jar="/Users/Rasika/Documents/Project/Rtech/Reliance/src/1.0.2/MyTestROS/app/build/intermediates/exploded-aar/com.google.android.gms/play-services/6.5.87/classes.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="dd9247ea0fabe8ee479638c4b4a23e93752be256">
+        <dex dex="/Users/Rasika/Documents/Project/Rtech/Reliance/src/1.0.2/MyTestROS/app/build/intermediates/pre-dexed/debug/classes-7d1a255ce8ce7628bfa60553a3b3c5ca215e6127.jar" />
+    </item>
+    <item
+        jar="/Users/Rasika/Documents/Project/Rtech/Reliance/src/1.0.2/MyTestROS/app/libs/gson-2.3.1.jar"
+        jumboMode="false"
+        revision="21.1.2"
+        sha1="ecb6e1f8e4b0e84c4b886c2f14a1500caf309757">
+        <dex dex="/Users/Rasika/Documents/Project/Rtech/Reliance/src/1.0.2/MyTestROS/app/build/intermediates/pre-dexed/debug/gson-2.3.1-9451ecb545c43ee46a270bd9ccc0e4d6af1e18d2.jar" />
     </item>
 
 </items>
