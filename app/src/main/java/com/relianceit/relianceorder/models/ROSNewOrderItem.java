@@ -1,11 +1,15 @@
 package com.relianceit.relianceorder.models;
 
+import android.util.Log;
+
 import com.google.gson.annotations.Expose;
 
 /**
  * Created by sura on 4/28/15.
  */
 public class ROSNewOrderItem {
+
+    public static final String TAG = ROSNewOrderItem.class.getSimpleName();
 
     private String itemId = null;
     private String orderId = null;
@@ -17,6 +21,8 @@ public class ROSNewOrderItem {
     @Expose private double ProdDiscount = 0.0;
     @Expose private int QtyBonus = 0;
     @Expose private double EffPrice = 0.0;
+    @Expose private String SuppCode = null;
+    @Expose private String StockLocationCode = null;
 
     public ROSNewOrderItem() {
         this.itemId = null;
@@ -29,6 +35,18 @@ public class ROSNewOrderItem {
         this.ProdDiscount = 0.0;
         this.QtyBonus = 0;
         this.EffPrice = 0.0;
+    }
+
+    public void print() {
+        Log.i(TAG, ProductDescription + " " +
+                ProductBatchCode + " " +
+                QtyOrdered + " " +
+                ProdDiscount + " " +
+                QtyBonus + " " +
+                EffPrice + " " +
+                ProductCode + " " +
+                SuppCode + " " +
+                UnitPrice);
     }
 
     public String getItemId() {
@@ -109,5 +127,21 @@ public class ROSNewOrderItem {
 
     public void setEffPrice(double effPrice) {
         this.EffPrice = effPrice;
+    }
+
+    public String getSuppCode() {
+        return SuppCode;
+    }
+
+    public void setSuppCode(String suppCode) {
+        SuppCode = suppCode;
+    }
+
+    public String getStockLocationCode() {
+        return StockLocationCode;
+    }
+
+    public void setStockLocationCode(String stockLocationCode) {
+        StockLocationCode = stockLocationCode;
     }
 }

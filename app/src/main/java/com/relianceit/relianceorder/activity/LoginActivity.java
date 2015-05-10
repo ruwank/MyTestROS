@@ -38,8 +38,8 @@ public class LoginActivity extends ActionBarActivity {
 
     public static final String TAG = LoginActivity.class.getSimpleName();
 
-    private String username = "User_Reliance";
-    private String password = "User_10";
+    private String username = "Reliance";
+    private String password = "10";
 
     Button loginBtn;
     @Override
@@ -79,7 +79,7 @@ public class LoginActivity extends ActionBarActivity {
 //                HomeActivity.class);
 //        startActivity(intent);
 
-        sendLoginRequest();
+        //sendLoginRequest();
 
         GeneralServiceHandler generalServiceHandler = new GeneralServiceHandler(this);
         generalServiceHandler.doDailyContentUpdate(TAG, new GeneralServiceHandler.DailyUpdateListener() {
@@ -117,6 +117,7 @@ public class LoginActivity extends ActionBarActivity {
 
         //Authorization: Basic <username>:<password>:<deviceId>
         final String params = "Basic " + username + ":" + password + ":" + "18388499282";
+        Log.i(TAG, "Authorization: " + params);
 
         JsonObjectRequest loginRequest = new JsonObjectRequest(Request.Method.POST, AppURLs.LOGIN_ENDPOINT, null,
                 new Response.Listener<JSONObject>() {

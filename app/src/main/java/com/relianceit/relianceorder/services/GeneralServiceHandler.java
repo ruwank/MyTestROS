@@ -109,16 +109,17 @@ public class GeneralServiceHandler {
 
     private void productsDownloaded(ArrayList<ROSProduct> products, final String requestTag, final DailyUpdateListener listener) {
 
-//        ArrayList<ROSProduct> productToDb = new ArrayList<ROSProduct>();
-//        for (int i = 0; i < products.size(); i++) {
-//            ROSProduct product = products.get(i);
-//            productToDb.add(product);
-//        }
+        ArrayList<ROSProduct> productToDb = new ArrayList<ROSProduct>();
+        for (int i = 0; i < products.size(); i++) {
+            ROSProduct product = products.get(i);
+            product.print();
+            productToDb.add(product);
+        }
 
         ROSDbHelper dbHelper = new ROSDbHelper(context);
         dbHelper.clearProductTable(context);
-        //dbHelper.insertProducts(context, productToDb);
-        dbHelper.addProducts(context);
+        dbHelper.insertProducts(context, productToDb);
+        //dbHelper.addProducts(context);
 
         productListDownloaded = true;
         doDailyContentUpdate(requestTag, listener);
@@ -223,48 +224,48 @@ public class GeneralServiceHandler {
 
     private void downloadProductsList(final String requestTag, final DailyUpdateListener listener) {
 
-        productsDownloaded(null, requestTag, listener);
+        //productsDownloaded(null, requestTag, listener);
 
 
-//        ROSUser user = ROSUser.getInstance();
-//        //Authorization: Token <auth token>:<deviceId>
-//        final String params = "Token " + user.getAccessToken() + ":" + user.getDeviceToken();
-//
-//        JsonArrayRequest productRequest = new JsonArrayRequest(AppURLs.STOCK_LIST_ENDPOINT, new Response.Listener<JSONArray>() {
-//            @Override
-//            public void onResponse(JSONArray jsonArray) {
-//                Log.i(TAG, "Products list success " + jsonArray.toString());
-//
-//                Type listType = new TypeToken<ArrayList<ROSProduct>>(){}.getType();
-//                Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
-//                ArrayList<ROSProduct> products = gson.fromJson(jsonArray.toString(), listType);
-//
-//                if(products == null) products = new ArrayList<ROSProduct>();
-//                Log.i(TAG, "Product list size: " + products.size());
-//                productsDownloaded(products, requestTag, listener);
-//            }
-//        }, new Response.ErrorListener() {
-//            @Override
-//            public void onErrorResponse(VolleyError volleyError) {
-//                Log.i(TAG, "Products list error " + volleyError.toString());
-//                if (volleyError.networkResponse != null && volleyError.networkResponse.statusCode == 401) {
-//                    Log.i(TAG, "Products list failed ====== Unauthorized");
-//                }else {
-//                    Log.i(TAG, "Products list failed ====== Server error");
-//                }
-//                dailyUpdateFailed(requestTag, listener, volleyError);
-//            }
-//        })
-//        {
-//            @Override
-//            public Map<String, String> getHeaders() throws AuthFailureError {
-//                HashMap<String, String> headers = new HashMap<String, String>();
-//                headers.put("Authorization", params);
-//                return headers;
-//            }
-//        };
-//
-//        AppController.getInstance().addToRequestQueue(productRequest, requestTag);
+        ROSUser user = ROSUser.getInstance();
+        //Authorization: Token <auth token>:<deviceId>
+        final String params = "Token " + user.getAccessToken() + ":" + user.getDeviceToken();
+
+        JsonArrayRequest productRequest = new JsonArrayRequest(AppURLs.PRODUCT_LIST_ENDPOINT, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray jsonArray) {
+                Log.i(TAG, "Products list success " + jsonArray.toString());
+
+                Type listType = new TypeToken<ArrayList<ROSProduct>>(){}.getType();
+                Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+                ArrayList<ROSProduct> products = gson.fromJson(jsonArray.toString(), listType);
+
+                if(products == null) products = new ArrayList<ROSProduct>();
+                Log.i(TAG, "Product list size: " + products.size());
+                productsDownloaded(products, requestTag, listener);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Log.i(TAG, "Products list error " + volleyError.toString());
+                if (volleyError.networkResponse != null && volleyError.networkResponse.statusCode == 401) {
+                    Log.i(TAG, "Products list failed ====== Unauthorized");
+                }else {
+                    Log.i(TAG, "Products list failed ====== Server error");
+                }
+                dailyUpdateFailed(requestTag, listener, volleyError);
+            }
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                headers.put("Authorization", params);
+                return headers;
+            }
+        };
+
+        AppController.getInstance().addToRequestQueue(productRequest, requestTag);
     }
 
 }

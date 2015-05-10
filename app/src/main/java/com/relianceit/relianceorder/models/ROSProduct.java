@@ -22,6 +22,7 @@ public class ROSProduct {
     @Expose private String CompCode = null;
     @Expose private String DistributorCode = null;
     @Expose private double UnitPrice = 0.0;
+    @Expose private String SuppCode = null;
 
     public ROSProduct() {
         this.ProductDescription = null;
@@ -35,6 +36,7 @@ public class ROSProduct {
         this.DistributorCode = null;
         this.UnitPrice = 0.0;
         this.QuntityInStock = 0;
+        this.SuppCode = null;
     }
 
     public void print() {
@@ -48,6 +50,7 @@ public class ROSProduct {
                 ProductCode + " " +
                 DistributorCode + " " +
                 CompCode + " " +
+                SuppCode + " " +
                 UnitPrice);
     }
 
@@ -137,5 +140,13 @@ public class ROSProduct {
 
     public void setUnitPrice(double unitPrice) {
         UnitPrice = unitPrice;
+    }
+
+    public String getSuppCode() {
+        return SuppCode;
+    }
+
+    public void setSuppCode(String suppCode) {
+        SuppCode = suppCode;
     }
 }

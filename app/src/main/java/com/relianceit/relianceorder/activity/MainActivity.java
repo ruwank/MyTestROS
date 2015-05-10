@@ -23,13 +23,14 @@ public class MainActivity extends ActionBarActivity {
 
         String logged = AppDataManager.getData(this, Constants.DM_LOGGED_KEY);
         if (logged != null && logged.equalsIgnoreCase("yes")) {
-            loadHome();
+            //loadHome();
         }else {
-            loadLogin();
+            //loadLogin();
         }
 
-        downloadDailyData();
+        loadLogin();
 
+        //downloadDailyData();
     }
 
     private void downloadDailyData(){
