@@ -1,5 +1,7 @@
 package com.relianceit.relianceorder.activity;
 
+import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -8,6 +10,7 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
@@ -26,6 +29,7 @@ import com.relianceit.relianceorder.services.NewOrderServiceHandler;
 import com.relianceit.relianceorder.util.AppDataManager;
 import com.relianceit.relianceorder.util.AppURLs;
 import com.relianceit.relianceorder.util.AppUtils;
+import com.relianceit.relianceorder.util.ConnectionDetector;
 import com.relianceit.relianceorder.util.Constants;
 
 import org.json.JSONException;
@@ -43,17 +47,21 @@ public class LoginActivity extends ActionBarActivity {
     private String username = "Reliance";
     private String password = "10";
 
+    private EditText userNameET = null;
+    private EditText passwordET = null;
+
     Button loginBtn;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+        userNameET = (EditText)findViewById(R.id.userName);
+        passwordET = (EditText)findViewById(R.id.password);
         loginBtn=(Button)findViewById(R.id.loginBtn);
         loginBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                loadLoginScreen();
-
+                loginButtonTapped();
             }
 
         });
@@ -76,15 +84,26 @@ public class LoginActivity extends ActionBarActivity {
         actionBar.setDisplayShowCustomEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);
     }
-    private  void loadLoginScreen(){
-//        Intent intent = new Intent(getApplicationContext(),
-//                HomeActivity.class);
-//        startActivity(intent);
+    private void loginButtonTapped() {
 
-        //sendLoginRequest();
-        //loginCompleted("f87d868d-df7f-4e98-aa79-0e795c61a19f");
+        username = userNameET.getText().toString().trim();
+        password = passwordET.getText().toString().trim();
 
-        //testDownloadContent();
+        if (username.length() == 0) {
+            AppUtils.showAlertDialog(this, "Invalid User Name", "Please enter a valid User Name.");
+            return;
+        }
+
+        if (password.length() == 0) {
+            AppUtils.showAlertDialog(this, "Invalid Password", "Please enter a valid Password.");
+            return;
+        }
+
+        if (!ConnectionDetector.isConnected(this)) {
+            AppUtils.showAlertDialog(this, Constants.MSG_NO_INTERNET_TITLE, Constants.MSG_NO_INTERNET_MSG);
+        }else {
+            sendLoginRequest();
+        }
     }
 
     private void testDownloadContent() {
@@ -129,7 +148,7 @@ public class LoginActivity extends ActionBarActivity {
 
         //Authorization: Basic <username>:<password>:<deviceId>
         final String params = "Basic " + username + ":" + password + ":" + "18388499282";
-        Log.i(TAG, "Authorization: " + params);
+        Log.i(TAG, "Login Authorization: " + params);
 
         JsonObjectRequest loginRequest = new JsonObjectRequest(Request.Method.POST, AppURLs.LOGIN_ENDPOINT, null,
                 new Response.Listener<JSONObject>() {
@@ -143,9 +162,7 @@ public class LoginActivity extends ActionBarActivity {
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-
                         loginCompleted(token);
-
                     }
                 },
                 new Response.ErrorListener() {
@@ -155,8 +172,10 @@ public class LoginActivity extends ActionBarActivity {
                         Log.i(TAG, "Login error " + volleyError.toString());
                         if (volleyError.networkResponse != null && volleyError.networkResponse.statusCode == 401) {
                             Log.i(TAG, "Login failed ====== Unauthorized");
+                            loginFailed(401);
                         }else {
                             Log.i(TAG, "Login failed ====== Server error");
+                            loginFailed(500);
                         }
                     }
                 })
@@ -170,7 +189,16 @@ public class LoginActivity extends ActionBarActivity {
         };
 
         AppController.getInstance().addToRequestQueue(loginRequest, TAG);
-        //TODO show indicator
+        AppUtils.showProgressDialog(this);
+    }
+
+    private void loginFailed(int errorCode) {
+        AppUtils.dismissProgressDialog();
+        if (errorCode == 401) {
+            AppUtils.showAlertDialog(this, "Login Failed!", "Invalid user credentials.");
+        }else {
+            AppUtils.showAlertDialog(this, "Login Failed!", "Server error. Please try again.");
+        }
     }
 
     private void loginCompleted(String accessToken) {
@@ -192,6 +220,16 @@ public class LoginActivity extends ActionBarActivity {
         AppDataManager.saveData(getApplicationContext(), Constants.DM_ACCESS_TOKEN_KEY, encodedToken);
         AppDataManager.saveData(getApplicationContext(), Constants.DM_USERNAME_KEY, username);
         AppDataManager.saveData(getApplicationContext(), Constants.DM_LOGGED_KEY, "yes");
+
+        AppUtils.dismissProgressDialog();
+
+        Intent returnIntent = new Intent();
+        setResult(RESULT_OK, returnIntent);
+        finish();
     }
 
+    @Override
+    public void onBackPressed() {
+
+    }
 }
