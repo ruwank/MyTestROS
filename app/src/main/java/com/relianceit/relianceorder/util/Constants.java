@@ -31,4 +31,10 @@ public class Constants {
         public static final int ONLINE = 2;
     }
 
+    //Message section
+    //Need to create ne class
+
+    public static final String MSG_NO_INTERNET_TITLE = "You are offline";
+    public static final String MSG_NO_INTERNET_MSG = "Make sure you have a good signal strength.";
+
 }
