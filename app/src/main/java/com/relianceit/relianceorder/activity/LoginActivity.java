@@ -38,8 +38,8 @@ public class LoginActivity extends ActionBarActivity {
 
     public static final String TAG = LoginActivity.class.getSimpleName();
 
-    private String username = "Reliance";
-    private String password = "10";
+    private String username = "User_Reliance";
+    private String password = "User_10";
 
     Button loginBtn;
     @Override
@@ -80,7 +80,6 @@ public class LoginActivity extends ActionBarActivity {
 //        startActivity(intent);
 
         sendLoginRequest();
-//        loginCompleted("F240484F-7565-4CC4-BC93-98699791FBE9");
 
         GeneralServiceHandler generalServiceHandler = new GeneralServiceHandler(this);
         generalServiceHandler.doDailyContentUpdate(TAG, new GeneralServiceHandler.DailyUpdateListener() {
