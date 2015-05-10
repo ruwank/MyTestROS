@@ -82,18 +82,18 @@ public class LoginActivity extends ActionBarActivity {
         sendLoginRequest();
 //        loginCompleted("F240484F-7565-4CC4-BC93-98699791FBE9");
 
-//        GeneralServiceHandler generalServiceHandler = new GeneralServiceHandler(this);
-//        generalServiceHandler.doDailyContentUpdate(TAG, new GeneralServiceHandler.DailyUpdateListener() {
-//            @Override
-//            public void onDailyUpdateSuccess() {
-//                tempShowData();
-//            }
-//
-//            @Override
-//            public void onDailyUpdateErrorResponse(VolleyError error) {
-//
-//            }
-//        });
+        GeneralServiceHandler generalServiceHandler = new GeneralServiceHandler(this);
+        generalServiceHandler.doDailyContentUpdate(TAG, new GeneralServiceHandler.DailyUpdateListener() {
+            @Override
+            public void onDailyUpdateSuccess() {
+                tempShowData();
+            }
+
+            @Override
+            public void onDailyUpdateErrorResponse(VolleyError error) {
+
+            }
+        });
     }
 
     private void tempShowData() {
