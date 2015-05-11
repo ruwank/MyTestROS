@@ -54,9 +54,22 @@ public class AppUtils {
         progressDialog.show();
     }
 
+    public static void showProgressDialog(Context context, String text) {
+        if(text == null) text = "";
+        if (progressDialog == null) {
+            progressDialog = new ProgressDialog(context);
+            progressDialog.setCanceledOnTouchOutside(false);
+            progressDialog.setCancelable(false);
+        }
+
+        progressDialog.setMessage(text);
+        progressDialog.show();
+    }
+
     public static void dismissProgressDialog() {
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
         }
+        progressDialog = null;
     }
 }

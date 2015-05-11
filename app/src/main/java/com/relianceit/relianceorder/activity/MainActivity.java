@@ -43,7 +43,10 @@ public class MainActivity extends ActionBarActivity {
 
         String logged = AppDataManager.getData(this, Constants.DM_LOGGED_KEY);
         if (logged != null && logged.equalsIgnoreCase("yes")) {
-            if (shouldShowDailySync()) {
+
+            if (isPendingDataAvailable()) {
+
+            }else if (shouldShowDailySync()) {
                 downloadDailyData();
             }else {
                 loadHome();
@@ -81,7 +84,7 @@ public class MainActivity extends ActionBarActivity {
                     dailyDownloadFailed(error.networkResponse != null ? error.networkResponse.statusCode : 500);
                 }
             });
-            AppUtils.showProgressDialog(this);
+            AppUtils.showProgressDialog(this, "Daily stock is downloading...");
         }
     }
 
@@ -184,16 +187,16 @@ public class MainActivity extends ActionBarActivity {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if (Constants.LocalDataChange.ACTION_ORDER_ADDED.equals(action)) {
-                setPendingSyncButtonStatus();
+                isPendingDataAvailable();
             } else if (Constants.LocalDataChange.ACTION_ORDER_SYNCED.equals(action)) {
-                setPendingSyncButtonStatus();
+                isPendingDataAvailable();
             } else if (Constants.LocalDataChange.ACTION_DAILY_SYNCED.equals(action)) {
 
             }
         }
     };
 
-    private void setPendingSyncButtonStatus() {
+    private boolean isPendingDataAvailable() {
 
         ROSDbHelper dbHelper = new ROSDbHelper(this);
         int newCount = dbHelper.getNewOrderCountPending(this);
@@ -201,12 +204,17 @@ public class MainActivity extends ActionBarActivity {
 
         int total = newCount + retCount;
         if (total > 0) {
-            //TODO Enable button
+            setPendingSyncButtonStatus(true);
+            return true;
         }else {
-            //TODO Disable button
+            setPendingSyncButtonStatus(false);
+            return false;
         }
     }
 
+    private void setPendingSyncButtonStatus(boolean enable) {
+        //TODO
+    }
 
     private ArrayList<ROSNewOrder> pendingNewOrders = null;
     private ArrayList<ROSReturnOrder> pendingRetOrders = null;
@@ -223,7 +231,11 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void orderSyncCompleted() {
-        setPendingSyncButtonStatus();
+        setPendingSyncButtonStatus(false);
+
+        if (shouldShowDailySync()) {
+            downloadDailyData();
+        }
         //TODO show message if needed
     }
 
