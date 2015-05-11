@@ -30,6 +30,7 @@ import com.relianceit.relianceorder.util.Constants;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public class NewOrderActivity extends RelianceBaseActivity implements OnItemSelectedListener{
@@ -37,7 +38,7 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
     TableLayout orderTableLayout;
     Spinner productSpinner,batchSpinner;
     EditText quantityText,orderPriceText,orderDiscountText,freeItemText,invoiceValueText;
-    TextView customerName,topSecondLabel,totalOutstanding,itemTotalAmount,totalAmountText,totalAmountTextLabel;
+    TextView customerName,topSecondLabel,totalOutstanding,itemTotalAmount,totalAmountText,totalAmountTextLabel,grossValueLabel;
     ImageButton addOrderButton;
     int itemCount;
     Constants.Section section;
@@ -139,8 +140,8 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
         totalAmountTextLabel=(TextView)findViewById(R.id.order_value_label);
        // totalAmountText=(TextView)findViewById(R.id.order_total_amount);
 
+        grossValueLabel=(TextView)findViewById(R.id.gross_value);
         addOrderButton=(ImageButton)findViewById(R.id.btnAddOrder);
-
         addOrderButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -178,22 +179,7 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
 
-        /*
-        //Customize the ActionBar
-        final ActionBar actionBar = getSupportActionBar();
-        View viewActionBar = getLayoutInflater().inflate(R.layout.action_bar_custom_layout, null);
-        ActionBar.LayoutParams params = new ActionBar.LayoutParams(//Center the textview in the ActionBar !
-                ActionBar.LayoutParams.WRAP_CONTENT,
-                ActionBar.LayoutParams.MATCH_PARENT,
-                Gravity.CENTER);
-        TextView textViewTitle = (TextView) viewActionBar.findViewById(R.id.actionbar_textview);
-        textViewTitle.setText("Test");
-        actionBar.setCustomView(viewActionBar,params);
-        actionBar.setDisplayShowCustomEnabled(true);
-        actionBar.setDisplayShowTitleEnabled(false);
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeButtonEnabled(true);
-        */
+
     }
     private void updateItemTotalAmount(){
         String productName= productSpinner.getSelectedItem().toString();
@@ -220,6 +206,19 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
 
 
     }
+    private void updateTotalOrderValue(){
+        double total=0.00;
+        Iterator iterator = newOrderItemMap.keySet().iterator();
+        while(iterator.hasNext()) {
+            String key=(String)iterator.next();
+            ROSNewOrderItem rosNewOrderItem=(ROSNewOrderItem)newOrderItemMap.get(key);
+            total=total+rosNewOrderItem.getEffPrice();
+
+        }
+        grossValueLabel.setText(""+total);
+
+    }
+
     private  void loadData(){
       ROSCustomer selectedCustomer= AppController.getInstance().getRosCustomer();
         totalOutstanding.setText(""+selectedCustomer.getOutstandingAmount());
@@ -267,6 +266,7 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
         stock= dbHelper.getStockForSale(getApplicationContext(), productName, batchName);
 
     }
+
     private void addNewOrder(){
 
         String productName= productSpinner.getSelectedItem().toString();
@@ -275,10 +275,11 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
         String orderPrice = orderPriceText.getText().toString();
         String orderDiscount = orderDiscountText.getText().toString();
         String freeItem = freeItemText.getText().toString();
-        String total=itemTotalAmount.getText().toString();
+        final String total=itemTotalAmount.getText().toString();
         if(productName != null && productName.length()>0 && batchName !=null && batchName.length()>0 &&
                 quantity != null && quantity.length()>0 && orderPrice !=null && orderPrice.length()>0) {
             itemCount++;
+            final int index=itemCount;
             ROSNewOrderItem newOrderItem=new ROSNewOrderItem();
             newOrderItem.setProductBatchCode(batchName);
             newOrderItem.setProductDescription(productName);
@@ -291,6 +292,7 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
 
 
             newOrderItemMap.put(""+itemCount,newOrderItem);
+            updateTotalOrderValue();
 
             TableRow.LayoutParams layoutParamsTableRow = new TableRow.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
@@ -373,12 +375,12 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
             removeItemButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    removeOrder(itemCount);
+                    removeOrder(index);
                 }
 
             });
 
-            tableRow.setId(itemCount);
+            tableRow.setId(index);
 
 
             tableRow.addView(productTextView, 0);
@@ -421,9 +423,11 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
 
             if (child instanceof TableRow) {
                 TableRow row = (TableRow) child;
+                Log.v("row","getId:"+row.getId() +"index: "+index);
                 if(row.getId()==index){
                     newOrderItemMap.remove(""+row.getId());
-                    itemCount--;
+                    updateTotalOrderValue();
+                  //  itemCount--;
                     orderTableLayout.removeView(row);
                 }
 
