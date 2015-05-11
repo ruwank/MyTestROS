@@ -146,11 +146,12 @@ public class NewOrderServiceHandler {
         syncNewOrder(order, TAG, new NewOrderSyncListener() {
             @Override
             public void onOrderSyncSuccess(String orderId) {
-
+Log.v("onOrderSyncSuccess","orderId:"+orderId);
             }
 
             @Override
             public void onOrderSyncError(String orderId, VolleyError error) {
+                Log.v("onOrderSyncError","orderId:"+orderId);
 
             }
         });
