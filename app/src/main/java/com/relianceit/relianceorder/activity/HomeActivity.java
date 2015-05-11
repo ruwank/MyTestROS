@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,8 +22,8 @@ import com.relianceit.relianceorder.fragment.StockStatementFragment;
 
 public class HomeActivity extends RelianceBaseActivity
 		{
-
-	/**
+            public static final String TAG = HomeActivity.class.getSimpleName();
+            /**
 	 * The serialization (saved instance state) Bundle key representing the
 	 * current dropdown position.
 	 */
@@ -125,7 +126,13 @@ public class HomeActivity extends RelianceBaseActivity
 		int id = item.getItemId();
 		if (id == R.id.action_settings) {
 			return true;
-		}
+		}else if (id == R.id.action_logout) {
+            Log.i(TAG, "Logout button tapped.");
+            return true;
+        }else if (id == R.id.action_refresh) {
+            Log.i(TAG, "Refresh button tapped.");
+            return true;
+        }
 		return super.onOptionsItemSelected(item);
 	}
 /*
