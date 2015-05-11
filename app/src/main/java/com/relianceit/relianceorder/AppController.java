@@ -102,6 +102,7 @@ public class AppController extends Application {
            }
        }
 
+       //user.setAccessToken("D6B2D03C-DEF1-4CA6-A236-FC766A31ADE7");
        user.setDeviceToken(getDeviceId());
    }
 

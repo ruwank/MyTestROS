@@ -79,6 +79,13 @@ public class GeneralServiceHandler {
         } else if (!productListDownloaded) {
             downloadProductsList(requestTag, listener);
         } else if (customerListDownloaded && stockListDownloaded && productListDownloaded) {
+
+            ROSDbHelper dbHelper = new ROSDbHelper(context);
+            dbHelper.clearNewOrderItemTable(context);
+            dbHelper.clearReturnOrderItemTable(context);
+            dbHelper.clearNewOrderTable(context);
+            dbHelper.clearReturnOrderTable(context);
+
             Date now = new Date();
             AppDataManager.saveDataLong(context, Constants.DM_DAILY_SYNC_TIME_KEY, now.getTime());
             this.context = null;
@@ -140,12 +147,6 @@ public class GeneralServiceHandler {
     }
 
     private void dailyUpdateFailed(final String requestTag, final DailyUpdateListener listener, VolleyError volleyError) {
-
-        ROSDbHelper dbHelper = new ROSDbHelper(context);
-        dbHelper.clearCustomerTable(context);
-        dbHelper.clearStockTable(context);
-        dbHelper.clearProductTable(context);
-
         this.context = null;
         listener.onDailyUpdateErrorResponse(volleyError);
     }

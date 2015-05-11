@@ -157,7 +157,8 @@ public class HomeActivity extends RelianceBaseActivity {
 	}
 
     private void logOutButtonTapped() {
-
+        NewOrderServiceHandler newOrderServiceHandler = new NewOrderServiceHandler(this);
+        newOrderServiceHandler.testGetList();
     }
 
     private void syncButtonTapped() {
