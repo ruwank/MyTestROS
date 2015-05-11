@@ -60,10 +60,10 @@
     <string name="tbl_label_new_order_fi">FI</string>
     <string name="tbl_label_new_order_value">Value</string>
 
-    <string name="tbl_label_gross_value">Gross value</string>
+    <string name="tbl_label_gross_value">Gross value :</string>
     <string name="tbl_label_overall_dis">Overall Discount (%)</string>
-    <string name="tbl_label_discount_value">Discount Value</string>
-    <string name="tbl_label_order_value">Order Value</string>
+    <string name="tbl_label_discount_value">Discount Value :</string>
+    <string name="tbl_label_order_value">Order Value :</string>
     <string name="title_activity_list_of_order">ListOfOrderActivity</string>
 
 <!-- TODO: Remove or change this placeholder text -->

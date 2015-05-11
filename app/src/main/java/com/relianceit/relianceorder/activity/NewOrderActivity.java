@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Spinner;
@@ -20,34 +21,41 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.android.volley.VolleyError;
 import com.relianceit.relianceorder.AppController;
 import com.relianceit.relianceorder.R;
 import com.relianceit.relianceorder.db.ROSDbHelper;
 import com.relianceit.relianceorder.models.ROSCustomer;
+import com.relianceit.relianceorder.models.ROSNewOrder;
 import com.relianceit.relianceorder.models.ROSNewOrderItem;
 import com.relianceit.relianceorder.models.ROSStock;
+import com.relianceit.relianceorder.services.NewOrderServiceHandler;
+import com.relianceit.relianceorder.util.AppUtils;
+import com.relianceit.relianceorder.util.ConnectionDetector;
 import com.relianceit.relianceorder.util.Constants;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 
 public class NewOrderActivity extends RelianceBaseActivity implements OnItemSelectedListener{
 
     TableLayout orderTableLayout;
     Spinner productSpinner,batchSpinner;
-    EditText quantityText,orderPriceText,orderDiscountText,freeItemText,invoiceValueText;
-    TextView customerName,topSecondLabel,totalOutstanding,itemTotalAmount,totalAmountText,totalAmountTextLabel,grossValueLabel;
+    EditText quantityText,orderPriceText,orderDiscountText,freeItemText,
+            invoiceValueText,overallDisPreText;
+    TextView customerName,topSecondLabel,totalOutstanding,itemTotalAmount,
+            totalAmountTextLabel,grossValueLabel,discountValueText,orderValue;
     ImageButton addOrderButton;
+    Button btnSaveOrder;
     int itemCount;
     Constants.Section section;
     ROSDbHelper dbHelper;
     ArrayList<String> products;
     ArrayList<String> batches;
     ROSStock stock;
-    Map<String,ROSNewOrderItem> newOrderItemMap =  new HashMap<String,ROSNewOrderItem>();
-
+    HashMap<String,ROSNewOrderItem> newOrderItemMap =  new HashMap<String,ROSNewOrderItem>();
+    ROSCustomer selectedCustomer;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -136,9 +144,28 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
             }
         });
 
+        overallDisPreText=(EditText)findViewById(R.id.overall_dis_pre);
+        overallDisPreText.addTextChangedListener(new TextWatcher() {
+
+            public void afterTextChanged(Editable s) {
+            }
+
+            public void beforeTextChanged(CharSequence s, int start,
+                                          int count, int after) {
+            }
+
+            public void onTextChanged(CharSequence s, int start,
+                                      int before, int count) {
+
+                updateTotalOrderValue();
+            }
+        });
+
+        discountValueText=(TextView)findViewById(R.id.order_discount_value);
+
         itemTotalAmount=(TextView)findViewById(R.id.item_total_amount);
         totalAmountTextLabel=(TextView)findViewById(R.id.order_value_label);
-       // totalAmountText=(TextView)findViewById(R.id.order_total_amount);
+        orderValue=(TextView)findViewById(R.id.order_value);
 
         grossValueLabel=(TextView)findViewById(R.id.gross_value);
         addOrderButton=(ImageButton)findViewById(R.id.btnAddOrder);
@@ -146,6 +173,15 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
             @Override
             public void onClick(View v) {
                 addNewOrder();
+
+            }
+
+        });
+        btnSaveOrder=(Button)findViewById(R.id.btnSaveOrder);
+        btnSaveOrder.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveOrder();
 
             }
 
@@ -181,46 +217,10 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
 
 
     }
-    private void updateItemTotalAmount(){
-        String productName= productSpinner.getSelectedItem().toString();
-        String batchName= batchSpinner.getSelectedItem().toString();
-        String quantity = quantityText.getText().toString();
-        String orderPrice = orderPriceText.getText().toString();
-        String orderDiscount = orderDiscountText.getText().toString();
-        String freeItem = freeItemText.getText().toString();
-        float total=0.00f;
-        if(productName != null && productName.length()>0 && batchName !=null && batchName.length()>0 &&
-        quantity != null && quantity.length()>0 && orderPrice !=null && orderPrice.length()>0){
-            int quantityValue=Integer.parseInt(quantity);
-            float orderPriceValue=Float.valueOf(orderPrice);
-            total=orderPriceValue *quantityValue;
 
-            if(orderDiscount !=null && orderDiscount.length()>0){
-                float orderDiscountValue=Float.valueOf(orderDiscount);
-                total= (float) (total*(1-(orderDiscountValue/100.0)));
-
-            }
-
-        }
-        itemTotalAmount.setText(""+total);
-
-
-    }
-    private void updateTotalOrderValue(){
-        double total=0.00;
-        Iterator iterator = newOrderItemMap.keySet().iterator();
-        while(iterator.hasNext()) {
-            String key=(String)iterator.next();
-            ROSNewOrderItem rosNewOrderItem=(ROSNewOrderItem)newOrderItemMap.get(key);
-            total=total+rosNewOrderItem.getEffPrice();
-
-        }
-        grossValueLabel.setText(""+total);
-
-    }
 
     private  void loadData(){
-      ROSCustomer selectedCustomer= AppController.getInstance().getRosCustomer();
+      selectedCustomer= AppController.getInstance().getRosCustomer();
         totalOutstanding.setText(""+selectedCustomer.getOutstandingAmount());
         customerName.setText(selectedCustomer.getCustName());
         customizeActionBar();
@@ -286,13 +286,15 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
             newOrderItem.setQtyOrdered(Integer.parseInt(quantity));
             newOrderItem.setQtyBonus(Integer.parseInt(freeItem));
             newOrderItem.setEffPrice(Float.valueOf(total));
-            newOrderItem.setProductBatchCode(stock.getProductBatchCode());
+            newOrderItem.setProductCode(stock.getProductCode());
+            newOrderItem.setSuppCode(stock.getSuppCode());
+            newOrderItem.setStockLocationCode(stock.getStockLocationCode());
             newOrderItem.setUnitPrice(Float.valueOf(orderPrice));
             newOrderItem.setProdDiscount(Float.valueOf(orderDiscount));
 
 
             newOrderItemMap.put(""+itemCount,newOrderItem);
-            updateTotalOrderValue();
+            updateOrderGrossValue();
 
             TableRow.LayoutParams layoutParamsTableRow = new TableRow.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
@@ -404,6 +406,114 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
         }
 
     }
+    private void updateItemTotalAmount(){
+        String productName= productSpinner.getSelectedItem().toString();
+        String batchName= batchSpinner.getSelectedItem().toString();
+        String quantity = quantityText.getText().toString();
+        String orderPrice = orderPriceText.getText().toString();
+        String orderDiscount = orderDiscountText.getText().toString();
+        double total=0.00f;
+        if(productName != null && productName.length()>0 && batchName !=null && batchName.length()>0 &&
+                quantity != null && quantity.length()>0 && orderPrice !=null && orderPrice.length()>0){
+            int quantityValue=Integer.parseInt(quantity);
+            double orderPriceValue=Double.valueOf(orderPrice);
+            total=orderPriceValue *quantityValue;
+
+            if(orderDiscount !=null && orderDiscount.length()>0){
+                double orderDiscountValue=Double.valueOf(orderDiscount);
+                total=(total*(1-(orderDiscountValue/100.0)));
+            }
+
+        }
+        itemTotalAmount.setText(String.format("%.2f", total));
+
+
+    }
+    private void updateOrderGrossValue(){
+        double total=0.00;
+        Iterator iterator = newOrderItemMap.keySet().iterator();
+        while(iterator.hasNext()) {
+            String key=(String)iterator.next();
+            ROSNewOrderItem rosNewOrderItem=(ROSNewOrderItem)newOrderItemMap.get(key);
+            total=total+rosNewOrderItem.getEffPrice();
+
+        }
+        grossValueLabel.setText(String.format("%.2f", total));
+        updateTotalOrderValue();
+
+
+    }
+    private void updateTotalOrderValue(){
+        double total=0.00;
+        double discountValue=0.00;
+        String grossValueText = grossValueLabel.getText().toString();
+
+        if(grossValueText != null && grossValueText.length()>0){
+            total=Double.valueOf(grossValueText);
+        }
+        String overallDisPre = overallDisPreText.getText().toString();
+        //discountValueText
+
+        if(overallDisPre != null && overallDisPre.length()>0){
+            double overallDisPreValue= Double.valueOf(overallDisPre);
+            discountValue=total*(overallDisPreValue/100.0);
+
+        }
+        discountValueText.setText(String.format("%.2f", discountValue));
+        total=total-discountValue;
+       // String discountValue = discountValueText.getText().toString();
+//        if(discountValue != null && discountValue.length()>0){
+//            total=total-Double.valueOf(discountValue);
+//        }
+
+        orderValue.setText(String.format("%.2f", total));
+    }
+    private void saveOrder(){
+        String orderValueText = orderValue.getText().toString();
+        String grossValueText = grossValueLabel.getText().toString();
+        String discountPre = overallDisPreText.getText().toString();
+
+        if(orderValueText != null && orderValueText.length()>0) {
+            ArrayList<ROSNewOrderItem> newOrderItemArrayList = new ArrayList<ROSNewOrderItem>(newOrderItemMap.values());
+            ROSNewOrder rosNewOrder = new ROSNewOrder();
+            rosNewOrder.setProducts(newOrderItemArrayList);
+            rosNewOrder.setOrderValue(Double.valueOf(orderValueText));
+            rosNewOrder.setGrossValue(Double.valueOf(grossValueText));
+            rosNewOrder.setDiscountValue(Double.valueOf(grossValueText) - Double.valueOf(orderValueText));
+            rosNewOrder.setCustCode(selectedCustomer.getCustCode());
+
+            if(discountPre != null && discountPre.length()>0)
+            rosNewOrder.setOVDiscount(Double.valueOf(discountPre));
+           String orderIdStr= dbHelper.insertNewOrder(getApplicationContext(),rosNewOrder);
+
+            if(orderIdStr !=null){
+
+                if (ConnectionDetector.isConnected(this)) {
+                    NewOrderServiceHandler newOrderServiceHandler = new NewOrderServiceHandler(getApplicationContext());
+                    newOrderServiceHandler.syncNewOrder(rosNewOrder, "new_order_add", new NewOrderServiceHandler.NewOrderSyncListener() {
+                        @Override
+                        public void onOrderSyncSuccess(String orderId) {
+                            Log.v("onOrderSyncSuccess", "orderId: " + orderId);
+                        }
+
+                        @Override
+                        public void onOrderSyncError(String orderId, VolleyError error) {
+                            Log.v("onOrderSyncError", "orderId: " + orderId);
+
+                        }
+                    });
+                }else{
+                    AppUtils.showAlertDialog(this, "No Network", "Order only stored in locally. You must  ");
+
+                }
+            }else{
+                AppUtils.showAlertDialog(this, "New Order Added Error!", "Try again later.");
+
+            }
+
+        }
+
+    }
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
@@ -426,15 +536,10 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
                 Log.v("row","getId:"+row.getId() +"index: "+index);
                 if(row.getId()==index){
                     newOrderItemMap.remove(""+row.getId());
-                    updateTotalOrderValue();
-                  //  itemCount--;
+                    updateOrderGrossValue();
                     orderTableLayout.removeView(row);
                 }
 
-//                for (int x = 0; x < row.getChildCount(); x++) {
-//                    View view = row.getChildAt(x);
-//                    view.setEnabled(false);
-//                }
             }
         }
     }
