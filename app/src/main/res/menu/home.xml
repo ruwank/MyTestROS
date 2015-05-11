@@ -9,6 +9,12 @@
         android:icon="@mipmap/ic_action_refresh"
         android:title="@string/action_refresh"
         app:showAsAction="ifRoom"/>
+
+    <item
+        android:id="@+id/action_force_sync"
+        android:title="Force Sync"
+        app:showAsAction="never"/>
+
      <item
         android:id="@+id/action_logout"
         android:title="@string/action_logout"

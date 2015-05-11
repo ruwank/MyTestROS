@@ -1,5 +1,9 @@
 package com.relianceit.relianceorder.activity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -14,16 +18,33 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.android.volley.VolleyError;
+import com.relianceit.relianceorder.AppController;
 import com.relianceit.relianceorder.R;
 import com.relianceit.relianceorder.appsupport.tab.SlidingTabLayout;
+import com.relianceit.relianceorder.db.ROSDbHelper;
 import com.relianceit.relianceorder.fragment.CustomerOutstandingFragment;
 import com.relianceit.relianceorder.fragment.RelianceOperationFragment;
 import com.relianceit.relianceorder.fragment.StockStatementFragment;
+import com.relianceit.relianceorder.models.ROSNewOrder;
+import com.relianceit.relianceorder.models.ROSReturnOrder;
+import com.relianceit.relianceorder.services.GeneralServiceHandler;
+import com.relianceit.relianceorder.services.NewOrderServiceHandler;
+import com.relianceit.relianceorder.util.AppDataManager;
+import com.relianceit.relianceorder.util.AppUtils;
+import com.relianceit.relianceorder.util.ConnectionDetector;
+import com.relianceit.relianceorder.util.Constants;
 
-public class HomeActivity extends RelianceBaseActivity
-		{
-            public static final String TAG = HomeActivity.class.getSimpleName();
-            /**
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+
+public class HomeActivity extends RelianceBaseActivity {
+
+    public static final String TAG = HomeActivity.class.getSimpleName();
+    public static final int RESULT_LOGOUT = 3;
+
+     /**
 	 * The serialization (saved instance state) Bundle key representing the
 	 * current dropdown position.
 	 */
@@ -32,42 +53,35 @@ public class HomeActivity extends RelianceBaseActivity
     SlidingTabLayout mTab;
     ViewPager mPager;
 
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_home);
 
-//        final ActionBar actionBar = getSupportActionBar();
-//        actionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-//        actionBar.setCustomView(R.layout.action_bar_custom_layout);
-        //toolbar = (Toolbar) findViewById(R.id.tool_bar); // Attaching the layout to the toolbar object
-       // setSupportActionBar(toolbar);
         mTab =(SlidingTabLayout)findViewById(R.id.sliding_tabs);
         mPager=(ViewPager)findViewById(R.id.view_pager);
         mPager.setAdapter(new sectionPageAdapter(getSupportFragmentManager()));
         mTab.setViewPager(mPager);
         customizeActionBar(0);
 
-/*
-        // Set up the action bar to show a dropdown list.
-		final ActionBar actionBar = getSupportActionBar();
-		actionBar.setDisplayShowTitleEnabled(false);
-		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
-
-
-		// Set up the dropdown list navigation in the action bar.
-		actionBar.setListNavigationCallbacks(
-		// Specify a SpinnerAdapter to populate the dropdown list.
-				new ArrayAdapter<String>(actionBar.getThemedContext(),
-						android.R.layout.simple_list_item_1,
-						android.R.id.text1, new String[] {
-								getString(R.string.title_section1),
-								getString(R.string.title_section2),
-								getString(R.string.title_section3), }), this);
-								*/
+        registerReceiver(localDataChangeReceiver, new IntentFilter(Constants.LocalDataChange.ACTION_ORDER_ADDED));
+        registerReceiver(localDataChangeReceiver, new IntentFilter(Constants.LocalDataChange.ACTION_ORDER_SYNCED));
+        registerReceiver(localDataChangeReceiver, new IntentFilter(Constants.LocalDataChange.ACTION_DAILY_SYNCED));
 	}
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        AppController.getInstance().cancelPendingRequests(TAG);
+        unregisterReceiver(localDataChangeReceiver);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent returnIntent = new Intent();
+        setResult(RESULT_OK, returnIntent);
+        finish();
+    }
 
     private void customizeActionBar(int section){
         final ActionBar actionBar = getSupportActionBar();
@@ -128,61 +142,220 @@ public class HomeActivity extends RelianceBaseActivity
 			return true;
 		}else if (id == R.id.action_logout) {
             Log.i(TAG, "Logout button tapped.");
+            logOutButtonTapped();
             return true;
         }else if (id == R.id.action_refresh) {
             Log.i(TAG, "Refresh button tapped.");
+            syncButtonTapped();
+            return true;
+        }else if (id == R.id.action_force_sync) {
+            Log.i(TAG, "Force sync button tapped.");
+            forceSyncButtonTapped();
             return true;
         }
 		return super.onOptionsItemSelected(item);
 	}
-/*
-	@Override
-	public boolean onNavigationItemSelected(int position, long id) {
-		// When the given dropdown item is selected, show its contents in the
-		// container view.
-        customizeActionBar(position);
-		switch (position) {
-		case 0:
-		{
-			FragmentManager fragmentManager = getSupportFragmentManager();
 
-			RelianceOperationFragment fragment = new RelianceOperationFragment();
-			fragmentManager.beginTransaction()
-					.replace(R.id.container, fragment)
-					.commit();
-		}
-			break;
-		case 1:
-		{
-			FragmentManager fragmentManager = getSupportFragmentManager();
+    private void logOutButtonTapped() {
 
-			StockStatementFragment fragment = new StockStatementFragment();
-			fragmentManager.beginTransaction()
-					.replace(R.id.container, fragment)
-					.commit();
-		}
-			break;
-		case 2:
-		{
-			FragmentManager fragmentManager = getSupportFragmentManager();
+    }
 
-			CustomerOutstandingFragment fragment = new CustomerOutstandingFragment();
-			fragmentManager.beginTransaction()
-					.replace(R.id.container, fragment)
-					.commit();
-		}
-			break;
-		default:
-		
-			break;
-		
+    private void syncButtonTapped() {
+        if (isPendingDataAvailable()) {
+            doSyncPendingOrders();
+        }else if (shouldShowDailySync()) {
+            downloadDailyData();
+        }
+    }
 
-		}
+    private void forceSyncButtonTapped() {
+        if (isPendingDataAvailable()) {
+            AppUtils.showAlertDialog(this, "Sync required!", "There is some local data in the app. Please sync them and Force Sync again.");
+        }else {
+            AppDataManager.saveDataInt(this, Constants.DM_DAILY_SYNC_PRODUCT_KEY, 0);
+            downloadDailyData();
+        }
+    }
 
-		return true;
-	}
-	*/
-class sectionPageAdapter extends FragmentPagerAdapter {
+    public void logout() {
+        Intent returnIntent = new Intent();
+        setResult(RESULT_LOGOUT, returnIntent);
+        finish();
+    }
+
+    private void refreshHome() {
+        //TODO
+    }
+
+    /*
+    Data and sync section
+     */
+
+    private void dailyDownloadFailed(int errorCode) {
+        setPendingSyncButtonStatus(true);
+        AppUtils.dismissProgressDialog();
+        if (errorCode == 401) {
+            logout();
+        }else {
+            AppUtils.showAlertDialog(this, "Sync Failed!", "Data syncing failed due to Server error. Please try again.");
+        }
+    }
+
+    private void downloadDailyData(){
+
+        if (!ConnectionDetector.isConnected(this)) {
+            AppUtils.showAlertDialog(this, Constants.MSG_NO_INTERNET_TITLE, Constants.MSG_NO_INTERNET_MSG);
+        }else {
+            GeneralServiceHandler generalServiceHandler = new GeneralServiceHandler(this);
+            generalServiceHandler.doDailyContentUpdate(TAG, new GeneralServiceHandler.DailyUpdateListener() {
+                @Override
+                public void onDailyUpdateSuccess() {
+                    AppUtils.dismissProgressDialog();
+                    refreshHome();
+                }
+
+                @Override
+                public void onDailyUpdateErrorResponse(VolleyError error) {
+                    dailyDownloadFailed(error.networkResponse != null ? error.networkResponse.statusCode : 500);
+                }
+            });
+            AppUtils.showProgressDialog(this, "Daily stock is downloading...");
+        }
+    }
+
+    private BroadcastReceiver localDataChangeReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (Constants.LocalDataChange.ACTION_ORDER_ADDED.equals(action)) {
+                isPendingDataAvailable();
+            } else if (Constants.LocalDataChange.ACTION_ORDER_SYNCED.equals(action)) {
+                isPendingDataAvailable();
+            } else if (Constants.LocalDataChange.ACTION_DAILY_SYNCED.equals(action)) {
+
+            }
+        }
+    };
+
+    private boolean shouldShowDailySync() {
+        long timeMS = AppDataManager.getDataLong(this, Constants.DM_DAILY_SYNC_TIME_KEY);
+        if (timeMS == 0) {
+            return true;
+        }
+        Date lastSyncDate = new Date(timeMS);
+        Date now = new Date();
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(lastSyncDate);
+        int lDate = calendar.get(Calendar.DATE);
+        calendar.setTime(now);
+        int nDate = calendar.get(Calendar.DATE);
+
+        if (nDate != lDate) {
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+    private boolean isPendingDataAvailable() {
+
+        ROSDbHelper dbHelper = new ROSDbHelper(this);
+        int newCount = dbHelper.getNewOrderCountPending(this);
+        int retCount = dbHelper.getReturnOrderCountPending(this);
+
+        int total = newCount + retCount;
+        if (total > 0) {
+            setPendingSyncButtonStatus(true);
+            return true;
+        }else {
+            setPendingSyncButtonStatus(false);
+            return false;
+        }
+    }
+
+    private void setPendingSyncButtonStatus(boolean enable) {
+        //TODO
+    }
+
+    private ArrayList<ROSNewOrder> pendingNewOrders = null;
+    private ArrayList<ROSReturnOrder> pendingRetOrders = null;
+    private void doSyncPendingOrders() {
+
+        if (!ConnectionDetector.isConnected(this)) {
+            AppUtils.showAlertDialog(this, Constants.MSG_NO_INTERNET_TITLE, Constants.MSG_NO_INTERNET_MSG);
+        }else {
+            ROSDbHelper dbHelper = new ROSDbHelper(this);
+            this.pendingNewOrders = dbHelper.getNewOrdersPending(this);
+            this.pendingRetOrders = dbHelper.getReturnOrdersPending(this);
+            AppUtils.showProgressDialog(this, "Syncing data...");
+            doSyncPendingOrdersContinue();
+        }
+    }
+
+    private void orderSyncCompleted() {
+        AppUtils.dismissProgressDialog();
+        setPendingSyncButtonStatus(false);
+        if (shouldShowDailySync()) {
+            downloadDailyData();
+        }
+    }
+
+    private void orderSyncFailed() {
+        AppUtils.dismissProgressDialog();
+        pendingNewOrders.clear();
+        pendingRetOrders.clear();
+        AppUtils.showAlertDialog(this, "Sync Failed!", "Data syncing failed due to Server error. Please try again.");
+        setPendingSyncButtonStatus(true);
+    }
+
+    private void doSyncPendingOrdersContinue() {
+        if (pendingNewOrders.size() > 0) {
+            ROSNewOrder newOrder = pendingNewOrders.get(0);
+            doNewOrderSync(newOrder);
+        }else if (pendingRetOrders.size() > 0) {
+            ROSReturnOrder returnOrder = pendingRetOrders.get(0);
+            doReturnOrderSync(returnOrder);
+        } else {
+            if(pendingNewOrders != null) pendingNewOrders.clear();
+            if(pendingRetOrders != null) pendingRetOrders.clear();
+            orderSyncCompleted();
+        }
+    }
+
+    private void updateNewOrderOnSyncComplete(String orderId) {
+        ROSDbHelper dbHelper = new ROSDbHelper(this);
+        dbHelper.updateNewOrderStatusToSynced(this, orderId);
+    }
+
+    private void updateReturnOrderOnSyncComplete(String orderId) {
+        ROSDbHelper dbHelper = new ROSDbHelper(this);
+        dbHelper.updateReturnOrderStatusToSynced(this, orderId);
+    }
+
+    private void doNewOrderSync(ROSNewOrder newOrder) {
+        NewOrderServiceHandler newOrderServiceHandler = new NewOrderServiceHandler(this);
+        newOrderServiceHandler.syncNewOrder(newOrder, TAG, new NewOrderServiceHandler.NewOrderSyncListener() {
+            @Override
+            public void onOrderSyncSuccess(String orderId) {
+                pendingNewOrders.remove(0);
+                updateNewOrderOnSyncComplete(orderId);
+                doSyncPendingOrdersContinue();
+            }
+
+            @Override
+            public void onOrderSyncError(String orderId, VolleyError error) {
+                orderSyncFailed();
+            }
+        });
+    }
+
+    private void doReturnOrderSync(ROSReturnOrder returnOrder) {
+
+    }
+
+
+    class sectionPageAdapter extends FragmentPagerAdapter {
 
     String [] tabs;
     public sectionPageAdapter(FragmentManager fm) {
@@ -233,6 +406,5 @@ class sectionPageAdapter extends FragmentPagerAdapter {
         return tabs.length;
     }
 }
-	
 
 }

@@ -66,6 +66,12 @@ public class GeneralServiceHandler {
      */
     public void doDailyContentUpdate(final String requestTag, final DailyUpdateListener listener) {
 
+        if (!productListDownloaded) {
+            if (AppDataManager.getDataInt(context, Constants.DM_DAILY_SYNC_PRODUCT_KEY) == 1) {
+                productListDownloaded = true;
+            }
+        }
+
         if (!customerListDownloaded) {
             downloadCustomerList(requestTag, listener);
         } else if (!stockListDownloaded) {
@@ -124,7 +130,10 @@ public class GeneralServiceHandler {
         ROSDbHelper dbHelper = new ROSDbHelper(context);
         dbHelper.clearProductTable(context);
         dbHelper.insertProducts(context, productToDb);
-        //dbHelper.addProducts(context);
+
+        if (productToDb.size() > 0) {
+            AppDataManager.saveDataInt(context, Constants.DM_DAILY_SYNC_PRODUCT_KEY, 1);
+        }
 
         productListDownloaded = true;
         doDailyContentUpdate(requestTag, listener);
