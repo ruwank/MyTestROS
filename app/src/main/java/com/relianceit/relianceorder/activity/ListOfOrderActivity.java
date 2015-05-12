@@ -16,14 +16,24 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.android.volley.VolleyError;
+import com.relianceit.relianceorder.AppController;
 import com.relianceit.relianceorder.R;
 import com.relianceit.relianceorder.fragment.DatePickerDialogFragment;
+import com.relianceit.relianceorder.models.ROSNewOrder;
+import com.relianceit.relianceorder.services.NewOrderServiceHandler;
+import com.relianceit.relianceorder.util.AppUtils;
+import com.relianceit.relianceorder.util.ConnectionDetector;
 import com.relianceit.relianceorder.util.Constants;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class ListOfOrderActivity extends ActionBarActivity implements  DatePickerDialog.OnDateSetListener {
-    TextView fromDate,toDate;
+
+    public static final String TAG = ListOfOrderActivity.class.getSimpleName();
+
+            TextView fromDate,toDate;
     DialogFragment datePickerFragment;
     TableLayout orderListTable;
     TextView tblHeaderCol1,tblHeaderCol2,tblHeaderCol3;
@@ -93,8 +103,7 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
         btnGetOrder.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                showOrderItem();
-
+                updateButtonTapped();
             }
 
         });
@@ -104,11 +113,33 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
         tblHeaderCol3=(TextView)findViewById(R.id.tbl_header_col3);
 
         updateLabel();
-        for (int i = 0; i <4 ; i++) {
-            showOrderItem();
+
+        if(section == Constants.Section.VIEW_SALE_RETURNS_LIST){
+            for (int i = 0; i <4 ; i++) {
+                showOrderItem();
+            }
         }
 
     }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        AppController.getInstance().cancelPendingRequests(TAG);
+    }
+
+    private void updateButtonTapped() {
+        if(section != Constants.Section.VIEW_SALE_RETURNS_LIST){
+            if (!ConnectionDetector.isConnected(this)) {
+                AppUtils.showAlertDialog(this, Constants.MSG_NO_INTERNET_TITLE, Constants.MSG_NO_INTERNET_MSG);
+            }else {
+                getSalesOrderList("00001", "2014-01-01", "2016-01-01");
+            }
+        }else {
+            showOrderItem();
+        }
+    }
+
     private void customizeActionBar(){
         final ActionBar actionBar = getSupportActionBar();
         ActionBar.LayoutParams params = new ActionBar.LayoutParams(//Center the textview in the ActionBar !
@@ -149,6 +180,78 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
             tblHeaderCol3.setText("Order Value");
 
         }
+    }
+
+    private void showSalesOrders(ArrayList<ROSNewOrder> orders) {
+        itemIndex = 0;
+
+        for (int i = 0; i < orderListTable.getChildCount(); i++) {
+            View child = orderListTable.getChildAt(i);
+            if (child instanceof TableRow) {
+                orderListTable.removeView(child);
+            }
+        }
+
+//        for (int i = 0; i < orders.size(); i++) {
+//            ROSNewOrder order = orders.get(i);
+//            addSaleOrderToTable(order);
+//        }
+    }
+
+    private void addSaleOrderToTable(ROSNewOrder order){
+        itemIndex++;
+        TableRow.LayoutParams layoutParamsTableRow = new TableRow.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParamsTableRow.topMargin=5;
+        layoutParamsTableRow.bottomMargin=5;
+
+        TableRow tableRow = new TableRow(this);
+        tableRow.setLayoutParams(layoutParamsTableRow);
+        tableRow.setBackgroundResource(R.drawable.border);
+
+        TableRow.LayoutParams layoutParamsTextView = new TableRow.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT,1.0f);
+        layoutParamsTextView.gravity = Gravity.CENTER_VERTICAL;
+        layoutParamsTextView.setMargins(1,5,1,5);
+
+        TextView productTextView = new TextView(this);
+        productTextView.setText(order.getSalesOrdNum());
+        productTextView.setGravity(Gravity.CENTER);
+        productTextView.setLayoutParams(layoutParamsTextView);
+        productTextView.setTextColor(getResources().getColor(R.color.color_black));
+        productTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
+
+        TextView batchTextView = new TextView(this);
+        batchTextView.setText(order.getAddedDate());
+        batchTextView.setGravity(Gravity.CENTER);
+        batchTextView.setLayoutParams(layoutParamsTextView);
+        batchTextView.setTextColor(getResources().getColor(R.color.color_black));
+        batchTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
+
+        TextView qtyTextView = new TextView(this);
+        qtyTextView.setText("" + order.getOrderValue());
+        qtyTextView.setGravity(Gravity.CENTER);
+        qtyTextView.setLayoutParams(layoutParamsTextView);
+        qtyTextView.setTextColor(getResources().getColor(R.color.color_black));
+        qtyTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
+
+        tableRow.setId(itemIndex);
+        tableRow.addView(productTextView,0);
+        tableRow.addView(batchTextView,1);
+        tableRow.addView(qtyTextView,2);
+
+        tableRow.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                loadOrderScreen(itemIndex);
+            }
+        });
+
+        orderListTable.addView(tableRow, 3);
+
     }
 
     private void showOrderItem(){
@@ -207,6 +310,7 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
         orderListTable.addView(tableRow, 3);
 
     }
+
     private  void loadOrderScreen(int index){
         Intent intent = new Intent(getApplicationContext(),
                 ViewOrderActivity.class);
@@ -250,8 +354,43 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
             toDay=selectedDay;
             toDate.setText(dateString);
         }
+    }
 
+    /*
+    Data service
+     */
 
+    private void getSalesSuccess(ArrayList<ROSNewOrder> orders) {
+        AppUtils.dismissProgressDialog();
+        showSalesOrders(orders);
+    }
 
+    private void getSalesFailed(int errorCode) {
+        AppUtils.dismissProgressDialog();
+        AppUtils.showAlertDialog(this, "Server error!", "Please try again.");
+    }
+
+    private void getSalesOrderList(String customerCode, String fromDate, String toDate) {
+        AppUtils.showProgressDialog(this);
+        NewOrderServiceHandler newOrderServiceHandler = new NewOrderServiceHandler(this);
+        newOrderServiceHandler.getSalesOrderList(customerCode, fromDate, toDate, TAG, new NewOrderServiceHandler.SalesOrderListListener() {
+            @Override
+            public void onGetListSuccess(ArrayList<ROSNewOrder> orders) {
+                getSalesSuccess(orders);
+            }
+
+            @Override
+            public void onGetListError(VolleyError error) {
+                if (error != null) {
+                    if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                        getSalesFailed(401);
+                    }else {
+                        getSalesFailed(501);
+                    }
+                }else {
+                    getSalesFailed(501);
+                }
+            }
+        });
     }
 }

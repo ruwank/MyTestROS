@@ -7,6 +7,7 @@ import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -17,10 +18,13 @@ import com.relianceit.relianceorder.models.ROSNewOrderItem;
 import com.relianceit.relianceorder.models.ROSUser;
 import com.relianceit.relianceorder.util.AppURLs;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -152,6 +156,105 @@ Log.v("onOrderSyncSuccess","orderId:"+orderId);
             @Override
             public void onOrderSyncError(String orderId, VolleyError error) {
                 Log.v("onOrderSyncError","orderId:"+orderId);
+
+            }
+        });
+    }
+
+    /*
+    List Of Orders
+     */
+
+    public static interface SalesOrderListListener {
+        public abstract void onGetListSuccess(ArrayList<ROSNewOrder> orders);
+        public abstract void onGetListError(VolleyError error);
+    }
+
+    public void getSalesOrderList(String customerCode, String fromDate, String toDate, final String requestTag, final SalesOrderListListener listener) {
+
+        if (customerCode == null || customerCode.length() == 0) {
+            listener.onGetListError(null);
+            return;
+        }
+
+        try {
+            customerCode = URLEncoder.encode(customerCode, "utf-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        ROSUser user = ROSUser.getInstance();
+        //Authorization: Token <auth token>:<deviceId>
+        final String params = "Token " + user.getAccessToken() + ":" + user.getDeviceToken();
+        Log.i(TAG, "Sales Order Authorization: " + params);
+
+        String endPoint = AppURLs.SALES_LIST_GET_ENDPOINT + customerCode;
+        if (fromDate != null && fromDate.length() > 0) {
+            try {
+                fromDate = URLEncoder.encode(fromDate, "utf-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            endPoint = endPoint + "/" + fromDate;
+        }
+
+        if (toDate != null && toDate.length() > 0) {
+            try {
+                toDate = URLEncoder.encode(toDate, "utf-8");
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            endPoint = endPoint + "/" + toDate;
+        }
+
+        JsonArrayRequest listRequest = new JsonArrayRequest(endPoint, new Response.Listener<JSONArray>() {
+            @Override
+            public void onResponse(JSONArray jsonArray) {
+                Log.i(TAG, "Sales Order list success " + jsonArray.toString());
+
+                Type listType = new TypeToken<ArrayList<ROSNewOrder>>(){}.getType();
+                Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+                ArrayList<ROSNewOrder> orders = gson.fromJson(jsonArray.toString(), listType);
+
+                if(orders == null) orders = new ArrayList<ROSNewOrder>();
+                Log.i(TAG, "Sales Order list size: " + orders.size());
+
+                listener.onGetListSuccess(orders);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Log.i(TAG, "Sales Order list error " + volleyError.toString());
+                if (volleyError.networkResponse != null && volleyError.networkResponse.statusCode == 401) {
+                    Log.i(TAG, "Sales Order list failed ====== Unauthorized");
+                }else {
+                    Log.i(TAG, "Sales Order list failed ====== Server error");
+                }
+                listener.onGetListError(volleyError);
+            }
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                headers.put("Authorization", params);
+                return headers;
+            }
+        };
+
+        AppController.getInstance().addToRequestQueue(listRequest, requestTag);
+    }
+
+    public void testGetList() {
+        //00001/2014-01-01/2016-01-01
+        getSalesOrderList("00001", "2014-01-01", "2016-01-01", TAG, new SalesOrderListListener() {
+            @Override
+            public void onGetListSuccess(ArrayList<ROSNewOrder> orders) {
+
+            }
+
+            @Override
+            public void onGetListError(VolleyError error) {
 
             }
         });

@@ -18,6 +18,7 @@ public class Constants {
     public static final String DM_ACCESS_TOKEN_KEY = "com.relianceit.relianceorder.token_key";
     public static final String DM_USERNAME_KEY = "com.relianceit.relianceorder.username_key";
     public static final String DM_DAILY_SYNC_TIME_KEY = "com.relianceit.relianceorder.daily_sync_time_key";
+    public static final String DM_DAILY_SYNC_PRODUCT_KEY = "com.relianceit.relianceorder.daily_sync_product_time_key";
 
     public static final class LocalDataChange {
         public static final String ACTION_ORDER_ADDED = "action_order_added";

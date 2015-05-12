@@ -31,21 +31,19 @@ public class MainActivity extends ActionBarActivity {
     public static final String TAG = MainActivity.class.getSimpleName();
 
     public static final int LOGIN_REQUEST_CODE = 1;
+    public static final int HOME_REQUEST_CODE = 2;
+    public static final int RESULT_LOGOUT = 3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        registerReceiver(localDataChangeReceiver, new IntentFilter(Constants.LocalDataChange.ACTION_ORDER_ADDED));
-        registerReceiver(localDataChangeReceiver, new IntentFilter(Constants.LocalDataChange.ACTION_ORDER_SYNCED));
-        registerReceiver(localDataChangeReceiver, new IntentFilter(Constants.LocalDataChange.ACTION_DAILY_SYNCED));
-
         String logged = AppDataManager.getData(this, Constants.DM_LOGGED_KEY);
         if (logged != null && logged.equalsIgnoreCase("yes")) {
-
             if (isPendingDataAvailable()) {
-
+                AppUtils.showAlertDialog(this, "Sync required!", "There is some local data in the app. Please sync them.");
+                loadHome();
             }else if (shouldShowDailySync()) {
                 downloadDailyData();
             }else {
@@ -90,7 +88,7 @@ public class MainActivity extends ActionBarActivity {
 
     private void loadHome() {
         Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent, HOME_REQUEST_CODE);
     }
 
     private void loadLogin() {
@@ -111,7 +109,6 @@ public class MainActivity extends ActionBarActivity {
         dbHelper.clearNewOrderTable(this);
         dbHelper.clearReturnOrderItemTable(this);
         dbHelper.clearReturnOrderTable(this);
-        dbHelper.clearProductTable(this);
 
         loadLogin();
     }
@@ -122,6 +119,13 @@ public class MainActivity extends ActionBarActivity {
         if (requestCode == LOGIN_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 downloadDailyData();
+            }
+        }else if (requestCode == HOME_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                finish();
+            }else if (resultCode == RESULT_LOGOUT) {
+                AppUtils.showAlertDialog(this, "Oops!", "Login session expired. Please login again.");
+                logout();
             }
         }
     }
@@ -152,7 +156,6 @@ public class MainActivity extends ActionBarActivity {
     protected void onDestroy() {
         super.onDestroy();
         AppController.getInstance().cancelPendingRequests(TAG);
-        unregisterReceiver(localDataChangeReceiver);
     }
 
     /*
@@ -179,23 +182,6 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    /*
-    Data Sync section
-     */
-    private BroadcastReceiver localDataChangeReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (Constants.LocalDataChange.ACTION_ORDER_ADDED.equals(action)) {
-                isPendingDataAvailable();
-            } else if (Constants.LocalDataChange.ACTION_ORDER_SYNCED.equals(action)) {
-                isPendingDataAvailable();
-            } else if (Constants.LocalDataChange.ACTION_DAILY_SYNCED.equals(action)) {
-
-            }
-        }
-    };
-
     private boolean isPendingDataAvailable() {
 
         ROSDbHelper dbHelper = new ROSDbHelper(this);
@@ -204,89 +190,9 @@ public class MainActivity extends ActionBarActivity {
 
         int total = newCount + retCount;
         if (total > 0) {
-            setPendingSyncButtonStatus(true);
             return true;
         }else {
-            setPendingSyncButtonStatus(false);
             return false;
         }
-    }
-
-    private void setPendingSyncButtonStatus(boolean enable) {
-        //TODO
-    }
-
-    private ArrayList<ROSNewOrder> pendingNewOrders = null;
-    private ArrayList<ROSReturnOrder> pendingRetOrders = null;
-    private void doSyncPendingOrders() {
-
-        if (!ConnectionDetector.isConnected(this)) {
-            AppUtils.showAlertDialog(this, Constants.MSG_NO_INTERNET_TITLE, Constants.MSG_NO_INTERNET_MSG);
-        }else {
-            ROSDbHelper dbHelper = new ROSDbHelper(this);
-            this.pendingNewOrders = dbHelper.getNewOrdersPending(this);
-            this.pendingRetOrders = dbHelper.getReturnOrdersPending(this);
-            doSyncPendingOrdersContinue();
-        }
-    }
-
-    private void orderSyncCompleted() {
-        setPendingSyncButtonStatus(false);
-
-        if (shouldShowDailySync()) {
-            downloadDailyData();
-        }
-        //TODO show message if needed
-    }
-
-    private void orderSyncFailed() {
-        pendingNewOrders.clear();
-        pendingRetOrders.clear();
-        //TODO show message
-    }
-
-    private void doSyncPendingOrdersContinue() {
-        if (pendingNewOrders.size() > 0) {
-            ROSNewOrder newOrder = pendingNewOrders.get(0);
-            doNewOrderSync(newOrder);
-        }else if (pendingRetOrders.size() > 0) {
-            ROSReturnOrder returnOrder = pendingRetOrders.get(0);
-            doReturnOrderSync(returnOrder);
-        } else {
-            if(pendingNewOrders != null) pendingNewOrders.clear();
-            if(pendingRetOrders != null) pendingRetOrders.clear();
-            orderSyncCompleted();
-        }
-    }
-
-    private void updateNewOrderOnSyncComplete(String orderId) {
-        ROSDbHelper dbHelper = new ROSDbHelper(this);
-        dbHelper.updateNewOrderStatusToSynced(this, orderId);
-    }
-
-    private void updateReturnOrderOnSyncComplete(String orderId) {
-        ROSDbHelper dbHelper = new ROSDbHelper(this);
-        dbHelper.updateReturnOrderStatusToSynced(this, orderId);
-    }
-
-    private void doNewOrderSync(ROSNewOrder newOrder) {
-        NewOrderServiceHandler newOrderServiceHandler = new NewOrderServiceHandler(this);
-        newOrderServiceHandler.syncNewOrder(newOrder, TAG, new NewOrderServiceHandler.NewOrderSyncListener() {
-            @Override
-            public void onOrderSyncSuccess(String orderId) {
-                pendingNewOrders.remove(0);
-                updateNewOrderOnSyncComplete(orderId);
-                doSyncPendingOrdersContinue();
-            }
-
-            @Override
-            public void onOrderSyncError(String orderId, VolleyError error) {
-                orderSyncFailed();
-            }
-        });
-    }
-
-    private void doReturnOrderSync(ROSReturnOrder returnOrder) {
-
     }
 }
