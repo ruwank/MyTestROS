@@ -1,11 +1,8 @@
 package com.relianceit.relianceorder.activity;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -13,16 +10,12 @@ import com.android.volley.VolleyError;
 import com.relianceit.relianceorder.AppController;
 import com.relianceit.relianceorder.R;
 import com.relianceit.relianceorder.db.ROSDbHelper;
-import com.relianceit.relianceorder.models.ROSNewOrder;
-import com.relianceit.relianceorder.models.ROSReturnOrder;
 import com.relianceit.relianceorder.services.GeneralServiceHandler;
-import com.relianceit.relianceorder.services.NewOrderServiceHandler;
 import com.relianceit.relianceorder.util.AppDataManager;
 import com.relianceit.relianceorder.util.AppUtils;
 import com.relianceit.relianceorder.util.ConnectionDetector;
 import com.relianceit.relianceorder.util.Constants;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -40,6 +33,8 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         String logged = AppDataManager.getData(this, Constants.DM_LOGGED_KEY);
+      //  downloadDailyData();
+/*
         if (logged != null && logged.equalsIgnoreCase("yes")) {
             if (isPendingDataAvailable()) {
                 loadHome();
@@ -51,6 +46,8 @@ public class MainActivity extends ActionBarActivity {
         }else {
             loadLogin();
         }
+        */
+        loadHome();
     }
 
     private void dailyDownloadFailed(int errorCode) {

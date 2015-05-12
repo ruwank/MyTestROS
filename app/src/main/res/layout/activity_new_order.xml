@@ -206,15 +206,7 @@
                 android:background="@drawable/border"
                 android:textSize="@dimen/common_text_size"
                 android:inputType="number" />
-            <!--<TextView-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:text="%"-->
-                <!--android:gravity="center_vertical|left"-->
-                <!--android:textSize="@dimen/tb_header_text_size"-->
-                <!--android:layout_marginRight="5dp"-->
-                <!--android:id="@+id/textView3"-->
-                <!--android:textStyle="bold" />-->
+
             <EditText
                 android:id="@+id/order_free_item"
                 android:layout_weight="1"
@@ -266,196 +258,13 @@
         android:id="@+id/new_order_table"
         >
 
-            <!--<TableRow-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_marginBottom="10dp"-->
-                <!--android:id="@+id/add_order_top_row"-->
-                <!-->-->
-                <!--<TextView-->
-                    <!--android:id="@+id/customer_name_label"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:gravity="right"-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:text="Customer : " />-->
-                <!--<TextView-->
-                    <!--android:id="@+id/customer_name"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:gravity="left"-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:text="Customer 2" />-->
-
-                <!--<TextView-->
-                    <!--android:id="@+id/top_second_label"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:gravity="right"-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:text="Total outstanding : " />-->
-                <!--<EditText-->
-                    <!--android:id="@+id/invoice_value"-->
-                    <!--android:layout_width="60dp"-->
-                    <!--android:layout_height="40dp"-->
-                    <!--android:textColor="@android:color/black"-->
-                    <!--android:background="@drawable/border"/>-->
-                <!--<TextView-->
-                    <!--android:id="@+id/total_outstanding"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:gravity="left"-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:text="Rs. 50,000" />-->
-
-                <!--</TableRow>-->
-
-        <!--<TableRow-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="60dp"-->
-            <!--android:background="@color/app_base_color"-->
-
-            <!-->-->
-            <!--<TextView android:text="@string/tbl_label_new_order_product"-->
-                <!--android:layout_weight="1"-->
-                <!--android:gravity="center_horizontal"-->
-                <!--android:textStyle="bold"-->
-                <!--android:layout_margin="1px"-->
-                <!--android:layout_marginTop="5dp"-->
-                <!--android:layout_marginBottom="5dp"-->
-                <!--android:textColor="@android:color/white"/>-->
-            <!--<TextView android:text="@string/tbl_label_new_order_batch"-->
-                <!--android:layout_weight="1"-->
-                <!--android:gravity="center_horizontal"-->
-                <!--android:textStyle="bold"-->
-                <!--android:layout_margin="1px"-->
-                <!--android:layout_marginTop="5dp"-->
-                <!--android:layout_marginBottom="5dp"-->
-                <!--android:textColor="@android:color/white"/>-->
-            <!--<TextView android:text="@string/tbl_label_new_order_qty"-->
-                <!--android:layout_weight="1"-->
-                <!--android:gravity="center_horizontal"-->
-                <!--android:textStyle="bold"-->
-                <!--android:layout_margin="1px"-->
-                <!--android:layout_marginTop="5dp"-->
-                <!--android:layout_marginBottom="5dp"-->
-                <!--android:textColor="@android:color/white"/>-->
-            <!--<TextView android:text="@string/tbl_label_new_order_price"-->
-                <!--android:layout_weight="1"-->
-                <!--android:gravity="center_horizontal"-->
-                <!--android:textStyle="bold"-->
-                <!--android:layout_margin="1px"-->
-                <!--android:layout_marginTop="5dp"-->
-                <!--android:layout_marginBottom="5dp"-->
-                <!--android:textColor="@android:color/white"/>-->
-            <!--<TextView android:text="@string/tbl_label_new_order_disc"-->
-                <!--android:layout_weight="1"-->
-                <!--android:gravity="center_horizontal"-->
-                <!--android:textStyle="bold"-->
-                <!--android:layout_margin="1px"-->
-                <!--android:layout_marginTop="5dp"-->
-                <!--android:layout_marginBottom="5dp"-->
-                <!--android:textColor="@android:color/white"/>-->
-            <!--<TextView android:text="@string/tbl_label_new_order_fi"-->
-                <!--android:layout_weight="1"-->
-                <!--android:gravity="center_horizontal"-->
-                <!--android:textStyle="bold"-->
-                <!--android:layout_margin="1px"-->
-                <!--android:layout_marginTop="5dp"-->
-                <!--android:layout_marginBottom="5dp"-->
-                <!--android:textColor="@android:color/white"/>-->
-            <!--<TextView android:text="@string/tbl_label_new_order_value"-->
-                <!--android:layout_weight="1"-->
-                <!--android:gravity="center_horizontal"-->
-                <!--android:textStyle="bold"-->
-                <!--android:layout_margin="1px"-->
-                <!--android:layout_marginTop="5dp"-->
-                <!--android:layout_marginBottom="5dp"-->
-                <!--android:textColor="@android:color/white"/>-->
-            <!--<LinearLayout-->
-                <!--android:layout_width="40dp"-->
-                <!--android:layout_height="match_parent" />-->
-        <!--</TableRow>-->
-        <!--<TableRow-->
-            <!--android:layout_marginTop="5dp"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="80dp"-->
-           <!-->-->
-            <!--<Spinner-->
-                <!--android:id="@+id/product_spinner"-->
-                <!--android:layout_width="80dp"-->
-                <!--android:layout_weight="1"-->
-                <!--android:layout_margin="5px"-->
-                <!--android:spinnerMode="dropdown" />-->
-            <!--<Spinner-->
-                <!--android:id="@+id/batch_spinner"-->
-                <!--android:layout_width="80dp"-->
-                <!--android:layout_weight="1"-->
-                <!--android:textColor="@android:color/black"-->
-                <!--android:layout_margin="5dp"-->
-                <!--android:spinnerMode="dropdown" />-->
-            <!--<EditText-->
-                <!--android:id="@+id/order_quantity"-->
-                <!--android:layout_weight="1"-->
-                <!--android:gravity="center_horizontal"-->
-                <!--android:layout_width="80dp"-->
-                <!--android:layout_height="fill_parent"-->
-                <!--android:layout_margin="5px"-->
-                <!--android:textColor="@android:color/black"-->
-                <!--android:background="@drawable/border"/>-->
-            <!--<EditText-->
-                <!--android:id="@+id/order_price"-->
-                <!--android:layout_weight="1"-->
-                <!--android:gravity="center_horizontal"-->
-                <!--android:layout_width="80dp"-->
-                <!--android:layout_height="fill_parent"-->
-                <!--android:layout_margin="5px"-->
-                <!--android:textColor="@android:color/black"-->
-                <!--android:background="@drawable/border"/>-->
-            <!--<EditText-->
-                <!--android:id="@+id/order_discount"-->
-                <!--android:layout_weight="1"-->
-                <!--android:layout_width="80dp"-->
-                <!--android:layout_height="fill_parent"-->
-                <!--android:gravity="center_horizontal"-->
-                <!--android:layout_margin="5px"-->
-                <!--android:textColor="@android:color/black"-->
-                <!--android:background="@drawable/border"/>-->
-            <!--<EditText-->
-                <!--android:id="@+id/order_free_item"-->
-                <!--android:layout_weight="1"-->
-                <!--android:layout_width="80dp"-->
-                <!--android:layout_height="fill_parent"-->
-                <!--android:gravity="center_horizontal"-->
-                <!--android:layout_margin="5px"-->
-                <!--android:textColor="@android:color/black"-->
-                <!--android:background="@drawable/border"/>-->
-            <!--<TextView-->
-                <!--android:id="@+id/order_total_amount"-->
-                <!--android:layout_weight="1"-->
-                <!--android:gravity="center_horizontal"-->
-                <!--android:editable="false"-->
-                <!--android:layout_width="80dp"-->
-                <!--android:layout_height="fill_parent"-->
-                <!--android:layout_margin="5px"-->
-                <!--android:textColor="@android:color/black"-->
-                <!--></TextView>-->
-
-            <!--<ImageButton-->
-                <!--android:id="@+id/btnAddOrder"-->
-                <!--android:layout_width="80dp"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:layout_gravity="center"-->
-                <!--android:src="@mipmap/btn_add_item"-->
-                <!--android:background="@android:color/transparent" />-->
-
-        <!--</TableRow>-->
         </TableLayout>
     </ScrollView>
     <TableLayout
         android:id="@+id/bottom_table"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:gravity="bottom"
         android:layout_alignParentBottom="true">
         <TableRow
             android:layout_width="fill_parent"
