@@ -44,7 +44,8 @@
                 android:inputType="textPersonName"
                 android:ems="10"
                 android:id="@+id/userName"
-                android:textSize="@dimen/tb_header_text_size"/>
+                android:textSize="@dimen/tb_header_text_size"
+                android:textColor="@color/app_base_color" />
         </LinearLayout>
 
         <LinearLayout
@@ -68,7 +69,8 @@
                 android:inputType="textPassword"
                 android:ems="10"
                 android:id="@+id/password"
-                android:textSize="@dimen/tb_header_text_size"/>
+                android:textSize="@dimen/tb_header_text_size"
+                android:textColor="@color/app_base_color" />
 
         </LinearLayout>
 
