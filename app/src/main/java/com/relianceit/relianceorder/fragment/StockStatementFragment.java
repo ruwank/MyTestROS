@@ -27,10 +27,17 @@ public class StockStatementFragment extends Fragment{
 				R.layout.fragment_stock_statement, container, false);
 
         stockStatementTable=(TableLayout)rootView.findViewById(R.id.stock_statement_table);
-        loadData();
+
 		return rootView;
 	}
-private void loadData(){
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadData();
+    }
+
+    private void loadData(){
     ROSDbHelper dbHelper = new ROSDbHelper(getActivity().getApplicationContext());
     ArrayList<ROSStock> stockArrayList=dbHelper.getStocks(getActivity().getApplicationContext());
     for (int i = 0; i <stockArrayList.size() ; i++) {
