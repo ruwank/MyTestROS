@@ -268,164 +268,210 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
     }
 
     private void addNewOrder(){
-
-        String productName= productSpinner.getSelectedItem().toString();
-        String batchName= batchSpinner.getSelectedItem().toString();
-        String quantity = quantityText.getText().toString();
-        String orderPrice = orderPriceText.getText().toString();
-        String orderDiscount = orderDiscountText.getText().toString();
-        String freeItem = freeItemText.getText().toString();
-        final String total=itemTotalAmount.getText().toString();
-        if(productName != null && productName.length()>0 && batchName !=null && batchName.length()>0 &&
-                quantity != null && quantity.length()>0 && orderPrice !=null && orderPrice.length()>0) {
-            itemCount++;
-            final int index=itemCount;
-            ROSNewOrderItem newOrderItem=new ROSNewOrderItem();
-            newOrderItem.setProductBatchCode(batchName);
-            newOrderItem.setProductDescription(productName);
-            newOrderItem.setQtyOrdered(Integer.parseInt(quantity));
-            newOrderItem.setQtyBonus(Integer.parseInt(freeItem));
-            newOrderItem.setEffPrice(Float.valueOf(total));
-            newOrderItem.setProductCode(stock.getProductCode());
-            newOrderItem.setSuppCode(stock.getSuppCode());
-            newOrderItem.setStockLocationCode(stock.getStockLocationCode());
-            newOrderItem.setUnitPrice(Float.valueOf(orderPrice));
-            newOrderItem.setProdDiscount(Float.valueOf(orderDiscount));
-
-
-            newOrderItemMap.put(""+itemCount,newOrderItem);
-            updateOrderGrossValue();
-
-            TableRow.LayoutParams layoutParamsTableRow = new TableRow.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
-            layoutParamsTableRow.topMargin = 5;
-            layoutParamsTableRow.bottomMargin = 5;
-            TableRow tableRow = new TableRow(this);
-            tableRow.setLayoutParams(layoutParamsTableRow);
-            //tableRow.setBackgroundResource(R.drawable.border);
+if(isFieldHasValidAmount()) {
+    String productName = productSpinner.getSelectedItem().toString();
+    String batchName = batchSpinner.getSelectedItem().toString();
+    String quantity = quantityText.getText().toString();
+    String orderPrice = orderPriceText.getText().toString();
+    String orderDiscount = orderDiscountText.getText().toString();
+    String freeItem = freeItemText.getText().toString();
+    final String total = itemTotalAmount.getText().toString();
+    if (productName != null && productName.length() > 0 && batchName != null && batchName.length() > 0 &&
+            quantity != null && quantity.length() > 0 && orderPrice != null && orderPrice.length() > 0) {
+        itemCount++;
+        final int index = itemCount;
+        ROSNewOrderItem newOrderItem = new ROSNewOrderItem();
+        newOrderItem.setProductBatchCode(batchName);
+        newOrderItem.setProductDescription(productName);
+        newOrderItem.setQtyOrdered(Integer.parseInt(quantity));
+        newOrderItem.setQtyBonus(Integer.parseInt(freeItem));
+        newOrderItem.setEffPrice(Float.valueOf(total));
+        newOrderItem.setProductCode(stock.getProductCode());
+        newOrderItem.setSuppCode(stock.getSuppCode());
+        newOrderItem.setStockLocationCode(stock.getStockLocationCode());
+        newOrderItem.setUnitPrice(Float.valueOf(orderPrice));
+        newOrderItem.setProdDiscount(Float.valueOf(orderDiscount));
 
 
-            TableRow.LayoutParams layoutParamsTextView = new TableRow.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1.0f);
-            layoutParamsTextView.gravity = Gravity.CENTER_VERTICAL;
-            layoutParamsTextView.setMargins(5, 10, 5, 5);
-            layoutParamsTextView.weight = 1.5f;
+        newOrderItemMap.put("" + itemCount, newOrderItem);
+        updateOrderGrossValue();
 
-            TextView productTextView = new TextView(this);
-            productTextView.setText(productName);
-            productTextView.setGravity(Gravity.LEFT);
-            productTextView.setLayoutParams(layoutParamsTextView);
-            productTextView.setTextColor(getResources().getColor(R.color.color_black));
-            productTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
-
-            TextView batchTextView = new TextView(this);
-            batchTextView.setText(batchName);
-            batchTextView.setGravity(Gravity.LEFT);
-            batchTextView.setLayoutParams(layoutParamsTextView);
-            batchTextView.setTextColor(getResources().getColor(R.color.color_black));
-            batchTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
+        TableRow.LayoutParams layoutParamsTableRow = new TableRow.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParamsTableRow.topMargin = 5;
+        layoutParamsTableRow.bottomMargin = 5;
+        TableRow tableRow = new TableRow(this);
+        tableRow.setLayoutParams(layoutParamsTableRow);
+        //tableRow.setBackgroundResource(R.drawable.border);
 
 
-            TableRow.LayoutParams layoutParamsTextView2 = new TableRow.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1.0f);
-            layoutParamsTextView2.gravity = Gravity.CENTER_VERTICAL;
-            layoutParamsTextView2.setMargins(5, 10, 5, 5);
-            layoutParamsTextView2.weight = 1f;
+        TableRow.LayoutParams layoutParamsTextView = new TableRow.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1.0f);
+        layoutParamsTextView.gravity = Gravity.CENTER_VERTICAL;
+        layoutParamsTextView.setMargins(5, 10, 5, 5);
+        layoutParamsTextView.weight = 1.5f;
 
-            TextView qtyTextView = new TextView(this);
-            qtyTextView.setText(quantity);
-            qtyTextView.setGravity(Gravity.LEFT);
-            qtyTextView.setLayoutParams(layoutParamsTextView2);
-            qtyTextView.setTextColor(getResources().getColor(R.color.color_black));
-            qtyTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
+        TextView productTextView = new TextView(this);
+        productTextView.setText(productName);
+        productTextView.setGravity(Gravity.LEFT);
+        productTextView.setLayoutParams(layoutParamsTextView);
+        productTextView.setTextColor(getResources().getColor(R.color.color_black));
+        productTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
 
-            TextView priceTextView = new TextView(this);
-            priceTextView.setText(orderPrice);
-            priceTextView.setGravity(Gravity.LEFT);
-            priceTextView.setLayoutParams(layoutParamsTextView2);
-            priceTextView.setTextColor(getResources().getColor(R.color.color_black));
-            priceTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
-
-            TextView discTextView = new TextView(this);
-            discTextView.setText(orderDiscount);
-            discTextView.setGravity(Gravity.LEFT);
-            discTextView.setLayoutParams(layoutParamsTextView2);
-            discTextView.setTextColor(getResources().getColor(R.color.color_black));
-            discTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
-
-            TextView freeItemTextView = new TextView(this);
-            freeItemTextView.setText(freeItem);
-            freeItemTextView.setGravity(Gravity.LEFT);
-            freeItemTextView.setLayoutParams(layoutParamsTextView2);
-            freeItemTextView.setTextColor(getResources().getColor(R.color.color_black));
-            freeItemTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
-
-            TextView totalValueTextView = new TextView(this);
-            totalValueTextView.setText(total);
-            totalValueTextView.setGravity(Gravity.LEFT);
-            totalValueTextView.setLayoutParams(layoutParamsTextView2);
-            totalValueTextView.setTextColor(getResources().getColor(R.color.color_black));
-            totalValueTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
-
-            TableRow.LayoutParams layoutParamsImageButton = new TableRow.LayoutParams(80, ViewGroup.LayoutParams.WRAP_CONTENT);
-            layoutParamsImageButton.gravity = Gravity.RIGHT;
-
-            ImageButton removeItemButton = new ImageButton(this);
-            removeItemButton.setImageResource(R.mipmap.btn_delete_item);
-            //removeItemButton.setLayoutParams(layoutParamsTextView2);
-            removeItemButton.setBackgroundResource(R.color.color_transparent);
-
-            removeItemButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    removeOrder(index);
-                }
-
-            });
-
-            tableRow.setId(index);
+        TextView batchTextView = new TextView(this);
+        batchTextView.setText(batchName);
+        batchTextView.setGravity(Gravity.LEFT);
+        batchTextView.setLayoutParams(layoutParamsTextView);
+        batchTextView.setTextColor(getResources().getColor(R.color.color_black));
+        batchTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
 
 
-            tableRow.addView(productTextView, 0);
-            tableRow.addView(batchTextView, 1);
-            tableRow.addView(qtyTextView, 2);
-            tableRow.addView(priceTextView, 3);
-            tableRow.addView(discTextView, 4);
-            tableRow.addView(freeItemTextView, 5);
-            tableRow.addView(totalValueTextView, 6);
-            tableRow.addView(removeItemButton, 7);
+        TableRow.LayoutParams layoutParamsTextView2 = new TableRow.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1.0f);
+        layoutParamsTextView2.gravity = Gravity.CENTER_VERTICAL;
+        layoutParamsTextView2.setMargins(5, 10, 5, 5);
+        layoutParamsTextView2.weight = 1f;
 
-            //tableRow.addView(productTextView, 0);
-            //tableRow.addView(batchTextView, 1);
-            orderTableLayout.addView(tableRow, 0);
+        TextView qtyTextView = new TextView(this);
+        qtyTextView.setText(quantity);
+        qtyTextView.setGravity(Gravity.LEFT);
+        qtyTextView.setLayoutParams(layoutParamsTextView2);
+        qtyTextView.setTextColor(getResources().getColor(R.color.color_black));
+        qtyTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
 
-            quantityText.setText("");
-            orderPriceText.setText("");
-            orderDiscountText.setText("");
-            freeItemText.setText("");
-            itemTotalAmount.setText("");
-        }
+        TextView priceTextView = new TextView(this);
+        priceTextView.setText(orderPrice);
+        priceTextView.setGravity(Gravity.LEFT);
+        priceTextView.setLayoutParams(layoutParamsTextView2);
+        priceTextView.setTextColor(getResources().getColor(R.color.color_black));
+        priceTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
+
+        TextView discTextView = new TextView(this);
+        discTextView.setText(orderDiscount);
+        discTextView.setGravity(Gravity.LEFT);
+        discTextView.setLayoutParams(layoutParamsTextView2);
+        discTextView.setTextColor(getResources().getColor(R.color.color_black));
+        discTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
+
+        TextView freeItemTextView = new TextView(this);
+        freeItemTextView.setText(freeItem);
+        freeItemTextView.setGravity(Gravity.LEFT);
+        freeItemTextView.setLayoutParams(layoutParamsTextView2);
+        freeItemTextView.setTextColor(getResources().getColor(R.color.color_black));
+        freeItemTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
+
+        TextView totalValueTextView = new TextView(this);
+        totalValueTextView.setText(total);
+        totalValueTextView.setGravity(Gravity.LEFT);
+        totalValueTextView.setLayoutParams(layoutParamsTextView2);
+        totalValueTextView.setTextColor(getResources().getColor(R.color.color_black));
+        totalValueTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
+
+        TableRow.LayoutParams layoutParamsImageButton = new TableRow.LayoutParams(80, ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParamsImageButton.gravity = Gravity.RIGHT;
+
+        ImageButton removeItemButton = new ImageButton(this);
+        removeItemButton.setImageResource(R.mipmap.btn_delete_item);
+        //removeItemButton.setLayoutParams(layoutParamsTextView2);
+        removeItemButton.setBackgroundResource(R.color.color_transparent);
+
+        removeItemButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                removeOrder(index);
+            }
+
+        });
+
+        tableRow.setId(index);
+
+
+        tableRow.addView(productTextView, 0);
+        tableRow.addView(batchTextView, 1);
+        tableRow.addView(qtyTextView, 2);
+        tableRow.addView(priceTextView, 3);
+        tableRow.addView(discTextView, 4);
+        tableRow.addView(freeItemTextView, 5);
+        tableRow.addView(totalValueTextView, 6);
+        tableRow.addView(removeItemButton, 7);
+
+        //tableRow.addView(productTextView, 0);
+        //tableRow.addView(batchTextView, 1);
+        orderTableLayout.addView(tableRow, 0);
+
+        quantityText.setText("");
+        orderPriceText.setText("");
+        orderDiscountText.setText("");
+        freeItemText.setText("");
+        itemTotalAmount.setText("");
+    }
+}
 
     }
-    private void updateItemTotalAmount(){
-        String productName= productSpinner.getSelectedItem().toString();
-        String batchName= batchSpinner.getSelectedItem().toString();
-        String quantity = quantityText.getText().toString();
-        String orderPrice = orderPriceText.getText().toString();
-        String orderDiscount = orderDiscountText.getText().toString();
-        double total=0.00f;
-        if(productName != null && productName.length()>0 && batchName !=null && batchName.length()>0 &&
-                quantity != null && quantity.length()>0 && orderPrice !=null && orderPrice.length()>0){
-            int quantityValue=Integer.parseInt(quantity);
-            double orderPriceValue=Double.valueOf(orderPrice);
-            total=orderPriceValue *quantityValue;
+    private boolean isProductBatchAlreadyAdded(String batchName){
+        boolean returnValue= false;
 
-            if(orderDiscount !=null && orderDiscount.length()>0){
-                double orderDiscountValue=Double.valueOf(orderDiscount);
-                total=(total*(1-(orderDiscountValue/100.0)));
+        Iterator iterator = newOrderItemMap.keySet().iterator();
+        while(iterator.hasNext()) {
+            String key=(String)iterator.next();
+            ROSNewOrderItem rosNewOrderItem=(ROSNewOrderItem)newOrderItemMap.get(key);
+            if(rosNewOrderItem.getProductCode()==stock.getProductCode() && rosNewOrderItem.getProductBatchCode()==batchName ){
+                returnValue=true;
             }
 
         }
-        itemTotalAmount.setText(String.format("%.2f", total));
+        return returnValue;
+    }
+    private boolean isFieldHasValidAmount(){
+        boolean returnValue= true;
+        String batchName= batchSpinner.getSelectedItem().toString();
+        String quantity = quantityText.getText().toString();
+        String orderDiscount = orderDiscountText.getText().toString();
+
+        if(isProductBatchAlreadyAdded(batchName)){
+            AppUtils.showAlertDialog(this, "Already added", "This product batch Already added try new batch");
+            returnValue=false;
+        }
+        if(quantity != null && quantity.length()>0){
+            int quantityValue=Integer.parseInt(quantity);
+            if(stock.getAvailableQuantity() <quantityValue){
+                AppUtils.showAlertDialog(this, "Over stock Quantity", "Can not add this much of quantity. You have only "+stock.getAvailableQuantity()+" quantity");
+                returnValue=false;
+            }
+        }
+        if(orderDiscount != null && orderDiscount.length()>0){
+            double orderDiscountValue=Double.parseDouble(orderDiscount);
+            if(orderDiscountValue> 100.0){
+                AppUtils.showAlertDialog(this, "Over discount", "Can not give this amount of discount");
+                returnValue=false;
+            }
+        }
+
+        return returnValue;
+
+    }
+    private void updateItemTotalAmount(){
+            String productName = productSpinner.getSelectedItem().toString();
+            String batchName = batchSpinner.getSelectedItem().toString();
+            String quantity = quantityText.getText().toString();
+            String orderPrice = orderPriceText.getText().toString();
+            String orderDiscount = orderDiscountText.getText().toString();
+            double total = 0.00f;
+
+            if (productName != null && productName.length() > 0 && batchName != null && batchName.length() > 0 &&
+                    quantity != null && quantity.length() > 0 && orderPrice != null && orderPrice.length() > 0) {
+
+                int quantityValue = Integer.parseInt(quantity);
+                double orderPriceValue = Double.valueOf(orderPrice);
+                total = orderPriceValue * quantityValue;
+
+                if (orderDiscount != null && orderDiscount.length() > 0) {
+                    double orderDiscountValue = Double.valueOf(orderDiscount);
+                    total = (total * (1 - (orderDiscountValue / 100.0)));
+                }
+
+            }
+            itemTotalAmount.setText(String.format("%.2f", total));
+
 
 
     }
