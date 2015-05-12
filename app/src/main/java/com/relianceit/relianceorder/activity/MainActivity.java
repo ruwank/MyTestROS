@@ -42,7 +42,6 @@ public class MainActivity extends ActionBarActivity {
         String logged = AppDataManager.getData(this, Constants.DM_LOGGED_KEY);
         if (logged != null && logged.equalsIgnoreCase("yes")) {
             if (isPendingDataAvailable()) {
-                AppUtils.showAlertDialog(this, "Sync required!", "There is some local data in the app. Please sync them.");
                 loadHome();
             }else if (shouldShowDailySync()) {
                 downloadDailyData();

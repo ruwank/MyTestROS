@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.content.Context;
+import android.util.Log;
 
 import com.relianceit.relianceorder.models.ROSCustomer;
 import com.relianceit.relianceorder.models.ROSNewOrder;
@@ -21,6 +22,8 @@ import java.util.ArrayList;
  * Created by sura on 4/28/15.
  */
 public class ROSDbHelper extends SQLiteOpenHelper {
+
+    public static final String TAG = ROSDbHelper.class.getSimpleName();
 
     // If you change the database schema, you must increment the database version.
     public static final int DATABASE_VERSION = 5;
@@ -1090,8 +1093,9 @@ public class ROSDbHelper extends SQLiteOpenHelper {
         final String SQL_UPDATE_STOCK = "UPDATE " + ROSDbConstants.Stock.TABLE_NAME +
                 " SET " + ROSDbConstants.Stock.CL_NAME_AVAILABLE_QTY + " = (" + ROSDbConstants.Stock.CL_NAME_AVAILABLE_QTY + "-" + removedQuantity + ")" +
                 " WHERE " + ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME + " = '" + stock.getProductDescription() +
-                "' AND " + ROSDbConstants.Stock.CL_NAME_PRODUCT_CODE + " = '" + stock.getProductBatchCode() +
+                "' AND " + ROSDbConstants.Stock.CL_NAME_PRODUCT_CODE + " = '" + stock.getProductCode() +
                 "' AND " + ROSDbConstants.Stock.CL_NAME_BATCH_NAME + " = '" + stock.getProductBatchCode() + "';";
+        Log.i(TAG, "SQL_UPDATE_STOCK: " + SQL_UPDATE_STOCK);
         db.execSQL(SQL_UPDATE_STOCK);
         db.close();
     }

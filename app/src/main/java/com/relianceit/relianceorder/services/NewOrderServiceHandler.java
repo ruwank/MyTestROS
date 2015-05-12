@@ -13,8 +13,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.relianceit.relianceorder.AppController;
+import com.relianceit.relianceorder.db.ROSDbHelper;
 import com.relianceit.relianceorder.models.ROSNewOrder;
 import com.relianceit.relianceorder.models.ROSNewOrderItem;
+import com.relianceit.relianceorder.models.ROSStock;
 import com.relianceit.relianceorder.models.ROSUser;
 import com.relianceit.relianceorder.util.AppURLs;
 
@@ -107,10 +109,14 @@ public class NewOrderServiceHandler {
                         Log.i(TAG, "Sync NewOrder error " + volleyError.toString());
                         if (volleyError.networkResponse != null && volleyError.networkResponse.statusCode == 401) {
                             Log.i(TAG, "Sync NewOrder failed ====== Unauthorized");
+                            syncFailed(orderId, requestTag, listener, volleyError);
+                        }else if (volleyError.toString().contains("com.android.volley.ParseError")) {
+                            Log.i(TAG, "Sync NewOrder success ====== Parse error");
+                            syncSuccess(orderId, requestTag, listener);
                         }else {
                             Log.i(TAG, "Sync NewOrder failed ====== Server error");
+                            syncFailed(orderId, requestTag, listener, volleyError);
                         }
-                        syncFailed(orderId, requestTag, listener, volleyError);
                     }
                 })
         {
@@ -123,6 +129,15 @@ public class NewOrderServiceHandler {
         };
 
         AppController.getInstance().addToRequestQueue(syncRequest, requestTag);
+    }
+
+    private void testSticks() {
+        ROSDbHelper dbHelper = new ROSDbHelper(context);
+        ArrayList<ROSStock> stocks = dbHelper.getStocks(context);
+        for (int i = 0; i < stocks.size(); i++) {
+            ROSStock stock = stocks.get(i);
+            stock.print();
+        }
     }
 
     public void testSyncNewOrder() {
@@ -150,7 +165,7 @@ public class NewOrderServiceHandler {
         syncNewOrder(order, TAG, new NewOrderSyncListener() {
             @Override
             public void onOrderSyncSuccess(String orderId) {
-Log.v("onOrderSyncSuccess","orderId:"+orderId);
+                Log.v("onOrderSyncSuccess","orderId:"+orderId);
             }
 
             @Override

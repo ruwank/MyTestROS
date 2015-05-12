@@ -67,6 +67,10 @@ public class HomeActivity extends RelianceBaseActivity {
         registerReceiver(localDataChangeReceiver, new IntentFilter(Constants.LocalDataChange.ACTION_ORDER_ADDED));
         registerReceiver(localDataChangeReceiver, new IntentFilter(Constants.LocalDataChange.ACTION_ORDER_SYNCED));
         registerReceiver(localDataChangeReceiver, new IntentFilter(Constants.LocalDataChange.ACTION_DAILY_SYNCED));
+
+        if (isPendingDataAvailable()) {
+            AppUtils.showAlertDialog(this, "Sync required!", "There is some local data in the app. Please sync them.");
+        }
 	}
 
     @Override
