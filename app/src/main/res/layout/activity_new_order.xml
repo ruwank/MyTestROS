@@ -302,7 +302,8 @@
                 android:textColor="@android:color/black"
                 android:background="@drawable/border"
                 android:textSize="@dimen/common_text_size"
-                android:lines="1" />
+                android:lines="1"
+                android:inputType="number" />
             <TextView android:text="@string/tbl_label_discount_value"
                 android:layout_weight="1"
                 android:layout_margin="3px"

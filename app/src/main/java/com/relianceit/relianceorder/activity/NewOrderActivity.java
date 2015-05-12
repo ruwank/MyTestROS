@@ -221,7 +221,8 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
 
     private  void loadData(){
       selectedCustomer= AppController.getInstance().getRosCustomer();
-        totalOutstanding.setText(""+selectedCustomer.getOutstandingAmount());
+        totalOutstanding.setText(String.format("%.2f", selectedCustomer.getOutstandingAmount()));
+
         customerName.setText(selectedCustomer.getCustName());
         customizeActionBar();
 
@@ -264,6 +265,7 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
         String batchName= batchSpinner.getSelectedItem().toString();
         Log.v("productName :",productName);
         stock= dbHelper.getStockForSale(getApplicationContext(), productName, batchName);
+        orderPriceText.setText(String.format("%.2f", stock.getUnitPrice()));
 
     }
 
@@ -275,22 +277,31 @@ if(isFieldHasValidAmount()) {
     String orderPrice = orderPriceText.getText().toString();
     String orderDiscount = orderDiscountText.getText().toString();
     String freeItem = freeItemText.getText().toString();
+
     final String total = itemTotalAmount.getText().toString();
     if (productName != null && productName.length() > 0 && batchName != null && batchName.length() > 0 &&
             quantity != null && quantity.length() > 0 && orderPrice != null && orderPrice.length() > 0) {
         itemCount++;
         final int index = itemCount;
+        float orderDiscountValue=0.0f;
+        if (orderDiscount != null && orderDiscount.length() > 0){
+            orderDiscountValue=  Float.valueOf(orderDiscount);
+        }
+        int freeItemCount=0;
+        if (freeItem != null && freeItem.length() > 0){
+            freeItemCount=  Integer.parseInt(freeItem);
+        }
         ROSNewOrderItem newOrderItem = new ROSNewOrderItem();
         newOrderItem.setProductBatchCode(stock.getProductBatchCode());
         newOrderItem.setProductDescription(productName);
         newOrderItem.setQtyOrdered(Integer.parseInt(quantity));
-        newOrderItem.setQtyBonus(Integer.parseInt(freeItem));
+        newOrderItem.setQtyBonus(freeItemCount);
         newOrderItem.setEffPrice(Float.valueOf(total));
         newOrderItem.setProductCode(stock.getProductCode());
         newOrderItem.setSuppCode(stock.getSuppCode());
         newOrderItem.setStockLocationCode(stock.getStockLocationCode());
-        newOrderItem.setUnitPrice(Float.valueOf(orderPrice));
-        newOrderItem.setProdDiscount(Float.valueOf(orderDiscount));
+        newOrderItem.setUnitPrice(Double.parseDouble(orderPrice));
+        newOrderItem.setProdDiscount(orderDiscountValue);
 
 
         newOrderItemMap.put("" + itemCount, newOrderItem);
@@ -346,14 +357,14 @@ if(isFieldHasValidAmount()) {
         priceTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
 
         TextView discTextView = new TextView(this);
-        discTextView.setText(orderDiscount);
+        discTextView.setText(""+orderDiscountValue);
         discTextView.setGravity(Gravity.LEFT);
         discTextView.setLayoutParams(layoutParamsTextView2);
         discTextView.setTextColor(getResources().getColor(R.color.color_black));
         discTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
 
         TextView freeItemTextView = new TextView(this);
-        freeItemTextView.setText(freeItem);
+        freeItemTextView.setText(""+freeItemCount);
         freeItemTextView.setGravity(Gravity.LEFT);
         freeItemTextView.setLayoutParams(layoutParamsTextView2);
         freeItemTextView.setTextColor(getResources().getColor(R.color.color_black));
@@ -399,7 +410,7 @@ if(isFieldHasValidAmount()) {
         orderTableLayout.addView(tableRow, 0);
 
         quantityText.setText("");
-        orderPriceText.setText("");
+        orderPriceText.setText(String.format("%.2f", stock.getUnitPrice()));
         orderDiscountText.setText("");
         freeItemText.setText("");
         itemTotalAmount.setText("");
@@ -555,8 +566,10 @@ if(isFieldHasValidAmount()) {
             if(orderIdStr !=null){
                 double customerOutstanding=selectedCustomer.getOutstanding()+Double.valueOf(orderValueText);
                 dbHelper.updateCustomerOutstanding(getApplicationContext(),selectedCustomer.getCustomerId(),customerOutstanding);
+                totalOutstanding.setText(String.format("%.2f", customerOutstanding));
+
                 if (ConnectionDetector.isConnected(this)) {
-                    AppUtils.showProgressDialog(getApplicationContext());
+                    AppUtils.showProgressDialog(NewOrderActivity.this);
                     NewOrderServiceHandler newOrderServiceHandler = new NewOrderServiceHandler(getApplicationContext());
                     newOrderServiceHandler.syncNewOrder(rosNewOrder, "new_order_add", new NewOrderServiceHandler.NewOrderSyncListener() {
                         @Override

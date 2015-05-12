@@ -14,6 +14,7 @@
         <item name="colorPrimaryDark">@color/app_base_color_2</item>
         <item name="android:textColorPrimary">@android:color/white</item>
         <item name="android:spinnerItemStyle">@style/MooSpinnerItem</item>
+        <item name="actionOverflowMenuStyle">@style/CMOptionsMenu</item>
 
     </style>
 
@@ -30,5 +31,7 @@
     <style name="MooTextAppearanceSpinnerItem" parent="android:TextAppearance.Widget.TextView.SpinnerItem">
         <item name="android:textColor">@color/color_black</item>
     </style>
-
+    <style name="CMOptionsMenu" parent="Widget.AppCompat.PopupMenu.Overflow">
+        <item name="android:popupBackground">@color/app_base_color_2</item>
+    </style>
 </resources>
