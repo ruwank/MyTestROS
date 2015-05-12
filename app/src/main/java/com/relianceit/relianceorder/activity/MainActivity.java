@@ -37,7 +37,6 @@ public class MainActivity extends ActionBarActivity {
 /*
         if (logged != null && logged.equalsIgnoreCase("yes")) {
             if (isPendingDataAvailable()) {
-                AppUtils.showAlertDialog(this, "Sync required!", "There is some local data in the app. Please sync them.");
                 loadHome();
             }else if (shouldShowDailySync()) {
                 downloadDailyData();
