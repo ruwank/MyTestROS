@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,6 +33,7 @@ import java.util.Calendar;
 public class ListOfOrderActivity extends ActionBarActivity implements  DatePickerDialog.OnDateSetListener {
 
     public static final String TAG = ListOfOrderActivity.class.getSimpleName();
+    public static final String ROW_TAG = "table_row_tag";
 
             TextView fromDate,toDate;
     DialogFragment datePickerFragment;
@@ -183,23 +185,31 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
     }
 
     private void showSalesOrders(ArrayList<ROSNewOrder> orders) {
-        itemIndex = 0;
+
+        Log.i(TAG, "Row count: " + itemIndex);
 
         for (int i = 0; i < orderListTable.getChildCount(); i++) {
             View child = orderListTable.getChildAt(i);
             if (child instanceof TableRow) {
-                orderListTable.removeView(child);
+                TableRow row = (TableRow)child;
+                Log.i(TAG, "Row id: " + row.getId());
+                if(row.getId() >= 0 &&  row.getId() <= itemIndex){
+                    Log.i(TAG, "Row removed: " + row.getId());
+                    orderListTable.removeView(row);
+                }
             }
         }
 
-//        for (int i = 0; i < orders.size(); i++) {
-//            ROSNewOrder order = orders.get(i);
-//            addSaleOrderToTable(order);
-//        }
+        itemIndex = 0;
+        for (int i = 0; i < orders.size(); i++) {
+            itemIndex = i;
+            ROSNewOrder order = orders.get(i);
+            addSaleOrderToTable(order);
+        }
     }
 
     private void addSaleOrderToTable(ROSNewOrder order){
-        itemIndex++;
+
         TableRow.LayoutParams layoutParamsTableRow = new TableRow.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -236,7 +246,10 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
         qtyTextView.setTextColor(getResources().getColor(R.color.color_black));
         qtyTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
 
-        tableRow.setId(itemIndex);
+        final int index = itemIndex;
+
+        //tableRow.setTag(ROW_TAG);
+        tableRow.setId(index);
         tableRow.addView(productTextView,0);
         tableRow.addView(batchTextView,1);
         tableRow.addView(qtyTextView,2);
@@ -246,7 +259,7 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
             @Override
             public void onClick(View v)
             {
-                loadOrderScreen(itemIndex);
+                loadOrderScreen(index);
             }
         });
 
