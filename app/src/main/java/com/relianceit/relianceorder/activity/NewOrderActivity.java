@@ -501,7 +501,13 @@ if(isFieldHasValidAmount()) {
         //discountValueText
 
         if(overallDisPre != null && overallDisPre.length()>0){
+
             double overallDisPreValue= Double.valueOf(overallDisPre);
+
+            if(overallDisPreValue> 100.0){
+                AppUtils.showAlertDialog(this, "Over discount", "Can not give this amount of discount");
+                return;
+            }
             discountValue=total*(overallDisPreValue/100.0);
 
         }
@@ -514,6 +520,20 @@ if(isFieldHasValidAmount()) {
 
         orderValue.setText(String.format("%.2f", total));
     }
+
+    private void clearField(){
+       //Set<String> keys= newOrderItemMap.keySet();
+        Object[] keys =newOrderItemMap.keySet().toArray();
+        for(int i=0;i<keys.length;i++) {
+            removeOrder(Integer.parseInt((String)keys[i]));
+        }
+        stock=null;
+
+        newOrderItemMap.clear();
+        overallDisPreText.setText("0");
+
+    }
+
     private void saveOrder(){
         String orderValueText = orderValue.getText().toString();
         String grossValueText = grossValueLabel.getText().toString();
@@ -530,28 +550,35 @@ if(isFieldHasValidAmount()) {
 
             if(discountPre != null && discountPre.length()>0)
             rosNewOrder.setOVDiscount(Double.valueOf(discountPre));
-           String orderIdStr= dbHelper.insertNewOrder(getApplicationContext(),rosNewOrder);
+           final String orderIdStr= dbHelper.insertNewOrder(getApplicationContext(),rosNewOrder);
 
             if(orderIdStr !=null){
-
+                double customerOutstanding=selectedCustomer.getOutstanding()+Double.valueOf(orderValueText);
+                dbHelper.updateCustomerOutstanding(getApplicationContext(),selectedCustomer.getCustomerId(),customerOutstanding);
                 if (ConnectionDetector.isConnected(this)) {
                     NewOrderServiceHandler newOrderServiceHandler = new NewOrderServiceHandler(getApplicationContext());
                     newOrderServiceHandler.syncNewOrder(rosNewOrder, "new_order_add", new NewOrderServiceHandler.NewOrderSyncListener() {
                         @Override
                         public void onOrderSyncSuccess(String orderId) {
                             Log.v("onOrderSyncSuccess", "orderId: " + orderId);
+                            dbHelper.updateNewOrderStatusToSynced(getApplicationContext(),orderIdStr);
+                            AppUtils.showAlertDialog(NewOrderActivity.this, "Order update Success", "Successfully updated order ");
+
                         }
 
                         @Override
                         public void onOrderSyncError(String orderId, VolleyError error) {
                             Log.v("onOrderSyncError", "orderId: " + orderId);
+                            AppUtils.showAlertDialog(NewOrderActivity.this, "Order update Error", "Order only stored in locally. You must Sync it later");
 
                         }
                     });
                 }else{
-                    AppUtils.showAlertDialog(this, "No Network", "Order only stored in locally. You must  ");
+                    AppUtils.showAlertDialog(this, "No Network", "Order only stored in locally. You must Sync it later");
 
                 }
+                clearField();
+
             }else{
                 AppUtils.showAlertDialog(this, "New Order Added Error!", "Try again later.");
 
