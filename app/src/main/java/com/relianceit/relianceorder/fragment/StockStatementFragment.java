@@ -38,6 +38,8 @@ public class StockStatementFragment extends Fragment{
     }
 
     private void loadData(){
+        stockStatementTable.removeAllViews();
+
     ROSDbHelper dbHelper = new ROSDbHelper(getActivity().getApplicationContext());
     ArrayList<ROSStock> stockArrayList=dbHelper.getStocks(getActivity().getApplicationContext());
     for (int i = 0; i <stockArrayList.size() ; i++) {
