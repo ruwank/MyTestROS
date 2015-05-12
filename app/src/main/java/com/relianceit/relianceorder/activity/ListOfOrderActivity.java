@@ -21,6 +21,7 @@ import com.android.volley.VolleyError;
 import com.relianceit.relianceorder.AppController;
 import com.relianceit.relianceorder.R;
 import com.relianceit.relianceorder.fragment.DatePickerDialogFragment;
+import com.relianceit.relianceorder.models.ROSCustomer;
 import com.relianceit.relianceorder.models.ROSNewOrder;
 import com.relianceit.relianceorder.services.NewOrderServiceHandler;
 import com.relianceit.relianceorder.util.AppUtils;
@@ -39,6 +40,7 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
     DialogFragment datePickerFragment;
     TableLayout orderListTable;
     TextView tblHeaderCol1,tblHeaderCol2,tblHeaderCol3;
+    TextView customerName;
     boolean fromDateSelect;
     private int fromYear;
     private int fromMonth;
@@ -49,7 +51,9 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
     int itemIndex;
     Button btnGetOrder;
     Constants.Section section;
-//
+    ROSCustomer selectedCustomer;
+
+    //
 // test comment
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,7 +100,6 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
                 fromDateSelect=false;
 
                 datePickerFragment.show(getSupportFragmentManager(), "datePicker");
-              //  ((DatePickerDialogFragment)datePickerFragment).updateDate(toYear, toMonth, toDay);
 
             }
         });
@@ -114,6 +117,7 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
         tblHeaderCol2=(TextView)findViewById(R.id.tbl_header_col2);
         tblHeaderCol3=(TextView)findViewById(R.id.tbl_header_col3);
 
+        customerName=(TextView)findViewById(R.id.customer_name);
         updateLabel();
 
         if(section == Constants.Section.VIEW_SALE_RETURNS_LIST){
@@ -123,7 +127,12 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
         }
 
     }
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateButtonTapped();
 
+    }
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -135,7 +144,9 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
             if (!ConnectionDetector.isConnected(this)) {
                 AppUtils.showAlertDialog(this, Constants.MSG_NO_INTERNET_TITLE, Constants.MSG_NO_INTERNET_MSG);
             }else {
-                getSalesOrderList("00001", "2014-01-01", "2016-01-01");
+              //  getSalesOrderList("00001", "2014-01-01", "2016-01-01");
+              //  Log.i("selectedCustomer.getCustCode()",selectedCustomer.getCustCode());
+                getSalesOrderList(selectedCustomer.getCustomerId(), fromDate.getText().toString(), toDate.getText().toString());
             }
         }else {
             showOrderItem();
@@ -166,9 +177,11 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
 
-
     }
     private  void updateLabel(){
+        selectedCustomer= AppController.getInstance().getRosCustomer();
+
+        customerName.setText(selectedCustomer.getCustName());
         customizeActionBar();
 
         if(section == Constants.Section.VIEW_SALE_RETURNS_LIST){
@@ -188,17 +201,8 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
 
         Log.i(TAG, "Row count: " + itemIndex);
 
-        for (int i = 0; i < orderListTable.getChildCount(); i++) {
-            View child = orderListTable.getChildAt(i);
-            if (child instanceof TableRow) {
-                TableRow row = (TableRow)child;
-                Log.i(TAG, "Row id: " + row.getId());
-                if(row.getId() >= 0 &&  row.getId() <= itemIndex){
-                    Log.i(TAG, "Row removed: " + row.getId());
-                    orderListTable.removeView(row);
-                }
-            }
-        }
+        orderListTable.removeAllViews();
+
 
         itemIndex = 0;
         for (int i = 0; i < orders.size(); i++) {
@@ -263,7 +267,7 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
             }
         });
 
-        orderListTable.addView(tableRow, 3);
+        orderListTable.addView(tableRow, 0);
 
     }
 

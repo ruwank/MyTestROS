@@ -281,7 +281,7 @@ if(isFieldHasValidAmount()) {
         itemCount++;
         final int index = itemCount;
         ROSNewOrderItem newOrderItem = new ROSNewOrderItem();
-        newOrderItem.setProductBatchCode(batchName);
+        newOrderItem.setProductBatchCode(stock.getProductBatchCode());
         newOrderItem.setProductDescription(productName);
         newOrderItem.setQtyOrdered(Integer.parseInt(quantity));
         newOrderItem.setQtyBonus(Integer.parseInt(freeItem));
@@ -423,7 +423,7 @@ if(isFieldHasValidAmount()) {
     }
     private boolean isFieldHasValidAmount(){
         boolean returnValue= true;
-        String batchName= batchSpinner.getSelectedItem().toString();
+        String batchName= stock.getProductBatchCode();
         String quantity = quantityText.getText().toString();
         String orderDiscount = orderDiscountText.getText().toString();
 
@@ -450,8 +450,8 @@ if(isFieldHasValidAmount()) {
 
     }
     private void updateItemTotalAmount(){
-            String productName = productSpinner.getSelectedItem().toString();
-            String batchName = batchSpinner.getSelectedItem().toString();
+            String productName = stock.getProductCode();
+            String batchName = stock.getProductBatchCode();
             String quantity = quantityText.getText().toString();
             String orderPrice = orderPriceText.getText().toString();
             String orderDiscount = orderDiscountText.getText().toString();
@@ -556,6 +556,7 @@ if(isFieldHasValidAmount()) {
                 double customerOutstanding=selectedCustomer.getOutstanding()+Double.valueOf(orderValueText);
                 dbHelper.updateCustomerOutstanding(getApplicationContext(),selectedCustomer.getCustomerId(),customerOutstanding);
                 if (ConnectionDetector.isConnected(this)) {
+                    AppUtils.showProgressDialog(getApplicationContext());
                     NewOrderServiceHandler newOrderServiceHandler = new NewOrderServiceHandler(getApplicationContext());
                     newOrderServiceHandler.syncNewOrder(rosNewOrder, "new_order_add", new NewOrderServiceHandler.NewOrderSyncListener() {
                         @Override
@@ -563,14 +564,14 @@ if(isFieldHasValidAmount()) {
                             Log.v("onOrderSyncSuccess", "orderId: " + orderId);
                             dbHelper.updateNewOrderStatusToSynced(getApplicationContext(),orderIdStr);
                             AppUtils.showAlertDialog(NewOrderActivity.this, "Order update Success", "Successfully updated order ");
-
+                            AppUtils.dismissProgressDialog();
                         }
 
                         @Override
                         public void onOrderSyncError(String orderId, VolleyError error) {
                             Log.v("onOrderSyncError", "orderId: " + orderId);
                             AppUtils.showAlertDialog(NewOrderActivity.this, "Order update Error", "Order only stored in locally. You must Sync it later");
-
+                            AppUtils.dismissProgressDialog();
                         }
                     });
                 }else{
