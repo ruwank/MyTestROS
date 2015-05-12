@@ -72,7 +72,7 @@
     <string name="title_activity_login">LoginActivity</string>
 
     <string name="section_new_order">New Order</string>
-    <string name="section_order_list">List of orders</string>
+    <string name="section_order_list">List of Orders</string>
     <string name="section_order_view">View Orders</string>
     <string name="section_sales_return">List of Returns</string>
     <string name="section_view_return">View Returns</string>

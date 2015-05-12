@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.android.volley.VolleyError;
 import com.relianceit.relianceorder.AppController;
 import com.relianceit.relianceorder.R;
+import com.relianceit.relianceorder.db.ROSDbHelper;
 import com.relianceit.relianceorder.fragment.DatePickerDialogFragment;
 import com.relianceit.relianceorder.models.ROSCustomer;
 import com.relianceit.relianceorder.models.ROSNewOrder;
@@ -30,6 +31,7 @@ import com.relianceit.relianceorder.util.Constants;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 
 public class ListOfOrderActivity extends ActionBarActivity implements  DatePickerDialog.OnDateSetListener {
 
@@ -130,8 +132,7 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
     @Override
     public void onResume() {
         super.onResume();
-        updateButtonTapped();
-
+        showLocalDataForToday();
     }
     @Override
     protected void onDestroy() {
@@ -139,14 +140,38 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
         AppController.getInstance().cancelPendingRequests(TAG);
     }
 
+    private void showLocalDataForToday() {
+        if(section != Constants.Section.VIEW_SALE_RETURNS_LIST){
+            ROSDbHelper dbHelper = new ROSDbHelper(this);
+            ArrayList<ROSNewOrder> orders = dbHelper.getNewOrders(this, selectedCustomer.getCustomerId());
+
+            StringBuilder toDateString=new StringBuilder().append(toDay).
+                    append("/").append(toMonth + 1)
+                    .append("/").append(toYear);
+            String dateStr = toDateString.toString();
+
+            for (int i = 0; i < orders.size(); i++) {
+                ROSNewOrder order = orders.get(i);
+                order.setAddedDate(dateStr);
+            }
+            getSalesSuccess(orders);
+        }
+    }
+
     private void updateButtonTapped() {
         if(section != Constants.Section.VIEW_SALE_RETURNS_LIST){
             if (!ConnectionDetector.isConnected(this)) {
                 AppUtils.showAlertDialog(this, Constants.MSG_NO_INTERNET_TITLE, Constants.MSG_NO_INTERNET_MSG);
             }else {
-              //  getSalesOrderList("00001", "2014-01-01", "2016-01-01");
-              //  Log.i("selectedCustomer.getCustCode()",selectedCustomer.getCustCode());
-                getSalesOrderList(selectedCustomer.getCustomerId(), fromDate.getText().toString(), toDate.getText().toString());
+                StringBuilder fromDateString=new StringBuilder().append(fromYear).
+                        append("-").append(fromMonth + 1)
+                        .append("-").append(fromDay);
+
+                StringBuilder toDateString=new StringBuilder().append(toYear).
+                        append("-").append(toMonth + 1)
+                        .append("-").append(toDay);
+
+                getSalesOrderList(selectedCustomer.getCustomerId(), fromDateString.toString(), toDateString.toString());
             }
         }else {
             showOrderItem();
@@ -244,7 +269,7 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
         batchTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
 
         TextView qtyTextView = new TextView(this);
-        qtyTextView.setText("" + order.getOrderValue());
+        qtyTextView.setText(String.format("%.2f", order.getOrderValue()));
         qtyTextView.setGravity(Gravity.CENTER);
         qtyTextView.setLayoutParams(layoutParamsTextView);
         qtyTextView.setTextColor(getResources().getColor(R.color.color_black));
@@ -357,19 +382,47 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
 
         view.updateDate(selectedYear, selectedMonth, selectedDay);
 
+        Calendar c = Calendar.getInstance();
+        c.set(Calendar.DATE, selectedDay);
+        c.set(Calendar.MONTH, selectedMonth);
+        c.set(Calendar.YEAR, selectedYear);
+
+        Date selectedDate = c.getTime();
+
         StringBuilder dateString=new StringBuilder().append(selectedDay).append("-").append(selectedMonth + 1)
                 .append("-").append(selectedYear)
                 .append(" ");
         if(fromDateSelect){
-            fromYear=selectedYear;
-            fromMonth=selectedMonth;
-            fromDay=selectedDay;
-            fromDate.setText(dateString);
+
+            c = Calendar.getInstance();
+            c.set(Calendar.DATE, toDay);
+            c.set(Calendar.MONTH, toMonth);
+            c.set(Calendar.YEAR, toYear);
+
+            Date toLDate = c.getTime();
+
+            if (selectedDate.compareTo(toLDate) <= 0) {
+                fromYear = selectedYear;
+                fromMonth = selectedMonth;
+                fromDay = selectedDay;
+                fromDate.setText(dateString);
+            }
+
         }else{
-            toYear=selectedYear;
-            toMonth=selectedMonth;
-            toDay=selectedDay;
-            toDate.setText(dateString);
+
+            c = Calendar.getInstance();
+            c.set(Calendar.DATE, fromDay);
+            c.set(Calendar.MONTH, fromMonth);
+            c.set(Calendar.YEAR, fromYear);
+
+            Date fromLDate = c.getTime();
+
+            if (selectedDate.compareTo(fromLDate) >= 0) {
+                toYear=selectedYear;
+                toMonth=selectedMonth;
+                toDay=selectedDay;
+                toDate.setText(dateString);
+            }
         }
     }
 
@@ -378,6 +431,29 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
      */
 
     private void getSalesSuccess(ArrayList<ROSNewOrder> orders) {
+
+        if (orders != null && orders.size() == 0) {
+            Date now = new Date();
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(now);
+            int todayDate = calendar.get(Calendar.DATE);
+
+            if (toDay == todayDate) {
+                ROSDbHelper dbHelper = new ROSDbHelper(this);
+                orders = dbHelper.getNewOrders(this, selectedCustomer.getCustomerId());
+                StringBuilder toDateString=new StringBuilder().append(toDay).
+                        append("/").append(toMonth + 1)
+                        .append("/").append(toYear);
+                String dateStr = toDateString.toString();
+
+                for (int i = 0; i < orders.size(); i++) {
+                    ROSNewOrder order = orders.get(i);
+                    order.setAddedDate(dateStr);
+                }
+            }
+        }
+
+
         AppUtils.dismissProgressDialog();
         showSalesOrders(orders);
     }

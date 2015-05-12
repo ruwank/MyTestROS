@@ -1095,7 +1095,6 @@ public class ROSDbHelper extends SQLiteOpenHelper {
                 " WHERE " + ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME + " = '" + stock.getProductDescription() +
                 "' AND " + ROSDbConstants.Stock.CL_NAME_PRODUCT_CODE + " = '" + stock.getProductCode() +
                 "' AND " + ROSDbConstants.Stock.CL_NAME_BATCH_NAME + " = '" + stock.getProductBatchCode() + "';";
-        Log.i(TAG, "SQL_UPDATE_STOCK: " + SQL_UPDATE_STOCK);
         db.execSQL(SQL_UPDATE_STOCK);
         db.close();
     }
