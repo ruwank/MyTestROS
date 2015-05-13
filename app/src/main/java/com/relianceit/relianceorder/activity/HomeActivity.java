@@ -1,7 +1,9 @@
 package com.relianceit.relianceorder.activity;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
@@ -44,6 +46,8 @@ public class HomeActivity extends RelianceBaseActivity {
     public static final String TAG = HomeActivity.class.getSimpleName();
     public static final int RESULT_LOGOUT = 3;
 
+    private AlertDialog logoutAlertDialog = null;
+
      /**
 	 * The serialization (saved instance state) Bundle key representing the
 	 * current dropdown position.
@@ -68,8 +72,16 @@ public class HomeActivity extends RelianceBaseActivity {
         registerReceiver(localDataChangeReceiver, new IntentFilter(Constants.LocalDataChange.ACTION_ORDER_SYNCED));
         registerReceiver(localDataChangeReceiver, new IntentFilter(Constants.LocalDataChange.ACTION_DAILY_SYNCED));
 
+//        if (isPendingDataAvailable()) {
+//            AppUtils.showAlertDialog(this, "Sync required!", "There is some local data in the app. Please sync them.");
+//        }else if (shouldShowDailySync()) {
+//            downloadDailyData();
+//        }
+
         if (isPendingDataAvailable()) {
             AppUtils.showAlertDialog(this, "Sync required!", "There is some local data in the app. Please sync them.");
+        }else if (shouldShowDailySync()) {
+            downloadDailyData();
         }
 	}
 
@@ -161,8 +173,31 @@ public class HomeActivity extends RelianceBaseActivity {
 	}
 
     private void logOutButtonTapped() {
-        NewOrderServiceHandler newOrderServiceHandler = new NewOrderServiceHandler(this);
-        newOrderServiceHandler.testGetList();
+
+        if (isPendingDataAvailable()) {
+            AppUtils.showAlertDialog(this, "Sync required!", "There is some local data in the app. Please sync them before logout.");
+            return;
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Are you sure you want to logout?");
+        builder.setNegativeButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                logoutAlertDialog.dismiss();
+                logout();
+            }
+        });
+        builder.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                logoutAlertDialog.dismiss();
+            }
+        });
+        logoutAlertDialog = builder.create();
+        logoutAlertDialog.setCanceledOnTouchOutside(false);
+        logoutAlertDialog.setCancelable(false);
+        logoutAlertDialog.show();
     }
 
     private void syncButtonTapped() {

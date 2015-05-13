@@ -222,6 +222,8 @@ public class NewOrderServiceHandler {
             endPoint = endPoint + "/" + toDate;
         }
 
+        Log.i(TAG, "Sales Order end point: " + endPoint);
+
         JsonArrayRequest listRequest = new JsonArrayRequest(endPoint, new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray jsonArray) {

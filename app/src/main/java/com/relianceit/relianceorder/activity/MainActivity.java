@@ -33,31 +33,37 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         String logged = AppDataManager.getData(this, Constants.DM_LOGGED_KEY);
-      //  downloadDailyData();
-/*
+//        if (logged != null && logged.equalsIgnoreCase("yes")) {
+//            if (isPendingDataAvailable()) {
+//                loadHome();
+//            }else if (shouldShowDailySync()) {
+//                downloadDailyData();
+//            }else {
+//                loadHome();
+//            }
+//        }else {
+//            loadLogin();
+//        }
+
         if (logged != null && logged.equalsIgnoreCase("yes")) {
-            if (isPendingDataAvailable()) {
-                loadHome();
-            }else if (shouldShowDailySync()) {
-                downloadDailyData();
-            }else {
-                loadHome();
-            }
+            loadHome();
         }else {
             loadLogin();
         }
-        */
-        loadHome();
     }
 
     private void dailyDownloadFailed(int errorCode) {
         AppUtils.dismissProgressDialog();
-        if (errorCode == 401) {
-            AppUtils.showAlertDialog(this, "Oops!", "Login session expired. Please login again.");
-            logout();
-        }else {
-            AppUtils.showAlertDialog(this, "Sync Failed!", "Data syncing failed due to Server error. Please try again.");
-        }
+
+
+        //loadHome();
+
+//        if (errorCode == 401) {
+//            AppUtils.showAlertDialog(this, "Oops!", "Login session expired. Please login again.");
+//            logout();
+//        }else {
+//            AppUtils.showAlertDialog(this, "Sync Failed!", "Data syncing failed due to Server error. Please try again.");
+//        }
     }
 
     private void downloadDailyData(){
@@ -97,6 +103,8 @@ public class MainActivity extends ActionBarActivity {
         AppDataManager.saveData(getApplicationContext(), Constants.DM_ACCESS_TOKEN_KEY, "");
         AppDataManager.saveData(getApplicationContext(), Constants.DM_USERNAME_KEY, "");
         AppDataManager.saveData(getApplicationContext(), Constants.DM_LOGGED_KEY, "no");
+        AppDataManager.saveDataLong(getApplicationContext(), Constants.DM_DAILY_SYNC_TIME_KEY, 0);
+
 
         ROSDbHelper dbHelper = new ROSDbHelper(this);
         dbHelper.clearCustomerTable(this);
@@ -114,13 +122,13 @@ public class MainActivity extends ActionBarActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == LOGIN_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                downloadDailyData();
+                //downloadDailyData();
+                loadHome();
             }
         }else if (requestCode == HOME_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 finish();
             }else if (resultCode == RESULT_LOGOUT) {
-                AppUtils.showAlertDialog(this, "Oops!", "Login session expired. Please login again.");
                 logout();
             }
         }
