@@ -43,10 +43,10 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
     TableLayout orderTableLayout;
     Spinner productSpinner,batchSpinner;
     EditText quantityText,orderPriceText,orderDiscountText,freeItemText,
-            invoiceValueText,overallDisPreText;
+            invoiceValueText,overallDisPreText,batchNumber;
     TextView customerName,topSecondLabel,totalOutstanding,itemTotalAmount,
             totalAmountTextLabel,grossValueLabel,discountValueText,orderValue;
-    ImageButton addOrderButton;
+    ImageButton selectReturnBatch,addOrderButton;
     Button btnSaveOrder;
     int itemCount;
     Constants.Section section;
@@ -60,6 +60,7 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
 		setContentView(R.layout.activity_new_order);
 
         Intent intent = getIntent();
@@ -82,6 +83,14 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
         productSpinner.setOnItemSelectedListener(this);
         batchSpinner=(Spinner)findViewById(R.id.batch_spinner);
         batchSpinner.setOnItemSelectedListener(this);
+        batchSpinner.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus && (section == Constants.Section.ADD_SALE_RETURNS)) v.setVisibility(View.INVISIBLE);
+
+
+            }
+        });
         quantityText=(EditText)findViewById(R.id.order_quantity);
         quantityText.addTextChangedListener(new TextWatcher() {
 
@@ -161,6 +170,23 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
             }
         });
 
+        batchNumber=(EditText)findViewById(R.id.batch_number);
+        batchNumber.addTextChangedListener(new TextWatcher() {
+
+            public void afterTextChanged(Editable s) {
+            }
+
+            public void beforeTextChanged(CharSequence s, int start,
+                                          int count, int after) {
+            }
+
+            public void onTextChanged(CharSequence s, int start,
+                                      int before, int count) {
+
+                    Log.v("onTextChanged",""+s)  ;
+            }
+        });
+
         discountValueText=(TextView)findViewById(R.id.order_discount_value);
 
         itemTotalAmount=(TextView)findViewById(R.id.item_total_amount);
@@ -177,6 +203,18 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
             }
 
         });
+
+        selectReturnBatch=(ImageButton)findViewById(R.id.select_batch_btn);
+        selectReturnBatch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               showProductBatch();
+
+            }
+
+
+        });
+
         btnSaveOrder=(Button)findViewById(R.id.btnSaveOrder);
         btnSaveOrder.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -191,6 +229,11 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
         loadData();
 
 	}
+    private void showProductBatch() {
+
+        batchSpinner.setVisibility(View.VISIBLE);
+        batchSpinner.performClick();
+    }
     private void customizeActionBar(){
         final ActionBar actionBar = getSupportActionBar();
         ActionBar.LayoutParams params = new ActionBar.LayoutParams(//Center the textview in the ActionBar !
@@ -231,14 +274,21 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
             totalAmountTextLabel.setText("Return Value ");
             totalOutstanding.setVisibility(View.GONE);
             invoiceValueText.setVisibility(View.VISIBLE);
+            batchSpinner.setVisibility(View.INVISIBLE);
+
+            loadProductForSale();
 
         }else{
 
-            loadProductForSale();
+
             topSecondLabel.setText("Total outstanding : ");
             totalAmountTextLabel.setText("Order Value");
             totalOutstanding.setVisibility(View.VISIBLE);
             invoiceValueText.setVisibility(View.GONE);
+            batchNumber.setVisibility(View.GONE);
+            selectReturnBatch.setVisibility(View.GONE);
+
+            loadProductForSale();
 
         }
     }
@@ -263,9 +313,15 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
     private void loadStockForSale(){
         String productName= productSpinner.getSelectedItem().toString();
         String batchName= batchSpinner.getSelectedItem().toString();
-        Log.v("productName :",productName);
-        stock= dbHelper.getStockForSale(getApplicationContext(), productName, batchName);
-        orderPriceText.setText(String.format("%.2f", stock.getUnitPrice()));
+        if(section == Constants.Section.ADD_SALE_RETURNS) {
+            batchSpinner.setVisibility(View.INVISIBLE);
+            batchNumber.setText(batchName);
+        }else{
+            stock= dbHelper.getStockForSale(getApplicationContext(), productName, batchName);
+            orderPriceText.setText(String.format("%.2f", stock.getUnitPrice()));
+        }
+            Log.v("productName :",productName);
+
 
     }
 
@@ -639,12 +695,12 @@ if(isFieldHasValidAmount()) {
 
         switch (parent.getId()) {
             case R.id.product_spinner:
+
                 loadProductBatchForSale(products.get(position));
-                // do stuffs with you spinner 1
                 break;
             case R.id.batch_spinner:
+
                 loadStockForSale();
-                // do stuffs with you spinner 2
                 break;
             default:
                 break;
@@ -654,6 +710,17 @@ if(isFieldHasValidAmount()) {
 
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
+        switch (parent.getId()) {
+            case R.id.product_spinner:
 
+                break;
+            case R.id.batch_spinner:
+                if(section == Constants.Section.ADD_SALE_RETURNS) {
+                    batchSpinner.setVisibility(View.INVISIBLE);
+                }
+                break;
+            default:
+                break;
+        }
     }
 }

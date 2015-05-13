@@ -47,7 +47,7 @@
                 android:textSize="@dimen/tb_header_text_size" />
             <EditText
                 android:id="@+id/invoice_value"
-                android:layout_width="60dp"
+                android:layout_width="150dp"
                 android:layout_height="40dp"
                 android:textColor="@android:color/black"
                 android:background="@drawable/border"
@@ -160,14 +160,44 @@
                 android:layout_margin="5px"
                 android:textColor="@android:color/black"
                 android:spinnerMode="dropdown" />
-            <Spinner
-                android:id="@+id/batch_spinner"
+            <RelativeLayout
+                android:id="@+id/return_batch_select_layout"
                 android:layout_width="0dp"
                 android:layout_weight="1.5"
                 android:textColor="@android:color/black"
                 android:layout_margin="5dp"
                 android:layout_height="40dp"
-                android:spinnerMode="dropdown" />
+                android:weightSum="1">
+                <Spinner
+                    android:id="@+id/batch_spinner"
+                    android:layout_width="match_parent"
+                    android:textColor="@android:color/black"
+                    android:layout_height="match_parent"
+                    android:spinnerMode="dropdown"
+                    android:visibility="visible"/>
+
+                <EditText
+                    android:id="@+id/batch_number"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textColor="@android:color/black"
+                    android:background="@drawable/border"
+                    android:textSize="@dimen/common_text_size"
+                    android:inputType="number"
+                    android:visibility="visible"
+                    android:padding="5dp" />
+                <ImageButton
+                    android:id="@+id/select_batch_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:src="@mipmap/ic_arrow_drop_down"
+                    android:background="@color/color_transparent"
+                    android:layout_gravity="right|center_horizontal"
+                    android:layout_alignParentRight="true"
+                    android:visibility="visible" />
+
+            </RelativeLayout>
+
             <EditText
                 android:id="@+id/order_quantity"
                 android:layout_weight="1"
