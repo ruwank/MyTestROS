@@ -4,11 +4,9 @@ import android.content.Context;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
-import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -20,10 +18,10 @@ import com.relianceit.relianceorder.models.ROSStock;
 import com.relianceit.relianceorder.models.ROSUser;
 import com.relianceit.relianceorder.util.AppDataManager;
 import com.relianceit.relianceorder.util.AppURLs;
+import com.relianceit.relianceorder.util.AppUtils;
 import com.relianceit.relianceorder.util.Constants;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -85,7 +83,7 @@ public class GeneralServiceHandler {
             dbHelper.clearReturnOrderItemTable(context);
             dbHelper.clearNewOrderTable(context);
             dbHelper.clearReturnOrderTable(context);
-
+            AppUtils.broadcastAction(context,Constants.LocalDataChange.ACTION_DAILY_SYNCED);
             Date now = new Date();
             AppDataManager.saveDataLong(context, Constants.DM_DAILY_SYNC_TIME_KEY, now.getTime());
             this.context = null;

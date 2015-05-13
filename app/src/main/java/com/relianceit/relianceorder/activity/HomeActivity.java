@@ -236,7 +236,9 @@ public class HomeActivity extends RelianceBaseActivity {
     /*
     Data and sync section
      */
-
+    private void dailyDownloadSuccess() {
+        
+    }
     private void dailyDownloadFailed(int errorCode) {
         AppUtils.dismissProgressDialog();
         if (errorCode == 401) {
