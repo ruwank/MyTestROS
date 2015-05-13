@@ -63,8 +63,16 @@ public class LoginActivity extends ActionBarActivity {
             public void onClick(View arg0) {
                 loginButtonTapped();
             }
-
         });
+
+        Button cancelBtn = (Button)findViewById(R.id.cancelBtn);
+        cancelBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cancelButtonTapped();
+            }
+        });
+
         customizeActionBar();
     }
     private void customizeActionBar(){
@@ -84,6 +92,11 @@ public class LoginActivity extends ActionBarActivity {
         actionBar.setDisplayShowCustomEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);
     }
+
+    private void cancelButtonTapped() {
+        this.onBackPressed();
+    }
+
     private void loginButtonTapped() {
 
         username = userNameET.getText().toString().trim();
@@ -104,43 +117,6 @@ public class LoginActivity extends ActionBarActivity {
         }else {
             sendLoginRequest();
         }
-    }
-
-    private void testDownloadContent() {
-        GeneralServiceHandler generalServiceHandler = new GeneralServiceHandler(this);
-        generalServiceHandler.doDailyContentUpdate(TAG, new GeneralServiceHandler.DailyUpdateListener() {
-            @Override
-            public void onDailyUpdateSuccess() {
-                tempShowData();
-            }
-
-            @Override
-            public void onDailyUpdateErrorResponse(VolleyError error) {
-
-            }
-        });
-    }
-
-    private void tempShowData() {
-        ROSDbHelper dbHelper = new ROSDbHelper(this);
-
-        ArrayList<ROSCustomer> customers = dbHelper.getCustomers(this);
-        ArrayList<ROSStock> stocks = dbHelper.getStocks(this);
-
-        for (int i = 0; i < customers.size(); i++) {
-            ROSCustomer customer = customers.get(i);
-            customer.print();
-        }
-
-        for (int i = 0; i < stocks.size(); i++) {
-            ROSStock stock = stocks.get(i);
-            stock.print();
-        }
-    }
-
-    private void testNewOrder() {
-        NewOrderServiceHandler newOrderServiceHandler = new NewOrderServiceHandler(this);
-        newOrderServiceHandler.testSyncNewOrder();
     }
 
     private void sendLoginRequest() {
@@ -209,9 +185,9 @@ public class LoginActivity extends ActionBarActivity {
         user.setDeviceToken("18388499282");
 
         String encodedToken = accessToken;
-        byte[] data = null;
+
         try {
-            data = accessToken.getBytes("UTF-8");
+            byte[] data = accessToken.getBytes("UTF-8");
             encodedToken = Base64.encodeToString(data, Base64.DEFAULT);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
@@ -220,6 +196,7 @@ public class LoginActivity extends ActionBarActivity {
         AppDataManager.saveData(getApplicationContext(), Constants.DM_ACCESS_TOKEN_KEY, encodedToken);
         AppDataManager.saveData(getApplicationContext(), Constants.DM_USERNAME_KEY, username);
         AppDataManager.saveData(getApplicationContext(), Constants.DM_LOGGED_KEY, "yes");
+        AppDataManager.saveDataInt(getApplicationContext(), Constants.DM_OFFLINE_LOGOUT_KEY, 0);
 
         AppUtils.dismissProgressDialog();
 

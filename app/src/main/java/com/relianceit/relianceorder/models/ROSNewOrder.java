@@ -19,27 +19,6 @@ public class ROSNewOrder {
     @Expose private String AddedDate = null;
     @Expose private ArrayList<ROSNewOrderItem> Products = null;
 
-    /*
-    OrderNo  = SalesOrdNum
-            OrderDate = OrderValue(dd/mm/yyyy)
-	"CustCode" : "00001",
-	"GrossValue" : 100,
-	"OVDiscount" : ,
-	"DiscountValue" : ,
-	"OrderValue" : 1000.20,
-	"Products" : [{
-			"ProductCode" : "001",
-                                   ProductName = ProductDescription
-			"ProductBatchCode" : "0001",
-                                   UnitPrice = UnitPrice
-			"QtyOrdered" : 1,
-			"ProdDiscount" : 0,
-			"QtyBonus" : 0,
-			"EffPrice" : 100.00
-		}
-	]
-     */
-
     public ROSNewOrder() {
         this.SalesOrdNum = null;
         this.orderStatus = 0;

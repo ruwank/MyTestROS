@@ -80,6 +80,10 @@ public final class ROSDbConstants {
         public static final String CL_NAME_DISCOUNT = "discount";
         public static final String CL_NAME_FREE_ISSUES = "free_issues";
         public static final String CL_NAME_ITEM_VALUE = "item_value";
+        public static final String CL_NAME_SUPP_CODE = "supp_code";
+        public static final String CL_NAME_LOCATION_CODE = "location_code";
+        public static final String CL_NAME_BRAND_CODE = "brand_code";
+        public static final String CL_NAME_AGEN_CODE = "agen_code";
     }
 
     public static abstract class Stock implements BaseColumns {
