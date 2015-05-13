@@ -33,18 +33,6 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         String logged = AppDataManager.getData(this, Constants.DM_LOGGED_KEY);
-//        if (logged != null && logged.equalsIgnoreCase("yes")) {
-//            if (isPendingDataAvailable()) {
-//                loadHome();
-//            }else if (shouldShowDailySync()) {
-//                downloadDailyData();
-//            }else {
-//                loadHome();
-//            }
-//        }else {
-//            loadLogin();
-//        }
-
         if (logged != null && logged.equalsIgnoreCase("yes")) {
             loadHome();
         }else {
@@ -52,69 +40,16 @@ public class MainActivity extends ActionBarActivity {
         }
     }
 
-    private void dailyDownloadFailed(int errorCode) {
-        AppUtils.dismissProgressDialog();
-
-
-        //loadHome();
-
-//        if (errorCode == 401) {
-//            AppUtils.showAlertDialog(this, "Oops!", "Login session expired. Please login again.");
-//            logout();
-//        }else {
-//            AppUtils.showAlertDialog(this, "Sync Failed!", "Data syncing failed due to Server error. Please try again.");
-//        }
-    }
-
-    private void downloadDailyData(){
-
-        if (!ConnectionDetector.isConnected(this)) {
-            AppUtils.showAlertDialog(this, Constants.MSG_NO_INTERNET_TITLE, Constants.MSG_NO_INTERNET_MSG);
-        }else {
-            GeneralServiceHandler generalServiceHandler = new GeneralServiceHandler(this);
-            generalServiceHandler.doDailyContentUpdate(TAG, new GeneralServiceHandler.DailyUpdateListener() {
-                @Override
-                public void onDailyUpdateSuccess() {
-                    AppUtils.dismissProgressDialog();
-                    loadHome();
-                }
-
-                @Override
-                public void onDailyUpdateErrorResponse(VolleyError error) {
-                    dailyDownloadFailed(error.networkResponse != null ? error.networkResponse.statusCode : 500);
-                }
-            });
-            AppUtils.showProgressDialog(this, "Daily stock is downloading...");
-        }
-    }
-
     private void loadHome() {
         Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
-        startActivityForResult(intent, HOME_REQUEST_CODE);
+        startActivity(intent);
+        finish();
     }
 
     private void loadLogin() {
-        Intent intent = new Intent(getApplicationContext(),
-                LoginActivity.class);
-        startActivityForResult(intent, LOGIN_REQUEST_CODE);
-    }
-
-    public void logout() {
-        AppDataManager.saveData(getApplicationContext(), Constants.DM_ACCESS_TOKEN_KEY, "");
-        AppDataManager.saveData(getApplicationContext(), Constants.DM_USERNAME_KEY, "");
-        AppDataManager.saveData(getApplicationContext(), Constants.DM_LOGGED_KEY, "no");
-        AppDataManager.saveDataLong(getApplicationContext(), Constants.DM_DAILY_SYNC_TIME_KEY, 0);
-
-
-        ROSDbHelper dbHelper = new ROSDbHelper(this);
-        dbHelper.clearCustomerTable(this);
-        dbHelper.clearStockTable(this);
-        dbHelper.clearNewOrderItemTable(this);
-        dbHelper.clearNewOrderTable(this);
-        dbHelper.clearReturnOrderItemTable(this);
-        dbHelper.clearReturnOrderTable(this);
-
-        loadLogin();
+        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+        startActivity(intent);
+        finish();
     }
 
     @Override
@@ -122,14 +57,13 @@ public class MainActivity extends ActionBarActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == LOGIN_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                //downloadDailyData();
-                loadHome();
+
             }
         }else if (requestCode == HOME_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                finish();
+
             }else if (resultCode == RESULT_LOGOUT) {
-                logout();
+
             }
         }
     }
@@ -159,44 +93,5 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        AppController.getInstance().cancelPendingRequests(TAG);
-    }
-
-    /*
-    Daily Sync
-     */
-    private boolean shouldShowDailySync() {
-        long timeMS = AppDataManager.getDataLong(this, Constants.DM_DAILY_SYNC_TIME_KEY);
-        if (timeMS == 0) {
-            return true;
-        }
-        Date lastSyncDate = new Date(timeMS);
-        Date now = new Date();
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(lastSyncDate);
-        int lDate = calendar.get(Calendar.DATE);
-        calendar.setTime(now);
-        int nDate = calendar.get(Calendar.DATE);
-
-        if (nDate != lDate) {
-            return true;
-        }else {
-            return false;
-        }
-    }
-
-    private boolean isPendingDataAvailable() {
-
-        ROSDbHelper dbHelper = new ROSDbHelper(this);
-        int newCount = dbHelper.getNewOrderCountPending(this);
-        int retCount = dbHelper.getReturnOrderCountPending(this);
-
-        int total = newCount + retCount;
-        if (total > 0) {
-            return true;
-        }else {
-            return false;
-        }
     }
 }

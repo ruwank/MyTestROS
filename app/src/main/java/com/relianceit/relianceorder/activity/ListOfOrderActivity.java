@@ -55,8 +55,9 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
     Constants.Section section;
     ROSCustomer selectedCustomer;
 
-    //
-// test comment
+
+    private int listCount = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -132,7 +133,9 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
     @Override
     public void onResume() {
         super.onResume();
-        showLocalDataForToday();
+        if (listCount > 0) {
+            showLocalDataForToday();
+        }
     }
     @Override
     protected void onDestroy() {
@@ -144,6 +147,8 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
         if(section != Constants.Section.VIEW_SALE_RETURNS_LIST){
             ROSDbHelper dbHelper = new ROSDbHelper(this);
             ArrayList<ROSNewOrder> orders = dbHelper.getNewOrders(this, selectedCustomer.getCustomerId());
+
+            this.listCount = orders.size();
 
             StringBuilder toDateString=new StringBuilder().append(toDay).
                     append("/").append(toMonth + 1)
@@ -453,6 +458,9 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
             }
         }
 
+        if (orders != null) {
+            this.listCount = orders.size();
+        }
 
         AppUtils.dismissProgressDialog();
         showSalesOrders(orders);
