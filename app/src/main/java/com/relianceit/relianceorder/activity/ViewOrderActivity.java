@@ -49,8 +49,6 @@ public class ViewOrderActivity extends ActionBarActivity {
         discountValue=(TextView)findViewById(R.id.discount_value);
         orderValue=(TextView)findViewById(R.id.order_value);
 
-
-
         loadData();
 
 //        itemIndex=0;
