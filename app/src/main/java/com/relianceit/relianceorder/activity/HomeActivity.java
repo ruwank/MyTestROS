@@ -72,12 +72,6 @@ public class HomeActivity extends RelianceBaseActivity {
         registerReceiver(localDataChangeReceiver, new IntentFilter(Constants.LocalDataChange.ACTION_ORDER_SYNCED));
         registerReceiver(localDataChangeReceiver, new IntentFilter(Constants.LocalDataChange.ACTION_DAILY_SYNCED));
 
-//        if (isPendingDataAvailable()) {
-//            AppUtils.showAlertDialog(this, "Sync required!", "There is some local data in the app. Please sync them.");
-//        }else if (shouldShowDailySync()) {
-//            downloadDailyData();
-//        }
-
         if (isPendingDataAvailable()) {
             AppUtils.showAlertDialog(this, "Sync required!", "There is some local data in the app. Please sync them.");
         }else if (shouldShowDailySync()) {
@@ -94,9 +88,8 @@ public class HomeActivity extends RelianceBaseActivity {
 
     @Override
     public void onBackPressed() {
-        Intent returnIntent = new Intent();
-        setResult(RESULT_OK, returnIntent);
-        finish();
+        super.onBackPressed();
+        //TODO show local data message if exist
     }
 
     private void customizeActionBar(int section){
@@ -138,7 +131,6 @@ public class HomeActivity extends RelianceBaseActivity {
        // actionBar.setHomeButtonEnabled(true);
 
     }
-
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -218,8 +210,22 @@ public class HomeActivity extends RelianceBaseActivity {
     }
 
     public void logout() {
-        Intent returnIntent = new Intent();
-        setResult(RESULT_LOGOUT, returnIntent);
+        AppDataManager.saveData(getApplicationContext(), Constants.DM_ACCESS_TOKEN_KEY, "");
+        AppDataManager.saveData(getApplicationContext(), Constants.DM_USERNAME_KEY, "");
+        AppDataManager.saveData(getApplicationContext(), Constants.DM_LOGGED_KEY, "no");
+        AppDataManager.saveDataLong(getApplicationContext(), Constants.DM_DAILY_SYNC_TIME_KEY, 0);
+
+
+        ROSDbHelper dbHelper = new ROSDbHelper(this);
+        dbHelper.clearCustomerTable(this);
+        dbHelper.clearStockTable(this);
+        dbHelper.clearNewOrderItemTable(this);
+        dbHelper.clearNewOrderTable(this);
+        dbHelper.clearReturnOrderItemTable(this);
+        dbHelper.clearReturnOrderTable(this);
+
+        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+        startActivity(intent);
         finish();
     }
 
@@ -232,11 +238,11 @@ public class HomeActivity extends RelianceBaseActivity {
      */
 
     private void dailyDownloadFailed(int errorCode) {
-        setPendingSyncButtonStatus(true);
         AppUtils.dismissProgressDialog();
         if (errorCode == 401) {
             logout();
         }else {
+            setPendingSyncButtonStatus(true);
             AppUtils.showAlertDialog(this, "Sync Failed!", "Data syncing failed due to Server error. Please try again.");
         }
     }

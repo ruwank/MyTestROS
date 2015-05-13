@@ -223,13 +223,17 @@ public class LoginActivity extends ActionBarActivity {
 
         AppUtils.dismissProgressDialog();
 
-        Intent returnIntent = new Intent();
-        setResult(RESULT_OK, returnIntent);
+        loadHome();
+    }
+
+    private void loadHome() {
+        Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+        startActivity(intent);
         finish();
     }
 
     @Override
     public void onBackPressed() {
-
+        super.onBackPressed();
     }
 }
