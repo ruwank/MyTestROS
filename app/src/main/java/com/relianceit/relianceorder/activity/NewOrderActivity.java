@@ -585,9 +585,12 @@ if(isFieldHasValidAmount()) {
                             Log.v("onOrderSyncError", "orderId: " + orderId);
                             AppUtils.showAlertDialog(NewOrderActivity.this, "Order update Error", "Order only stored in locally. You must Sync it later");
                             AppUtils.dismissProgressDialog();
+                            AppUtils.broadcastAction(NewOrderActivity.this,Constants.LocalDataChange.ACTION_ORDER_ADDED);
+
                         }
                     });
                 }else{
+                    AppUtils.broadcastAction(NewOrderActivity.this,Constants.LocalDataChange.ACTION_ORDER_ADDED);
                     AppUtils.showAlertDialog(this, "No Network", "Order only stored in locally. You must Sync it later");
 
                 }

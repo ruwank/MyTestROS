@@ -1,6 +1,9 @@
 package com.relianceit.relianceorder.fragment;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -78,26 +81,43 @@ public class RelianceOperationFragment extends Fragment{
             }
 
         });
+        getActivity().registerReceiver(localDataChangeReceiver, new IntentFilter(Constants.LocalDataChange.ACTION_DAILY_SYNCED));
 
         loadCustomerList();
 		return rootView;
 	}
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        getActivity().unregisterReceiver(localDataChangeReceiver);
+    }
     private void loadCustomerList(){
         selectedCustomerIndex=0;
         ROSDbHelper dbHelper = new ROSDbHelper(getActivity().getApplicationContext());
         customers = dbHelper.getCustomers(getActivity().getApplicationContext());
-        CustomerListAdapter customerListAdapter= new CustomerListAdapter(getActivity().getApplicationContext(),customers);
-        customerListView.setAdapter(customerListAdapter);
-        customerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                selectedCustomerIndex=position;
-               // customerListView.setSelection(position);
-                updateCustomerData();
-            }
-        });
+        if(customers !=null && customers.size()>0) {
+            newOrderBtn.setVisibility(View.VISIBLE);
+            orderListBtn.setVisibility(View.VISIBLE);
+            saleReturnBtn.setVisibility(View.VISIBLE);
+            returnListBtn.setVisibility(View.VISIBLE);
 
-        updateCustomerData();
+            CustomerListAdapter customerListAdapter = new CustomerListAdapter(getActivity().getApplicationContext(), customers);
+            customerListView.setAdapter(customerListAdapter);
+            customerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    selectedCustomerIndex = position;
+                    updateCustomerData();
+                }
+            });
+
+            updateCustomerData();
+        }else{
+            newOrderBtn.setVisibility(View.INVISIBLE);
+            orderListBtn.setVisibility(View.INVISIBLE);
+            saleReturnBtn.setVisibility(View.INVISIBLE);
+            returnListBtn.setVisibility(View.INVISIBLE);
+        }
     }
     private void updateCustomerData(){
         if(customers != null && customers.size()>selectedCustomerIndex){
@@ -130,4 +150,10 @@ public class RelianceOperationFragment extends Fragment{
         intent.putExtra("section", Constants.Section.VIEW_SALE_RETURNS_LIST);
         startActivity(intent);
     }
+    private BroadcastReceiver localDataChangeReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+                loadCustomerList();
+        }
+    };
 }

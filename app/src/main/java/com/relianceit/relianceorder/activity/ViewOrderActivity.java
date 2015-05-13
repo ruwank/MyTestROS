@@ -12,15 +12,22 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.relianceit.relianceorder.AppController;
 import com.relianceit.relianceorder.R;
+import com.relianceit.relianceorder.models.ROSCustomer;
+import com.relianceit.relianceorder.models.ROSNewOrder;
+import com.relianceit.relianceorder.models.ROSNewOrderItem;
 import com.relianceit.relianceorder.util.Constants;
+
+import java.util.ArrayList;
 
 public class ViewOrderActivity extends ActionBarActivity {
 
     int itemIndex;
     TableLayout orderTable;
     Constants.Section section;
-    TextView orderNoLabel,orderValueLabel;
+    TextView orderNoLabel,orderNo,orderValueLabel,customerName;
+    TextView dateValue,overallDis,grossValue,discountValue,orderValue;
 
 
     @Override
@@ -31,17 +38,26 @@ public class ViewOrderActivity extends ActionBarActivity {
         Intent intent = getIntent();
         section = (Constants.Section) intent.getSerializableExtra("section");
 
+        orderTable=(TableLayout)findViewById(R.id.order_view_table);
         orderNoLabel=(TextView)findViewById(R.id.order_no_label);
         orderValueLabel=(TextView)findViewById(R.id.order_value_label);
+        orderNo=(TextView)findViewById(R.id.order_no);
+        dateValue=(TextView)findViewById(R.id.order_date);
+        customerName=(TextView)findViewById(R.id.customer_name);
+        grossValue=(TextView)findViewById(R.id.gross_value);
+        overallDis=(TextView)findViewById(R.id.overall_dis);
+        discountValue=(TextView)findViewById(R.id.discount_value);
+        orderValue=(TextView)findViewById(R.id.order_value);
 
 
-        updateLabel();
 
-        itemIndex=0;
-        orderTable=(TableLayout)findViewById(R.id.order_table);
-        for (int i = 0; i <3 ; i++) {
-            viewOrder();
-        }
+        loadData();
+
+//        itemIndex=0;
+//        orderTable=(TableLayout)findViewById(R.id.order_view_table);
+//        for (int i = 0; i <3 ; i++) {
+//            viewOrder();
+//        }
 
 
     }
@@ -84,6 +100,37 @@ public class ViewOrderActivity extends ActionBarActivity {
 
         }
     }
+    private void loadData(){
+        updateLabel();
+       ROSCustomer selectedCustomer= AppController.getInstance().getRosCustomer();
+
+        customerName.setText(selectedCustomer.getCustName());
+
+        if(section == Constants.Section.VIEW_SALE_RETURNS){
+
+        }else{
+            ROSNewOrder order = AppController.getInstance().getSelectedOrder();
+            orderNo.setText(order.getSalesOrdNum());
+            dateValue.setText(order.getAddedDate());
+            grossValue.setText(String.format("%.2f", order.getGrossValue()));
+            discountValue.setText(String.format("%.2f", order.getDiscountValue()));
+            overallDis.setText(String.format("%.2f",order.getOVDiscount()));
+            orderValue.setText(String.format("%.2f",order.getOrderValue()));
+
+         ArrayList<ROSNewOrderItem> itemArrayList= order.getProducts();
+            itemIndex = 0;
+            orderTable.removeAllViews();
+            for (int i = 0; i < itemArrayList.size(); i++) {
+                itemIndex = i;
+                ROSNewOrderItem item = itemArrayList.get(i);
+                loadOrderItem(item,itemIndex);
+            }
+        }
+
+
+
+
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -97,9 +144,9 @@ public class ViewOrderActivity extends ActionBarActivity {
         }
     }
 
-    private void viewOrder(){
+    private void loadOrderItem(ROSNewOrderItem item,int index){
 
-        itemIndex++;
+       // itemIndex++;
         TableRow.LayoutParams layoutParamsTableRow = new TableRow.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -111,62 +158,67 @@ public class ViewOrderActivity extends ActionBarActivity {
 
 
         TableRow.LayoutParams layoutParamsTextView = new TableRow.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT,1.0f);
+                0,ViewGroup.LayoutParams.MATCH_PARENT,1.0f);
         layoutParamsTextView.gravity = Gravity.CENTER_VERTICAL;
         layoutParamsTextView.setMargins(1,5,1,5);
-
+        layoutParamsTextView.weight=1.5f;
 
         TextView productTextView = new TextView(this);
-        productTextView.setText("Product 1");
+        productTextView.setText(item.getProductDescription());
         productTextView.setGravity(Gravity.CENTER);
         productTextView.setLayoutParams(layoutParamsTextView);
         productTextView.setTextColor(getResources().getColor(R.color.color_black));
         productTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
 
         TextView batchTextView = new TextView(this);
-        batchTextView.setText("batch 1");
+        batchTextView.setText(item.getProductBatchCode());
         batchTextView.setGravity(Gravity.CENTER);
         batchTextView.setLayoutParams(layoutParamsTextView);
         batchTextView.setTextColor(getResources().getColor(R.color.color_black));
         batchTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
 
+        TableRow.LayoutParams layoutParamsTextView2 = new TableRow.LayoutParams(
+                0,ViewGroup.LayoutParams.MATCH_PARENT,1.0f);
+        layoutParamsTextView2.gravity = Gravity.CENTER_VERTICAL;
+        layoutParamsTextView2.setMargins(1,5,1,5);
+        layoutParamsTextView2.weight=1.0f;
+
         TextView qtyTextView = new TextView(this);
-        qtyTextView.setText("10");
+        qtyTextView.setText(""+item.getQtyOrdered());
         qtyTextView.setGravity(Gravity.CENTER);
-        qtyTextView.setLayoutParams(layoutParamsTextView);
+        qtyTextView.setLayoutParams(layoutParamsTextView2);
         qtyTextView.setTextColor(getResources().getColor(R.color.color_black));
         qtyTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
 
         TextView priceTextView = new TextView(this);
-        priceTextView.setText("100.00");
+        priceTextView.setText(String.format("%.2f",item.getUnitPrice()));
         priceTextView.setGravity(Gravity.CENTER);
-        priceTextView.setLayoutParams(layoutParamsTextView);
+        priceTextView.setLayoutParams(layoutParamsTextView2);
         priceTextView.setTextColor(getResources().getColor(R.color.color_black));
         priceTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
 
         TextView discTextView = new TextView(this);
-        discTextView.setText("2");
+        discTextView.setText(""+item.getProdDiscount());
         discTextView.setGravity(Gravity.CENTER);
-        discTextView.setLayoutParams(layoutParamsTextView);
+        discTextView.setLayoutParams(layoutParamsTextView2);
         discTextView.setTextColor(getResources().getColor(R.color.color_black));
         discTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
 
         TextView freeItemTextView = new TextView(this);
-        freeItemTextView.setText("1");
+        freeItemTextView.setText(""+item.getQtyBonus());
         freeItemTextView.setGravity(Gravity.CENTER);
-        freeItemTextView.setLayoutParams(layoutParamsTextView);
+        freeItemTextView.setLayoutParams(layoutParamsTextView2);
         freeItemTextView.setTextColor(getResources().getColor(R.color.color_black));
         freeItemTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
 
         TextView totalValueTextView = new TextView(this);
-        totalValueTextView.setText("1200.00");
+        totalValueTextView.setText(String.format("%.2f",item.getEffPrice()));
         totalValueTextView.setGravity(Gravity.CENTER);
-        totalValueTextView.setLayoutParams(layoutParamsTextView);
+        totalValueTextView.setLayoutParams(layoutParamsTextView2);
         totalValueTextView.setTextColor(getResources().getColor(R.color.color_black));
         totalValueTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
 
 
-        tableRow.setId(itemIndex);
         //
 
         tableRow.addView(productTextView,0);
@@ -177,7 +229,7 @@ public class ViewOrderActivity extends ActionBarActivity {
         tableRow.addView(freeItemTextView,5);
         tableRow.addView(totalValueTextView,6);
 
-        orderTable.addView(tableRow, 2);
+        orderTable.addView(tableRow, index);
 
     }
 

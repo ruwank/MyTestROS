@@ -55,7 +55,7 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
     Constants.Section section;
     ROSCustomer selectedCustomer;
 
-
+    ArrayList<ROSNewOrder> orderArrayList;
     private int listCount = 0;
 
     @Override
@@ -128,14 +128,15 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
                 showOrderItem();
             }
         }
+        if (listCount > 0) {
+            showLocalDataForToday();
+        }
 
     }
     @Override
     public void onResume() {
         super.onResume();
-        if (listCount > 0) {
-            showLocalDataForToday();
-        }
+
     }
     @Override
     protected void onDestroy() {
@@ -233,11 +234,11 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
 
         orderListTable.removeAllViews();
 
-
+        orderArrayList=orders;
         itemIndex = 0;
-        for (int i = 0; i < orders.size(); i++) {
+        for (int i = 0; i < orderArrayList.size(); i++) {
             itemIndex = i;
-            ROSNewOrder order = orders.get(i);
+            ROSNewOrder order = orderArrayList.get(i);
             addSaleOrderToTable(order);
         }
     }
@@ -357,10 +358,32 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
         orderListTable.addView(tableRow, 3);
 
     }
+    private void downloadOrder(String orderId){
+        AppUtils.showProgressDialog(this);
+        NewOrderServiceHandler newOrderServiceHandler = new NewOrderServiceHandler(getApplicationContext());
+        newOrderServiceHandler.getSalesOrder(selectedCustomer.getCustCode(),orderId,"get_order",new NewOrderServiceHandler.SalesOrderDetailsListener() {
+            @Override
+            public void onGetOrderSuccess(ROSNewOrder order) {
+                AppUtils.dismissProgressDialog();
+                AppController.getInstance().setSelectedOrder(order);
+                loadOrderViewActivity();
+            }
 
-    private  void loadOrderScreen(int index){
+            @Override
+            public void onGetOrderError(VolleyError error) {
+                AppUtils.dismissProgressDialog();
+                AppUtils.showAlertDialog(ListOfOrderActivity.this, "Server Error", "Try again later");
+
+
+            }
+        });
+
+        }
+
+    private void  loadOrderViewActivity(){
         Intent intent = new Intent(getApplicationContext(),
                 ViewOrderActivity.class);
+
         if(section == Constants.Section.VIEW_SALE_RETURNS_LIST){
             intent.putExtra("section", Constants.Section.VIEW_SALE_RETURNS);
 
@@ -368,6 +391,15 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
             intent.putExtra("section", Constants.Section.VIEW_ORDER);
         }
         startActivity(intent);
+    }
+    private  void loadOrderScreen(int index){
+        ROSNewOrder order = orderArrayList.get(index);
+
+        if(ConnectionDetector.isConnected(getApplicationContext())){
+            downloadOrder(order.getSalesOrdNum());
+        }
+
+
     }
 
     @Override

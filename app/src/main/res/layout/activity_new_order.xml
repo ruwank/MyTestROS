@@ -35,7 +35,6 @@
                 android:layout_height="wrap_content"
                 android:gravity="left"
                 android:layout_weight="1"
-                android:text="Customer 2"
                 android:textSize="@dimen/tb_header_text_size" />
 
             <TextView
@@ -59,7 +58,6 @@
                 android:layout_height="wrap_content"
                 android:gravity="left"
                 android:layout_weight="1"
-                android:text="Rs. 50,000"
                 android:textSize="@dimen/tb_header_text_size" />
 
         </TableRow>
