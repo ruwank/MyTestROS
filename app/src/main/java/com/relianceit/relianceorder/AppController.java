@@ -11,6 +11,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 import com.relianceit.relianceorder.models.ROSCustomer;
 import com.relianceit.relianceorder.models.ROSNewOrder;
+import com.relianceit.relianceorder.models.ROSReturnOrder;
 import com.relianceit.relianceorder.models.ROSUser;
 import com.relianceit.relianceorder.util.AppDataManager;
 import com.relianceit.relianceorder.util.Constants;
@@ -27,6 +28,7 @@ public class AppController extends Application {
     private static AppController mInstance;
     private ROSCustomer rosCustomer;
     private ROSNewOrder selectedOrder;
+    private ROSReturnOrder selectedReturnOrder;
 
 
     @Override
@@ -123,5 +125,13 @@ public class AppController extends Application {
 
     public void setSelectedOrder(ROSNewOrder selectedOrder) {
         this.selectedOrder = selectedOrder;
+    }
+
+    public ROSReturnOrder getSelectedReturnOrder() {
+        return selectedReturnOrder;
+    }
+
+    public void setSelectedReturnOrder(ROSReturnOrder selectedReturnOrder) {
+        this.selectedReturnOrder = selectedReturnOrder;
     }
 }

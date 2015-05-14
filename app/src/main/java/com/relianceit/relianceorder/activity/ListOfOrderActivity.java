@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,7 +23,9 @@ import com.relianceit.relianceorder.db.ROSDbHelper;
 import com.relianceit.relianceorder.fragment.DatePickerDialogFragment;
 import com.relianceit.relianceorder.models.ROSCustomer;
 import com.relianceit.relianceorder.models.ROSNewOrder;
+import com.relianceit.relianceorder.models.ROSReturnOrder;
 import com.relianceit.relianceorder.services.NewOrderServiceHandler;
+import com.relianceit.relianceorder.services.ReturnOrderServiceHandler;
 import com.relianceit.relianceorder.util.AppUtils;
 import com.relianceit.relianceorder.util.ConnectionDetector;
 import com.relianceit.relianceorder.util.Constants;
@@ -38,7 +39,7 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
     public static final String TAG = ListOfOrderActivity.class.getSimpleName();
     public static final String ROW_TAG = "table_row_tag";
 
-            TextView fromDate,toDate;
+    TextView fromDate,toDate;
     DialogFragment datePickerFragment;
     TableLayout orderListTable;
     TextView tblHeaderCol1,tblHeaderCol2,tblHeaderCol3;
@@ -55,7 +56,9 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
     Constants.Section section;
     ROSCustomer selectedCustomer;
 
-    ArrayList<ROSNewOrder> orderArrayList;
+    ArrayList<ROSNewOrder> salesOrderArrayList;
+    ArrayList<ROSReturnOrder> returnOrderArrayList;
+    private boolean loadedFromDb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,7 +67,6 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
 
         Intent intent = getIntent();
         section = (Constants.Section) intent.getSerializableExtra("section");
-
 
         itemIndex=0;
 
@@ -92,7 +94,6 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
             public void onClick(View v) {
                 fromDateSelect=true;
                 datePickerFragment.show(getSupportFragmentManager(), "datePicker");
-
             }
         });
         toDate.setOnClickListener(new View.OnClickListener() {
@@ -100,9 +101,7 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
             @Override
             public void onClick(View v) {
                 fromDateSelect=false;
-
                 datePickerFragment.show(getSupportFragmentManager(), "datePicker");
-
             }
         });
 
@@ -122,61 +121,85 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
         customerName=(TextView)findViewById(R.id.customer_name);
         updateLabel();
 
-        if(section == Constants.Section.VIEW_SALE_RETURNS_LIST){
-            for (int i = 0; i <4 ; i++) {
-                showOrderItem();
-            }
-        }
-
         showLocalDataForToday();
     }
+
     @Override
     public void onResume() {
         super.onResume();
-
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
         AppController.getInstance().cancelPendingRequests(TAG);
     }
 
-    private void showLocalDataForToday() {
-        if(section != Constants.Section.VIEW_SALE_RETURNS_LIST){
-            ROSDbHelper dbHelper = new ROSDbHelper(this);
-            ArrayList<ROSNewOrder> orders = dbHelper.getNewOrders(this, selectedCustomer.getCustomerId());
+    private void updateButtonTapped() {
 
-            StringBuilder toDateString=new StringBuilder().append(toDay).
-                    append("/").append(toMonth + 1)
-                    .append("/").append(toYear);
-            String dateStr = toDateString.toString();
+        if (!ConnectionDetector.isConnected(this)) {
+            AppUtils.showAlertDialog(this, Constants.MSG_NO_INTERNET_TITLE, Constants.MSG_NO_INTERNET_MSG);
+            return;
+        }
 
-            for (int i = 0; i < orders.size(); i++) {
-                ROSNewOrder order = orders.get(i);
-                order.setAddedDate(dateStr);
-            }
-            getSalesSuccess(orders);
+        StringBuilder fromDateString=new StringBuilder().append(fromYear).
+                append("-").append(fromMonth + 1)
+                .append("-").append(fromDay);
+
+        StringBuilder toDateString=new StringBuilder().append(toYear).
+                append("-").append(toMonth + 1)
+                .append("-").append(toDay);
+
+        if(section == Constants.Section.VIEW_SALE_RETURNS_LIST){
+            getReturnOrderList(selectedCustomer.getCustomerId(), fromDateString.toString(), toDateString.toString());
+        }else {
+            getSalesOrderList(selectedCustomer.getCustomerId(), fromDateString.toString(), toDateString.toString());
         }
     }
 
-    private void updateButtonTapped() {
-        if(section != Constants.Section.VIEW_SALE_RETURNS_LIST){
-            if (!ConnectionDetector.isConnected(this)) {
-                AppUtils.showAlertDialog(this, Constants.MSG_NO_INTERNET_TITLE, Constants.MSG_NO_INTERNET_MSG);
+    private  void orderSelected(int index){
+
+        if (loadedFromDb) {
+            if(section == Constants.Section.VIEW_SALE_RETURNS_LIST){
+                ROSDbHelper dbHelper = new ROSDbHelper(this);
+                ROSReturnOrder order = returnOrderArrayList.get(index);
+                order = dbHelper.getReturnOrder(this, order.getReturnNumb());
+                getReturnDetailsSuccess(order);
             }else {
-                StringBuilder fromDateString=new StringBuilder().append(fromYear).
-                        append("-").append(fromMonth + 1)
-                        .append("-").append(fromDay);
-
-                StringBuilder toDateString=new StringBuilder().append(toYear).
-                        append("-").append(toMonth + 1)
-                        .append("-").append(toDay);
-
-                getSalesOrderList(selectedCustomer.getCustomerId(), fromDateString.toString(), toDateString.toString());
+                ROSDbHelper dbHelper = new ROSDbHelper(this);
+                ROSNewOrder order = salesOrderArrayList.get(index);
+                order = dbHelper.getNewOrder(this, order.getSalesOrdNum());
+                getSaleDetailsSuccess(order);
             }
-        }else {
-            showOrderItem();
+
+            return;
         }
+
+        if (!ConnectionDetector.isConnected(this)) {
+            AppUtils.showAlertDialog(this, Constants.MSG_NO_INTERNET_TITLE, Constants.MSG_NO_INTERNET_MSG);
+            return;
+        }
+
+        if(section == Constants.Section.VIEW_SALE_RETURNS_LIST){
+            ROSReturnOrder order = returnOrderArrayList.get(index);
+            getReturnOrderDetails(order.getReturnNumb());
+        }else {
+            ROSNewOrder order = salesOrderArrayList.get(index);
+            getSaleOrderDetails(order.getSalesOrdNum());
+        }
+    }
+
+    private void  loadOrderViewActivity(){
+        Intent intent = new Intent(getApplicationContext(),
+                ViewOrderActivity.class);
+
+        if(section == Constants.Section.VIEW_SALE_RETURNS_LIST){
+            intent.putExtra("section", Constants.Section.VIEW_SALE_RETURNS);
+
+        }else{
+            intent.putExtra("section", Constants.Section.VIEW_ORDER);
+        }
+        startActivity(intent);
     }
 
     private void customizeActionBar(){
@@ -204,6 +227,7 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
         actionBar.setHomeButtonEnabled(true);
 
     }
+
     private  void updateLabel(){
         selectedCustomer= AppController.getInstance().getRosCustomer();
 
@@ -223,18 +247,63 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
         }
     }
 
-    private void showSalesOrders(ArrayList<ROSNewOrder> orders) {
+    private void showLocalDataForToday() {
+        if(section == Constants.Section.VIEW_SALE_RETURNS_LIST){
+            ROSDbHelper dbHelper = new ROSDbHelper(this);
+            ArrayList<ROSReturnOrder> orders = dbHelper.getReturnOrders(this, selectedCustomer.getCustomerId());
 
-        Log.i(TAG, "Row count: " + itemIndex);
+            StringBuilder toDateString=new StringBuilder().append(toDay).
+                    append("/").append(toMonth + 1)
+                    .append("/").append(toYear);
+            String dateStr = toDateString.toString();
+
+            for (int i = 0; i < orders.size(); i++) {
+                ROSReturnOrder order = orders.get(i);
+                order.setAddedDate(dateStr);
+            }
+            loadedFromDb = true;
+            getReturnsSuccess(orders);
+        }else {
+            ROSDbHelper dbHelper = new ROSDbHelper(this);
+            ArrayList<ROSNewOrder> orders = dbHelper.getNewOrders(this, selectedCustomer.getCustomerId());
+
+            StringBuilder toDateString=new StringBuilder().append(toDay).
+                    append("/").append(toMonth + 1)
+                    .append("/").append(toYear);
+            String dateStr = toDateString.toString();
+
+            for (int i = 0; i < orders.size(); i++) {
+                ROSNewOrder order = orders.get(i);
+                order.setAddedDate(dateStr);
+            }
+            loadedFromDb = true;
+            getSalesSuccess(orders);
+        }
+    }
+
+    private void showSalesOrders(ArrayList<ROSNewOrder> orders) {
 
         orderListTable.removeAllViews();
 
-        orderArrayList=orders;
+        salesOrderArrayList =orders;
         itemIndex = 0;
-        for (int i = 0; i < orderArrayList.size(); i++) {
+        for (int i = 0; i < salesOrderArrayList.size(); i++) {
             itemIndex = i;
-            ROSNewOrder order = orderArrayList.get(i);
+            ROSNewOrder order = salesOrderArrayList.get(i);
             addSaleOrderToTable(order);
+        }
+    }
+
+    private void showReturnOrders(ArrayList<ROSReturnOrder> orders) {
+
+        orderListTable.removeAllViews();
+
+        returnOrderArrayList = orders;
+        itemIndex = 0;
+        for (int i = 0; i < returnOrderArrayList.size(); i++) {
+            itemIndex = i;
+            ROSReturnOrder order = returnOrderArrayList.get(i);
+            addReturnOrderToTable(order);
         }
     }
 
@@ -278,7 +347,6 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
 
         final int index = itemIndex;
 
-        //tableRow.setTag(ROW_TAG);
         tableRow.setId(index);
         tableRow.addView(productTextView,0);
         tableRow.addView(batchTextView,1);
@@ -289,7 +357,7 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
             @Override
             public void onClick(View v)
             {
-                loadOrderScreen(index);
+                orderSelected(index);
             }
         });
 
@@ -297,9 +365,8 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
 
     }
 
-    private void showOrderItem(){
+    private void addReturnOrderToTable(ROSReturnOrder order){
 
-        itemIndex++;
         TableRow.LayoutParams layoutParamsTableRow = new TableRow.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);
@@ -316,27 +383,29 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
         layoutParamsTextView.setMargins(1,5,1,5);
 
         TextView productTextView = new TextView(this);
-        productTextView.setText("product 1");
+        productTextView.setText(order.getReturnNumb());
         productTextView.setGravity(Gravity.CENTER);
         productTextView.setLayoutParams(layoutParamsTextView);
         productTextView.setTextColor(getResources().getColor(R.color.color_black));
         productTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
 
         TextView batchTextView = new TextView(this);
-        batchTextView.setText("000002");
+        batchTextView.setText(order.getAddedDate());
         batchTextView.setGravity(Gravity.CENTER);
         batchTextView.setLayoutParams(layoutParamsTextView);
         batchTextView.setTextColor(getResources().getColor(R.color.color_black));
         batchTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
 
         TextView qtyTextView = new TextView(this);
-        qtyTextView.setText("500");
+        qtyTextView.setText(String.format("%.2f", order.getOrderValue()));
         qtyTextView.setGravity(Gravity.CENTER);
         qtyTextView.setLayoutParams(layoutParamsTextView);
         qtyTextView.setTextColor(getResources().getColor(R.color.color_black));
         qtyTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
 
-        tableRow.setId(itemIndex);
+        final int index = itemIndex;
+
+        tableRow.setId(index);
         tableRow.addView(productTextView,0);
         tableRow.addView(batchTextView,1);
         tableRow.addView(qtyTextView,2);
@@ -346,54 +415,11 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
             @Override
             public void onClick(View v)
             {
-                loadOrderScreen(itemIndex);
+                orderSelected(index);
             }
         });
 
-        orderListTable.addView(tableRow, 3);
-
-    }
-    private void downloadOrder(String orderId){
-        AppUtils.showProgressDialog(this);
-        NewOrderServiceHandler newOrderServiceHandler = new NewOrderServiceHandler(getApplicationContext());
-        newOrderServiceHandler.getSalesOrder(selectedCustomer.getCustCode(),orderId,"get_order",new NewOrderServiceHandler.SalesOrderDetailsListener() {
-            @Override
-            public void onGetOrderSuccess(ROSNewOrder order) {
-                AppUtils.dismissProgressDialog();
-                AppController.getInstance().setSelectedOrder(order);
-                loadOrderViewActivity();
-            }
-
-            @Override
-            public void onGetOrderError(VolleyError error) {
-                AppUtils.dismissProgressDialog();
-                AppUtils.showAlertDialog(ListOfOrderActivity.this, "Server Error", "Try again later");
-
-
-            }
-        });
-
-        }
-
-    private void  loadOrderViewActivity(){
-        Intent intent = new Intent(getApplicationContext(),
-                ViewOrderActivity.class);
-
-        if(section == Constants.Section.VIEW_SALE_RETURNS_LIST){
-            intent.putExtra("section", Constants.Section.VIEW_SALE_RETURNS);
-
-        }else{
-            intent.putExtra("section", Constants.Section.VIEW_ORDER);
-        }
-        startActivity(intent);
-    }
-    private  void loadOrderScreen(int index){
-        ROSNewOrder order = orderArrayList.get(index);
-
-        if(ConnectionDetector.isConnected(getApplicationContext())){
-            downloadOrder(order.getSalesOrdNum());
-        }
-
+        orderListTable.addView(tableRow, 0);
 
     }
 
@@ -408,6 +434,7 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
                 return super.onOptionsItemSelected(item);
         }
     }
+
     @Override
     public void onDateSet(DatePicker view, int selectedYear,
                           int selectedMonth, int selectedDay) {
@@ -460,10 +487,11 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
 
     /*
     Data service
+    Sales
      */
 
     private void getSalesSuccess(ArrayList<ROSNewOrder> orders) {
-
+        loadedFromDb = false;
         if (orders != null && orders.size() == 0) {
             Date now = new Date();
             Calendar calendar = Calendar.getInstance();
@@ -482,6 +510,8 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
                     ROSNewOrder order = orders.get(i);
                     order.setAddedDate(dateStr);
                 }
+
+                loadedFromDb = true;
             }
         }
 
@@ -516,5 +546,121 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
                 }
             }
         });
+    }
+
+    private void getSaleDetailsSuccess(ROSNewOrder order) {
+        AppController.getInstance().setSelectedOrder(order);
+        loadOrderViewActivity();
+    }
+
+    private void getSaleDetailsFailed(int errorCode) {
+        AppUtils.showAlertDialog(ListOfOrderActivity.this, "Server Error", "Please try again.");
+    }
+
+    private void getSaleOrderDetails(String orderId){
+        AppUtils.showProgressDialog(this);
+        NewOrderServiceHandler newOrderServiceHandler = new NewOrderServiceHandler(getApplicationContext());
+        newOrderServiceHandler.getSalesOrder(selectedCustomer.getCustCode(),orderId,TAG,new NewOrderServiceHandler.SalesOrderDetailsListener() {
+            @Override
+            public void onGetOrderSuccess(ROSNewOrder order) {
+                AppUtils.dismissProgressDialog();
+                getSaleDetailsSuccess(order);
+            }
+
+            @Override
+            public void onGetOrderError(VolleyError error) {
+                AppUtils.dismissProgressDialog();
+                getSaleDetailsFailed(0);
+            }
+        });
+    }
+
+    /*
+    Returns
+     */
+
+    private void getReturnsSuccess(ArrayList<ROSReturnOrder> orders) {
+        loadedFromDb = false;
+        if (orders != null && orders.size() == 0) {
+            Date now = new Date();
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(now);
+            int todayDate = calendar.get(Calendar.DATE);
+
+            if (toDay == todayDate) {
+                ROSDbHelper dbHelper = new ROSDbHelper(this);
+                orders = dbHelper.getReturnOrders(this, selectedCustomer.getCustomerId());
+                StringBuilder toDateString=new StringBuilder().append(toDay).
+                        append("/").append(toMonth + 1)
+                        .append("/").append(toYear);
+                String dateStr = toDateString.toString();
+
+                for (int i = 0; i < orders.size(); i++) {
+                    ROSReturnOrder order = orders.get(i);
+                    order.setAddedDate(dateStr);
+                }
+                loadedFromDb = true;
+            }
+        }
+
+        AppUtils.dismissProgressDialog();
+        showReturnOrders(orders);
+    }
+
+    private void getReturnsFailed(int errorCode) {
+        AppUtils.dismissProgressDialog();
+        AppUtils.showAlertDialog(this, "Server error!", "Please try again.");
+    }
+
+    private void getReturnOrderList(String customerCode, String fromDate, String toDate) {
+        AppUtils.showProgressDialog(this);
+        ReturnOrderServiceHandler returnOrderServiceHandler = new ReturnOrderServiceHandler(this);
+        returnOrderServiceHandler.getReturnOrderList(customerCode, fromDate, toDate, TAG, new ReturnOrderServiceHandler.ReturnOrderListListener() {
+            @Override
+            public void onGetListSuccess(ArrayList<ROSReturnOrder> orders) {
+                getReturnsSuccess(orders);
+            }
+
+            @Override
+            public void onGetListError(VolleyError error) {
+                if (error != null) {
+                    if (error.networkResponse != null && error.networkResponse.statusCode == 401) {
+                        getReturnsFailed(401);
+                    }else {
+                        getReturnsFailed(501);
+                    }
+                }else {
+                    getReturnsFailed(501);
+                }
+            }
+        });
+    }
+
+    private void getReturnDetailsSuccess(ROSReturnOrder order) {
+        AppController.getInstance().setSelectedReturnOrder(order);
+        loadOrderViewActivity();
+    }
+
+    private void getReturnDetailsFailed(int errorCode) {
+        AppUtils.showAlertDialog(ListOfOrderActivity.this, "Server Error", "Please try again.");
+    }
+
+    private void getReturnOrderDetails(String orderId){
+        AppUtils.showProgressDialog(this);
+        ReturnOrderServiceHandler returnOrderServiceHandler = new ReturnOrderServiceHandler(this);
+        returnOrderServiceHandler.getReturnOrder(selectedCustomer.getCustCode(), orderId, TAG, new ReturnOrderServiceHandler.ReturnOrderDetailsListener() {
+            @Override
+            public void onGetOrderSuccess(ROSReturnOrder order) {
+                AppUtils.dismissProgressDialog();
+                getReturnDetailsSuccess(order);
+            }
+
+            @Override
+            public void onGetOrderError(VolleyError error) {
+                AppUtils.dismissProgressDialog();
+                getReturnDetailsFailed(0);
+            }
+        });
+
     }
 }
