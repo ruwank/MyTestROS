@@ -40,6 +40,7 @@ import com.relianceit.relianceorder.models.ROSReturnOrder;
 import com.relianceit.relianceorder.models.ROSUser;
 import com.relianceit.relianceorder.services.GeneralServiceHandler;
 import com.relianceit.relianceorder.services.NewOrderServiceHandler;
+import com.relianceit.relianceorder.services.ReturnOrderServiceHandler;
 import com.relianceit.relianceorder.util.AppDataManager;
 import com.relianceit.relianceorder.util.AppURLs;
 import com.relianceit.relianceorder.util.AppUtils;
@@ -176,6 +177,13 @@ public class HomeActivity extends RelianceBaseActivity {
         }
 		return super.onOptionsItemSelected(item);
 	}
+
+    private void testMethod() {
+        ReturnOrderServiceHandler returnOrderServiceHandler = new ReturnOrderServiceHandler(this);
+        //returnOrderServiceHandler.testSyncNewOrder();
+        //returnOrderServiceHandler.testGetList();
+        returnOrderServiceHandler.testGetOrder();
+    }
 
     private void logOutButtonTapped() {
 
