@@ -182,7 +182,8 @@ public class HomeActivity extends RelianceBaseActivity {
         ReturnOrderServiceHandler returnOrderServiceHandler = new ReturnOrderServiceHandler(this);
         //returnOrderServiceHandler.testSyncNewOrder();
         //returnOrderServiceHandler.testGetList();
-        returnOrderServiceHandler.testGetOrder();
+        //returnOrderServiceHandler.testGetOrder();
+        returnOrderServiceHandler.testGetInvoice();
     }
 
     private void logOutButtonTapped() {

@@ -9,15 +9,15 @@ import java.util.ArrayList;
  */
 public class ROSNewOrder {
 
-    @Expose private String SalesOrdNum = null;
-    private int orderStatus = 0;
-    @Expose private String CustCode = null;
-    @Expose private double GrossValue = 0.0;
-    @Expose private double OVDiscount = 0.0;
-    @Expose private double DiscountValue = 0.0;
-    @Expose private double OrderValue = 0.0;
-    @Expose private String AddedDate = null;
-    @Expose private ArrayList<ROSNewOrderItem> Products = null;
+    @Expose protected String SalesOrdNum = null;
+    protected int orderStatus = 0;
+    @Expose protected String CustCode = null;
+    @Expose protected double GrossValue = 0.0;
+    @Expose protected double OVDiscount = 0.0;
+    @Expose protected double DiscountValue = 0.0;
+    @Expose protected double OrderValue = 0.0;
+    @Expose protected String AddedDate = null;
+    @Expose protected ArrayList<ROSNewOrderItem> Products = null;
 
     public ROSNewOrder() {
         this.SalesOrdNum = null;

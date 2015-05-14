@@ -13,6 +13,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.relianceit.relianceorder.AppController;
+import com.relianceit.relianceorder.models.ROSInvoice;
 import com.relianceit.relianceorder.models.ROSNewOrder;
 import com.relianceit.relianceorder.models.ROSReturnOrder;
 import com.relianceit.relianceorder.models.ROSReturnOrderItem;
@@ -331,6 +332,78 @@ public class ReturnOrderServiceHandler {
 
             @Override
             public void onGetOrderError(VolleyError error) {
+
+            }
+        });
+    }
+
+    /*
+    Invoice details
+     */
+    public static interface InvoiceDetailsListener {
+        public abstract void onGetInvoiceSuccess(ROSInvoice invoice);
+        public abstract void onGetInvoiceError(VolleyError error);
+    }
+
+    public void getInvoice(String customerCode, String invoiceNo, final String requestTag, final InvoiceDetailsListener listener) {
+
+        if (customerCode == null || customerCode.length() == 0) {
+            listener.onGetInvoiceError(null);
+            return;
+        }
+
+        ROSUser user = ROSUser.getInstance();
+        //Authorization: Token <auth token>:<deviceId>
+        final String params = "Token " + user.getAccessToken() + ":" + user.getDeviceToken();
+        Log.i(TAG, "Get Invoice Authorization: " + params);
+
+        String endPoint = AppURLs.INVOICE_GET_ENDPOINT + customerCode + "/" + invoiceNo;
+
+        Log.i(TAG, "Get Invoice end point: " + endPoint);
+
+        JsonObjectRequest orderRequest = new JsonObjectRequest(Request.Method.GET, endPoint, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject jsonArray) {
+                Log.i(TAG, "Get Invoice success " + jsonArray.toString());
+
+                Type objType = new TypeToken<ROSInvoice>(){}.getType();
+                Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+                ROSInvoice invoice = gson.fromJson(jsonArray.toString(), objType);
+                listener.onGetInvoiceSuccess(invoice);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Log.i(TAG, "Get Invoice error " + volleyError.toString());
+                if (volleyError.networkResponse != null && volleyError.networkResponse.statusCode == 401) {
+                    Log.i(TAG, "Get Invoice failed ====== Unauthorized");
+                }else {
+                    Log.i(TAG, "Get Invoice failed ====== Server error");
+                }
+                listener.onGetInvoiceError(volleyError);
+            }
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                headers.put("Authorization", params);
+                return headers;
+            }
+        };
+
+        AppController.getInstance().addToRequestQueue(orderRequest, requestTag);
+    }
+
+    public void testGetInvoice() {
+        getInvoice("00001", "000044", TAG, new InvoiceDetailsListener() {
+            @Override
+            public void onGetInvoiceSuccess(ROSInvoice invoice) {
+
+            }
+
+            @Override
+            public void onGetInvoiceError(VolleyError error) {
 
             }
         });

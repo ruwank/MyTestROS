@@ -18,4 +18,6 @@ public class AppURLs {
     public static String RETURN_ORDER_SYNC_ENDPOINT = BASE_URL + "/api/return/add";
     public static String RETURN_LIST_GET_ENDPOINT = BASE_URL + "/api/return/get/";
     public static String RETURN_GET_ENDPOINT = BASE_URL + "/api/return/get/";
+    public static String INVOICE_GET_ENDPOINT = BASE_URL + "/api/order/getforinvoice/";
+
 }
