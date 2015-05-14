@@ -9,36 +9,15 @@ import java.util.ArrayList;
  */
 public class ROSNewOrder {
 
-    @Expose private String SalesOrdNum = null;
-    private int orderStatus = 0;
-    @Expose private String CustCode = null;
-    @Expose private double GrossValue = 0.0;
-    @Expose private double OVDiscount = 0.0;
-    @Expose private double DiscountValue = 0.0;
-    @Expose private double OrderValue = 0.0;
-    @Expose private String AddedDate = null;
-    @Expose private ArrayList<ROSNewOrderItem> Products = null;
-
-    /*
-    OrderNo  = SalesOrdNum
-            OrderDate = OrderValue(dd/mm/yyyy)
-	"CustCode" : "00001",
-	"GrossValue" : 100,
-	"OVDiscount" : ,
-	"DiscountValue" : ,
-	"OrderValue" : 1000.20,
-	"Products" : [{
-			"ProductCode" : "001",
-                                   ProductName = ProductDescription
-			"ProductBatchCode" : "0001",
-                                   UnitPrice = UnitPrice
-			"QtyOrdered" : 1,
-			"ProdDiscount" : 0,
-			"QtyBonus" : 0,
-			"EffPrice" : 100.00
-		}
-	]
-     */
+    @Expose protected String SalesOrdNum = null;
+    protected int orderStatus = 0;
+    @Expose protected String CustCode = null;
+    @Expose protected double GrossValue = 0.0;
+    @Expose protected double OVDiscount = 0.0;
+    @Expose protected double DiscountValue = 0.0;
+    @Expose protected double OrderValue = 0.0;
+    @Expose protected String AddedDate = null;
+    @Expose protected ArrayList<ROSNewOrderItem> Products = null;
 
     public ROSNewOrder() {
         this.SalesOrdNum = null;

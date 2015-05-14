@@ -1,43 +1,49 @@
 package com.relianceit.relianceorder.models;
 
+import com.google.gson.annotations.Expose;
+
 import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * Created by sura on 4/28/15.
  */
 public class ROSReturnOrder {
 
-    private String orderId = null;
+    @Expose private String ReturnNumb = null;
     private int orderStatus = 0;
-    private String customerId = null;
-    private String invoiceNo = null;
-    private double grossValue = 0.0;
-    private double discount = 0.0;
-    private double discountValue = 0.0;
-    private double orderValue = 0.0;
-    private String orderDate = null;
-    private ArrayList<ROSReturnOrderItem> orderItems = null;
+    @Expose private String CustCode = null;
+    @Expose private String InvoiceNumb = null;
+    @Expose private double GrossValue = 0.0;
+    @Expose private double OVDiscount = 0.0;
+    @Expose private double DiscountValue = 0.0;
+    @Expose private double OrderValue = 0.0;
+    @Expose private String AddedDate = null;
+    @Expose private ArrayList<ROSReturnOrderItem> Products = null;
 
     public ROSReturnOrder() {
-        this.orderId = null;
+        this.ReturnNumb = null;
         this.orderStatus = 0;
-        this.invoiceNo = null;
-        this.customerId = null;
-        this.grossValue = 0.0;
-        this.discount = 0.0;
-        this.discountValue = 0.0;
-        this.orderValue = 0.0;
-        this.orderDate = null;
-        this.orderItems = null;
+        this.InvoiceNumb = null;
+        this.CustCode = null;
+        this.GrossValue = 0.0;
+        this.OVDiscount = 0.0;
+        this.DiscountValue = 0.0;
+        this.OrderValue = 0.0;
+        this.AddedDate = null;
+        this.Products = null;
     }
 
-    public String getOrderId() {
-        return orderId;
+    public void fillDbFields() {
+        this.DiscountValue = GrossValue*OVDiscount/100;
+        this.OrderValue = GrossValue - DiscountValue;
     }
 
-    public void setOrderId(String orderId) {
-        this.orderId = orderId;
+    public String getReturnNumb() {
+        return ReturnNumb;
+    }
+
+    public void setReturnNumb(String returnNumb) {
+        this.ReturnNumb = returnNumb;
     }
 
     public int getOrderStatus() {
@@ -48,67 +54,67 @@ public class ROSReturnOrder {
         this.orderStatus = orderStatus;
     }
 
-    public String getCustomerId() {
-        return customerId;
+    public String getCustCode() {
+        return CustCode;
     }
 
-    public void setCustomerId(String customerId) {
-        this.customerId = customerId;
+    public void setCustCode(String custCode) {
+        this.CustCode = custCode;
     }
 
-    public String getInvoiceNo() {
-        return invoiceNo;
+    public String getInvoiceNumb() {
+        return InvoiceNumb;
     }
 
-    public void setInvoiceNo(String invoiceNo) {
-        this.invoiceNo = invoiceNo;
+    public void setInvoiceNumb(String invoiceNumb) {
+        this.InvoiceNumb = invoiceNumb;
     }
 
     public double getGrossValue() {
-        return grossValue;
+        return GrossValue;
     }
 
     public void setGrossValue(double grossValue) {
-        this.grossValue = grossValue;
+        this.GrossValue = grossValue;
     }
 
-    public double getDiscount() {
-        return discount;
+    public double getOVDiscount() {
+        return OVDiscount;
     }
 
-    public void setDiscount(double discount) {
-        this.discount = discount;
+    public void setOVDiscount(double OVDiscount) {
+        this.OVDiscount = OVDiscount;
     }
 
     public double getDiscountValue() {
-        return discountValue;
+        return DiscountValue;
     }
 
     public void setDiscountValue(double discountValue) {
-        this.discountValue = discountValue;
+        this.DiscountValue = discountValue;
     }
 
     public double getOrderValue() {
-        return orderValue;
+        return OrderValue;
     }
 
     public void setOrderValue(double orderValue) {
-        this.orderValue = orderValue;
+        this.OrderValue = orderValue;
     }
 
-    public String getOrderDate() {
-        return orderDate;
+    public String getAddedDate() {
+        return AddedDate;
     }
 
-    public void setOrderDate(String orderDate) {
-        this.orderDate = orderDate;
+    public void setAddedDate(String addedDate) {
+        this.AddedDate = addedDate;
     }
 
-    public ArrayList<ROSReturnOrderItem> getOrderItems() {
-        return orderItems;
+    public ArrayList<ROSReturnOrderItem> getProducts() {
+        return Products;
     }
 
-    public void setOrderItems(ArrayList<ROSReturnOrderItem> orderItems) {
-        this.orderItems = orderItems;
+    public void setProducts(ArrayList<ROSReturnOrderItem> products) {
+        this.Products = products;
     }
 }

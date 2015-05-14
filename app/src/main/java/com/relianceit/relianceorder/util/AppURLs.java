@@ -14,4 +14,10 @@ public class AppURLs {
     public static String PRODUCT_LIST_ENDPOINT = BASE_URL + "/api/stock/productlist";
     public static String SALES_LIST_GET_ENDPOINT = BASE_URL + "/api/order/get/";
     public static String SALE_GET_ENDPOINT = BASE_URL + "/api/order/get/";
+    public static String LOGOUT_ENDPOINT = BASE_URL + "/api/authenticate/logout";
+    public static String RETURN_ORDER_SYNC_ENDPOINT = BASE_URL + "/api/return/add";
+    public static String RETURN_LIST_GET_ENDPOINT = BASE_URL + "/api/return/get/";
+    public static String RETURN_GET_ENDPOINT = BASE_URL + "/api/return/get/";
+    public static String INVOICE_GET_ENDPOINT = BASE_URL + "/api/order/getforinvoice/";
+
 }

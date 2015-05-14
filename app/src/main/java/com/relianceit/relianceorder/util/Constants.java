@@ -17,8 +17,10 @@ public class Constants {
     public static final String DM_LOGGED_KEY = "com.relianceit.relianceorder.already_logged_key";
     public static final String DM_ACCESS_TOKEN_KEY = "com.relianceit.relianceorder.token_key";
     public static final String DM_USERNAME_KEY = "com.relianceit.relianceorder.username_key";
+    public static final String DM_PASSWORD_KEY = "com.relianceit.relianceorder.password_key";
     public static final String DM_DAILY_SYNC_TIME_KEY = "com.relianceit.relianceorder.daily_sync_time_key";
     public static final String DM_DAILY_SYNC_PRODUCT_KEY = "com.relianceit.relianceorder.daily_sync_product_time_key";
+    public static final String DM_OFFLINE_LOGOUT_KEY = "com.relianceit.relianceorder.offline_logout_key";
 
     public static final class LocalDataChange {
         public static final String ACTION_ORDER_ADDED = "action_order_added";
@@ -30,6 +32,11 @@ public class Constants {
         public static final int PENDING = 0;
         public static final int SYNCED = 1;
         public static final int ONLINE = 2;
+    }
+
+    public static final class OrderType {
+        public static final int Sale = 0;
+        public static final int Return = 1;
     }
 
     //Message section

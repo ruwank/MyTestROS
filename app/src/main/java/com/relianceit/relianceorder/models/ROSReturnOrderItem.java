@@ -1,32 +1,60 @@
 package com.relianceit.relianceorder.models;
 
+import android.util.Log;
+
+import com.google.gson.annotations.Expose;
+
 /**
  * Created by sura on 4/28/15.
  */
 public class ROSReturnOrderItem {
 
+    public static final String TAG = ROSReturnOrderItem.class.getSimpleName();
+
     private String itemId = null;
     private String orderId = null;
-    private String productId = null;
-    private String productName = null;
-    private String batchName = null;
-    private int quantity = 0;
-    private double price = 0.0;
-    private double discount = 0.0;
-    private int freeIssues = 0;
-    private double itemValue = 0.0;
+    @Expose private String ProductCode = null;
+    @Expose private String ProductDescription = null;
+    @Expose private String ProductBatchCode = null;
+    @Expose private int QtyOrdered = 0;
+    @Expose private double UnitPrice = 0.0;
+    @Expose private double ProdDiscount = 0.0;
+    @Expose private int QtyBonus = 0;
+    @Expose private double EffPrice = 0.0;
+
+    @Expose private String SuppCode = null;
+    @Expose private String StockLocationCode = null;
+    @Expose private String BrandCode = null;
+    @Expose private String AgenCode = null;
+
 
     public ROSReturnOrderItem() {
         this.itemId = null;
         this.orderId = null;
-        this.productId = null;
-        this.productName = "";
-        this.batchName = "";
-        this.quantity = 0;
-        this.price = 0.0;
-        this.discount = 0.0;
-        this.freeIssues = 0;
-        this.itemValue = 0.0;
+        this.ProductCode = null;
+        this.ProductDescription = "";
+        this.ProductBatchCode = "";
+        this.QtyOrdered = 0;
+        this.UnitPrice = 0.0;
+        this.ProdDiscount = 0.0;
+        this.QtyBonus = 0;
+        this.EffPrice = 0.0;
+        this.SuppCode = null;
+        this.StockLocationCode = null;
+        this.BrandCode = null;
+        this.AgenCode = null;
+    }
+
+    public void print() {
+        Log.i(TAG, ProductDescription + " " +
+                ProductBatchCode + " " +
+                QtyOrdered + " " +
+                ProdDiscount + " " +
+                QtyBonus + " " +
+                EffPrice + " " +
+                ProductCode + " " +
+                SuppCode + " " +
+                UnitPrice);
     }
 
     public String getItemId() {
@@ -45,67 +73,99 @@ public class ROSReturnOrderItem {
         this.orderId = orderId;
     }
 
-    public String getProductId() {
-        return productId;
+    public String getProductCode() {
+        return ProductCode;
     }
 
-    public void setProductId(String productId) {
-        this.productId = productId;
+    public void setProductCode(String productCode) {
+        this.ProductCode = productCode;
     }
 
-    public String getProductName() {
-        return productName;
+    public String getProductDescription() {
+        return ProductDescription;
     }
 
-    public void setProductName(String productName) {
-        this.productName = productName;
+    public void setProductDescription(String productDescription) {
+        this.ProductDescription = productDescription;
     }
 
-    public String getBatchName() {
-        return batchName;
+    public String getProductBatchCode() {
+        return ProductBatchCode;
     }
 
-    public void setBatchName(String batchName) {
-        this.batchName = batchName;
+    public void setProductBatchCode(String productBatchCode) {
+        this.ProductBatchCode = productBatchCode;
     }
 
-    public int getQuantity() {
-        return quantity;
+    public int getQtyOrdered() {
+        return QtyOrdered;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public void setQtyOrdered(int qtyOrdered) {
+        this.QtyOrdered = qtyOrdered;
     }
 
-    public double getPrice() {
-        return price;
+    public double getUnitPrice() {
+        return UnitPrice;
     }
 
-    public void setPrice(double price) {
-        this.price = price;
+    public void setUnitPrice(double unitPrice) {
+        this.UnitPrice = unitPrice;
     }
 
-    public double getDiscount() {
-        return discount;
+    public double getProdDiscount() {
+        return ProdDiscount;
     }
 
-    public void setDiscount(double discount) {
-        this.discount = discount;
+    public void setProdDiscount(double prodDiscount) {
+        this.ProdDiscount = prodDiscount;
     }
 
-    public int getFreeIssues() {
-        return freeIssues;
+    public int getQtyBonus() {
+        return QtyBonus;
     }
 
-    public void setFreeIssues(int freeIssues) {
-        this.freeIssues = freeIssues;
+    public void setQtyBonus(int qtyBonus) {
+        this.QtyBonus = qtyBonus;
     }
 
-    public double getItemValue() {
-        return itemValue;
+    public double getEffPrice() {
+        return EffPrice;
     }
 
-    public void setItemValue(double itemValue) {
-        this.itemValue = itemValue;
+    public void setEffPrice(double effPrice) {
+        this.EffPrice = effPrice;
+    }
+
+    public String getSuppCode() {
+        return SuppCode;
+    }
+
+    public void setSuppCode(String suppCode) {
+        SuppCode = suppCode;
+    }
+
+    public String getStockLocationCode() {
+        return StockLocationCode;
+    }
+
+    public void setStockLocationCode(String stockLocationCode) {
+        StockLocationCode = stockLocationCode;
+    }
+
+    public String getBrandCode() {
+        return BrandCode;
+    }
+
+    public void setBrandCode(String brandCode) {
+        BrandCode = brandCode;
+    }
+
+    public String getAgenCode() {
+        return AgenCode;
+    }
+
+    public void setAgenCode(String agenCode) {
+        AgenCode = agenCode;
     }
 }

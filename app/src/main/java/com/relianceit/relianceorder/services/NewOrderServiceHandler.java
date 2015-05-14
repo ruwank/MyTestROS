@@ -58,8 +58,6 @@ public class NewOrderServiceHandler {
     }
 
     private void syncSuccess(String orderId, final String requestTag, final NewOrderSyncListener listener) {
-
-        //update db
         listener.onOrderSyncSuccess(orderId);
     }
 
@@ -129,15 +127,6 @@ public class NewOrderServiceHandler {
         };
 
         AppController.getInstance().addToRequestQueue(syncRequest, requestTag);
-    }
-
-    private void testSticks() {
-        ROSDbHelper dbHelper = new ROSDbHelper(context);
-        ArrayList<ROSStock> stocks = dbHelper.getStocks(context);
-        for (int i = 0; i < stocks.size(); i++) {
-            ROSStock stock = stocks.get(i);
-            stock.print();
-        }
     }
 
     public void testSyncNewOrder() {

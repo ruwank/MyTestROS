@@ -20,7 +20,14 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import com.relianceit.relianceorder.AppController;
 import com.relianceit.relianceorder.R;
 import com.relianceit.relianceorder.appsupport.tab.SlidingTabLayout;
@@ -30,21 +37,28 @@ import com.relianceit.relianceorder.fragment.RelianceOperationFragment;
 import com.relianceit.relianceorder.fragment.StockStatementFragment;
 import com.relianceit.relianceorder.models.ROSNewOrder;
 import com.relianceit.relianceorder.models.ROSReturnOrder;
+import com.relianceit.relianceorder.models.ROSUser;
 import com.relianceit.relianceorder.services.GeneralServiceHandler;
 import com.relianceit.relianceorder.services.NewOrderServiceHandler;
+import com.relianceit.relianceorder.services.ReturnOrderServiceHandler;
 import com.relianceit.relianceorder.util.AppDataManager;
+import com.relianceit.relianceorder.util.AppURLs;
 import com.relianceit.relianceorder.util.AppUtils;
 import com.relianceit.relianceorder.util.ConnectionDetector;
 import com.relianceit.relianceorder.util.Constants;
 
+import org.json.JSONObject;
+
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class HomeActivity extends RelianceBaseActivity {
 
     public static final String TAG = HomeActivity.class.getSimpleName();
-    public static final int RESULT_LOGOUT = 3;
 
     private AlertDialog logoutAlertDialog = null;
 
@@ -164,6 +178,14 @@ public class HomeActivity extends RelianceBaseActivity {
 		return super.onOptionsItemSelected(item);
 	}
 
+    private void testMethod() {
+        ReturnOrderServiceHandler returnOrderServiceHandler = new ReturnOrderServiceHandler(this);
+        //returnOrderServiceHandler.testSyncNewOrder();
+        //returnOrderServiceHandler.testGetList();
+        //returnOrderServiceHandler.testGetOrder();
+        returnOrderServiceHandler.testGetInvoice();
+    }
+
     private void logOutButtonTapped() {
 
         if (isPendingDataAvailable()) {
@@ -177,7 +199,7 @@ public class HomeActivity extends RelianceBaseActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 logoutAlertDialog.dismiss();
-                logout();
+                sendLogoutRequest();
             }
         });
         builder.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
@@ -209,12 +231,11 @@ public class HomeActivity extends RelianceBaseActivity {
         }
     }
 
-    public void logout() {
+    private void logout() {
         AppDataManager.saveData(getApplicationContext(), Constants.DM_ACCESS_TOKEN_KEY, "");
         AppDataManager.saveData(getApplicationContext(), Constants.DM_USERNAME_KEY, "");
         AppDataManager.saveData(getApplicationContext(), Constants.DM_LOGGED_KEY, "no");
         AppDataManager.saveDataLong(getApplicationContext(), Constants.DM_DAILY_SYNC_TIME_KEY, 0);
-
 
         ROSDbHelper dbHelper = new ROSDbHelper(this);
         dbHelper.clearCustomerTable(this);
@@ -227,6 +248,52 @@ public class HomeActivity extends RelianceBaseActivity {
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
         startActivity(intent);
         finish();
+    }
+
+    private void sendLogoutRequest() {
+
+        if (!ConnectionDetector.isConnected(this)) {
+            AppUtils.showAlertDialog(this, Constants.MSG_NO_INTERNET_TITLE, Constants.MSG_NO_INTERNET_MSG);
+            return;
+        }
+
+        AppUtils.showProgressDialog(this);
+
+        ROSUser user = ROSUser.getInstance();
+        //Authorization: Token <auth token>:<deviceId>
+        final String params = "Token " + user.getAccessToken() + ":" + user.getDeviceToken();
+        Log.i(TAG, "Logout Authorization: " + params);
+
+        JsonObjectRequest lRequest = new JsonObjectRequest(Request.Method.GET, AppURLs.LOGOUT_ENDPOINT, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject jsonObject) {
+                Log.i(TAG, "Logout success " + jsonObject.toString());
+                AppUtils.dismissProgressDialog();
+                logout();
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Log.i(TAG, "Logout error " + volleyError.toString());
+                if (volleyError.networkResponse != null && volleyError.networkResponse.statusCode == 401) {
+                    Log.i(TAG, "Logout failed ====== Unauthorized");
+                }else {
+                    Log.i(TAG, "Logout failed ====== Server error");
+                }
+
+                AppUtils.dismissProgressDialog();
+            }
+        })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                headers.put("Authorization", params);
+                return headers;
+            }
+        };
+
+        AppController.getInstance().addToRequestQueue(lRequest, TAG);
     }
 
     private void refreshHome() {

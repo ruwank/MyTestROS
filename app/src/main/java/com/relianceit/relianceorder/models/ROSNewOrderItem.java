@@ -35,6 +35,8 @@ public class ROSNewOrderItem {
         this.ProdDiscount = 0.0;
         this.QtyBonus = 0;
         this.EffPrice = 0.0;
+        this.SuppCode = null;
+        this.StockLocationCode = null;
     }
 
     public void print() {

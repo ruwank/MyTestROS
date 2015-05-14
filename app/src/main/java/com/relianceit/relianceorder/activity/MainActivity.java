@@ -32,6 +32,8 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        AppController.getInstance().fillUserUsingSavedData();
+
         String logged = AppDataManager.getData(this, Constants.DM_LOGGED_KEY);
         if (logged != null && logged.equalsIgnoreCase("yes")) {
             loadHome();
