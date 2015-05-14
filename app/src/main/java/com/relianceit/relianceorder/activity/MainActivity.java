@@ -32,6 +32,7 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //AppDataManager.saveData(getApplicationContext(), Constants.DM_LOGGED_KEY, "yes");
         AppController.getInstance().fillUserUsingSavedData();
 
         String logged = AppDataManager.getData(this, Constants.DM_LOGGED_KEY);
