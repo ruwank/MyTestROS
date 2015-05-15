@@ -157,7 +157,7 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
         }
     }
 
-    private  void orderSelected(int index){
+    private void orderSelected(int index){
 
         if (loadedFromDb) {
             if(section == Constants.Section.VIEW_SALE_RETURNS_LIST){
@@ -189,7 +189,7 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
         }
     }
 
-    private void  loadOrderViewActivity(){
+    private void loadOrderViewActivity(){
         Intent intent = new Intent(getApplicationContext(),
                 ViewOrderActivity.class);
 
@@ -228,7 +228,7 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
 
     }
 
-    private  void updateLabel(){
+    private void updateLabel(){
         selectedCustomer= AppController.getInstance().getRosCustomer();
 
         customerName.setText(selectedCustomer.getCustName());

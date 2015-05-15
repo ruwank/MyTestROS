@@ -71,6 +71,8 @@ public class HomeActivity extends RelianceBaseActivity {
     SlidingTabLayout mTab;
     ViewPager mPager;
 
+    private long lastLogoutTime = 0;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -85,13 +87,20 @@ public class HomeActivity extends RelianceBaseActivity {
         registerReceiver(localDataChangeReceiver, new IntentFilter(Constants.LocalDataChange.ACTION_ORDER_ADDED));
         registerReceiver(localDataChangeReceiver, new IntentFilter(Constants.LocalDataChange.ACTION_ORDER_SYNCED));
         registerReceiver(localDataChangeReceiver, new IntentFilter(Constants.LocalDataChange.ACTION_DAILY_SYNCED));
+	}
+
+    @Override
+    protected void onResume() {
+        super.onResume();
 
         if (isPendingDataAvailable()) {
-            AppUtils.showAlertDialog(this, "Sync required!", "There is some local data in the app. Please sync them.");
+            if (ConnectionDetector.isConnected(this)) {
+                AppUtils.showAlertDialog(this, "Sync required!", "There is some local data in the app. Please sync them.");
+            }
         }else if (shouldShowDailySync()) {
             downloadDailyData();
         }
-	}
+    }
 
     @Override
     protected void onDestroy() {
@@ -188,13 +197,25 @@ public class HomeActivity extends RelianceBaseActivity {
 
     private void logOutButtonTapped() {
 
-        if (isPendingDataAvailable()) {
-            AppUtils.showAlertDialog(this, "Sync required!", "There is some local data in the app. Please sync them before logout.");
-            return;
+        Date date = new Date();
+        boolean showMessage = false;
+        if (date.getTime() - lastLogoutTime < 1000*60) {
+            lastLogoutTime = 0;
+            if (isPendingDataAvailable()) {
+                showMessage = true;
+            }
+        }else {
+            if (isPendingDataAvailable()) {
+                AppUtils.showAlertDialog(this, "Sync required!", "There is some local data in the app. Please sync them before logout.");
+                lastLogoutTime = date.getTime();
+                return;
+            }
         }
 
+        lastLogoutTime = 0;
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Are you sure you want to logout?");
+        if(showMessage) builder.setMessage("There is some local data in the app. If you continue logout that data will loss.");
         builder.setNegativeButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -304,8 +325,10 @@ public class HomeActivity extends RelianceBaseActivity {
     Data and sync section
      */
     private void dailyDownloadSuccess() {
-        
+        AppUtils.dismissProgressDialog();
+        refreshHome();
     }
+
     private void dailyDownloadFailed(int errorCode) {
         AppUtils.dismissProgressDialog();
         if (errorCode == 401) {
@@ -325,8 +348,7 @@ public class HomeActivity extends RelianceBaseActivity {
             generalServiceHandler.doDailyContentUpdate(TAG, new GeneralServiceHandler.DailyUpdateListener() {
                 @Override
                 public void onDailyUpdateSuccess() {
-                    AppUtils.dismissProgressDialog();
-                    refreshHome();
+                    dailyDownloadSuccess();
                 }
 
                 @Override
@@ -466,7 +488,20 @@ public class HomeActivity extends RelianceBaseActivity {
     }
 
     private void doReturnOrderSync(ROSReturnOrder returnOrder) {
+        ReturnOrderServiceHandler returnOrderServiceHandler = new ReturnOrderServiceHandler(this);
+        returnOrderServiceHandler.syncReturnOrder(returnOrder, TAG, new ReturnOrderServiceHandler.ReturnOrderSyncListener() {
+            @Override
+            public void onOrderSyncSuccess(String orderId) {
+                pendingRetOrders.remove(0);
+                updateReturnOrderOnSyncComplete(orderId);
+                doSyncPendingOrdersContinue();
+            }
 
+            @Override
+            public void onOrderSyncError(String orderId, VolleyError error) {
+                orderSyncFailed();
+            }
+        });
     }
 
 
