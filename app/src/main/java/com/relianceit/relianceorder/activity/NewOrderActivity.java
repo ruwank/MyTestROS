@@ -7,6 +7,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +32,8 @@ import com.relianceit.relianceorder.models.ROSInvoice;
 import com.relianceit.relianceorder.models.ROSNewOrder;
 import com.relianceit.relianceorder.models.ROSNewOrderItem;
 import com.relianceit.relianceorder.models.ROSProduct;
+import com.relianceit.relianceorder.models.ROSReturnOrder;
+import com.relianceit.relianceorder.models.ROSReturnOrderItem;
 import com.relianceit.relianceorder.models.ROSStock;
 import com.relianceit.relianceorder.services.NewOrderServiceHandler;
 import com.relianceit.relianceorder.services.ReturnOrderServiceHandler;
@@ -59,6 +62,8 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
     ArrayList<String> batches;
     ROSStock stock;
     HashMap<String,ROSNewOrderItem> newOrderItemMap =  new HashMap<String,ROSNewOrderItem>();
+    HashMap<String,ROSReturnOrderItem> returnOrderItemMap =  new HashMap<String,ROSReturnOrderItem>();
+
     ROSCustomer selectedCustomer;
     RelativeLayout relativeLayout;
     TableLayout new_order_table_header_content;
@@ -106,6 +111,20 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
         totalOutstanding=(TextView)findViewById(R.id.total_outstanding);
         invoiceValueText=(EditText)findViewById(R.id.invoice_value);
 
+        invoiceValueText.setOnKeyListener(new View.OnKeyListener() {
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                // If the event is a key-down event on the "enter" button
+                if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+                        (keyCode == KeyEvent.KEYCODE_ENTER)) {
+                    // Perform action on key press
+                    loadInvoiceData();
+
+                    return true;
+                }
+                return false;
+            }
+        });
+        /*
         invoiceValueText.addTextChangedListener(new TextWatcher() {
 
             public void afterTextChanged(Editable s) {
@@ -119,8 +138,9 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
                                       int before, int count) {
                 loadInvoiceData();
             }
-        });
 
+        });
+*/
         orderTableLayout=(TableLayout)findViewById(R.id.new_order_table);
 
 
@@ -267,6 +287,40 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
         loadData();
 
 	}
+    /*
+    load initial data
+     */
+    private void loadData(){
+        selectedCustomer= AppController.getInstance().getRosCustomer();
+        totalOutstanding.setText(String.format("%.2f", selectedCustomer.getOutstandingAmount()));
+
+        customerName.setText(selectedCustomer.getCustName());
+        customizeActionBar();
+
+        if(section == Constants.Section.ADD_SALE_RETURNS){
+            isLoadFromInvoice=false;
+
+            topSecondLabel.setText("Invoice ");
+            totalAmountTextLabel.setText("Return Value ");
+            totalOutstanding.setVisibility(View.GONE);
+            invoiceValueText.setVisibility(View.VISIBLE);
+            batchSpinner.setVisibility(View.INVISIBLE);
+
+            loadAllProductNamesForReturns();
+
+        }else{
+
+            topSecondLabel.setText("Total outstanding : ");
+            totalAmountTextLabel.setText("Order Value");
+            totalOutstanding.setVisibility(View.VISIBLE);
+            invoiceValueText.setVisibility(View.GONE);
+            batchNumber.setVisibility(View.GONE);
+            selectReturnBatch.setVisibility(View.GONE);
+
+            loadProductForSale();
+
+        }
+    }
     private void hiddenBatchSpinner(){
         if (section == Constants.Section.ADD_SALE_RETURNS && !isLoadFromInvoice) batchSpinner.setVisibility(View.INVISIBLE);
     }
@@ -301,38 +355,9 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
 
     }
 
-
-    private  void loadData(){
-      selectedCustomer= AppController.getInstance().getRosCustomer();
-        totalOutstanding.setText(String.format("%.2f", selectedCustomer.getOutstandingAmount()));
-
-        customerName.setText(selectedCustomer.getCustName());
-        customizeActionBar();
-
-        if(section == Constants.Section.ADD_SALE_RETURNS){
-            isLoadFromInvoice=false;
-
-            topSecondLabel.setText("Invoice ");
-            totalAmountTextLabel.setText("Return Value ");
-            totalOutstanding.setVisibility(View.GONE);
-            invoiceValueText.setVisibility(View.VISIBLE);
-            batchSpinner.setVisibility(View.INVISIBLE);
-
-            loadAllProductNamesForReturns();
-
-        }else{
-
-            topSecondLabel.setText("Total outstanding : ");
-            totalAmountTextLabel.setText("Order Value");
-            totalOutstanding.setVisibility(View.VISIBLE);
-            invoiceValueText.setVisibility(View.GONE);
-            batchNumber.setVisibility(View.GONE);
-            selectReturnBatch.setVisibility(View.GONE);
-
-            loadProductForSale();
-
-        }
-    }
+    /*
+        new  Order section
+         */
     private void loadProductForSale(){
         products= dbHelper.getProductNamesForSale(getApplicationContext());
 
@@ -341,27 +366,29 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         productSpinner.setAdapter(dataAdapter);
     }
-    private void loadAllProductNamesForReturns(){
-        products= dbHelper.getProductNamesForReturns(getApplicationContext());
+    private void loadProductBatchForSale(String productName){
+        Log.v("productName :",productName);
+        batches= dbHelper.getBatchNamesForSale(getApplicationContext(),productName);
 
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, products);
+                android.R.layout.simple_spinner_item, batches);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        productSpinner.setAdapter(dataAdapter);
-    }
-    private void loadInvoiceProductNamesForReturns(){
-        batchNumber.setVisibility(View.INVISIBLE);
-        selectReturnBatch.setVisibility(View.INVISIBLE);
-        batchSpinner.setVisibility(View.VISIBLE);
-        isLoadFromInvoice=true;
-        products= rosInvoice.getProductNames();
-
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, products);
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        productSpinner.setAdapter(dataAdapter);
+        batchSpinner.setAdapter(dataAdapter);
 
     }
+    private void loadStockForSale(){
+        String productName= productSpinner.getSelectedItem().toString();
+        String batchName= batchSpinner.getSelectedItem().toString();
+
+        stock= dbHelper.getStockForSale(getApplicationContext(), productName, batchName);
+        orderPriceText.setText(String.format("%.2f", stock.getUnitPrice()));
+        Log.v("productName :",productName);
+
+    }
+
+    /*
+    Return Order section
+     */
     private void loadProductBatchForReturnOrder(String productName){
         Log.v("productName :",productName);
         if(isLoadFromInvoice){
@@ -378,26 +405,26 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
         batchSpinner.setAdapter(dataAdapter);
 
     }
-
-    private void loadProductBatchForSale(String productName){
-        Log.v("productName :",productName);
-        batches= dbHelper.getBatchNamesForSale(getApplicationContext(),productName);
+    private void loadInvoiceProductNamesForReturns(){
+        batchNumber.setVisibility(View.INVISIBLE);
+        selectReturnBatch.setVisibility(View.INVISIBLE);
+        batchSpinner.setVisibility(View.VISIBLE);
+        isLoadFromInvoice=true;
+        products= rosInvoice.getProductNames();
 
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, batches);
+                android.R.layout.simple_spinner_item, products);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        batchSpinner.setAdapter(dataAdapter);
+        productSpinner.setAdapter(dataAdapter);
 
     }
+    private void loadAllProductNamesForReturns(){
+        products= dbHelper.getProductNamesForReturns(getApplicationContext());
 
-    private void loadStockForSale(){
-        String productName= productSpinner.getSelectedItem().toString();
-        String batchName= batchSpinner.getSelectedItem().toString();
-
-            stock= dbHelper.getStockForSale(getApplicationContext(), productName, batchName);
-            orderPriceText.setText(String.format("%.2f", stock.getUnitPrice()));
-            Log.v("productName :",productName);
-
+        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_spinner_item, products);
+        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        productSpinner.setAdapter(dataAdapter);
     }
     private void loadProductForReturns(){
         String productName= productSpinner.getSelectedItem().toString();
@@ -413,6 +440,36 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
         Log.v("productName :",productName);
 
     }
+    private void loadInvoiceData(){
+        isLoadFromInvoice=false;
+        String  invoiceValue=  invoiceValueText.getText().toString();
+        if(ConnectionDetector.isConnected(getApplicationContext()) && invoiceValue != null && invoiceValue.length()>0){
+            ReturnOrderServiceHandler returnOrderServiceHandler=new ReturnOrderServiceHandler(getApplicationContext());
+            returnOrderServiceHandler.getInvoice(selectedCustomer.getCustCode(),invoiceValue,"get_invoice",new ReturnOrderServiceHandler.InvoiceDetailsListener() {
+                @Override
+                public void onGetInvoiceSuccess(ROSInvoice invoice) {
+                    rosInvoice=invoice;
+                    if(rosInvoice !=null){
+                        loadInvoiceProductNamesForReturns();
+
+                    }else {
+                        loadAllProductNamesForReturns();
+                    }
+
+                }
+
+                @Override
+                public void onGetInvoiceError(VolleyError error) {
+                    loadAllProductNamesForReturns();
+
+                }
+            });
+
+        }else{
+            isLoadFromInvoice=false;
+        }
+    }
+
 
 
     private void addNewOrder(){
@@ -437,20 +494,43 @@ if(isFieldHasValidAmount()) {
         if (freeItem != null && freeItem.length() > 0){
             freeItemCount=  Integer.parseInt(freeItem);
         }
-        ROSNewOrderItem newOrderItem = new ROSNewOrderItem();
-        newOrderItem.setProductBatchCode(stock.getProductBatchCode());
-        newOrderItem.setProductDescription(productName);
-        newOrderItem.setQtyOrdered(Integer.parseInt(quantity));
-        newOrderItem.setQtyBonus(freeItemCount);
-        newOrderItem.setEffPrice(Float.valueOf(total));
-        newOrderItem.setProductCode(stock.getProductCode());
-        newOrderItem.setSuppCode(stock.getSuppCode());
-        newOrderItem.setStockLocationCode(stock.getStockLocationCode());
-        newOrderItem.setUnitPrice(Double.parseDouble(orderPrice));
-        newOrderItem.setProdDiscount(orderDiscountValue);
+       // ROSReturnOrderItem
+        double unitPrice=0.0;
 
+        if(section == Constants.Section.ADD_SALE_RETURNS){
+            ROSReturnOrderItem returnOrderItem= new ROSReturnOrderItem();
+            returnOrderItem.setProductBatchCode(rosProduct.getProductBatchCode());
+            returnOrderItem.setProductDescription(productName);
+            returnOrderItem.setQtyOrdered(Integer.parseInt(quantity));
+            returnOrderItem.setQtyBonus(freeItemCount);
+            returnOrderItem.setEffPrice(Float.valueOf(total));
+            returnOrderItem.setProductCode(rosProduct.getProductCode());
+            returnOrderItem.setSuppCode(rosProduct.getSuppCode());
+           // returnOrderItem.setStockLocationCode(rosProduct.get);
+            returnOrderItem.setUnitPrice(Double.parseDouble(orderPrice));
+            returnOrderItem.setProdDiscount(orderDiscountValue);
 
-        newOrderItemMap.put("" + itemCount, newOrderItem);
+            returnOrderItemMap.put("" + itemCount, returnOrderItem);
+            unitPrice= rosProduct.getUnitPrice();
+
+        }else {
+            ROSNewOrderItem newOrderItem = new ROSNewOrderItem();
+            newOrderItem.setProductBatchCode(stock.getProductBatchCode());
+            newOrderItem.setProductDescription(productName);
+            newOrderItem.setQtyOrdered(Integer.parseInt(quantity));
+            newOrderItem.setQtyBonus(freeItemCount);
+            newOrderItem.setEffPrice(Float.valueOf(total));
+            newOrderItem.setProductCode(stock.getProductCode());
+            newOrderItem.setSuppCode(stock.getSuppCode());
+            newOrderItem.setStockLocationCode(stock.getStockLocationCode());
+            newOrderItem.setUnitPrice(Double.parseDouble(orderPrice));
+            newOrderItem.setProdDiscount(orderDiscountValue);
+
+            newOrderItemMap.put("" + itemCount, newOrderItem);
+            unitPrice= stock.getUnitPrice();
+
+        }
+
         updateOrderGrossValue();
 
         TableRow.LayoutParams layoutParamsTableRow = new TableRow.LayoutParams(
@@ -556,7 +636,7 @@ if(isFieldHasValidAmount()) {
         orderTableLayout.addView(tableRow, 0);
 
         quantityText.setText("");
-        orderPriceText.setText(String.format("%.2f", stock.getUnitPrice()));
+        orderPriceText.setText(String.format("%.2f", unitPrice));
         orderDiscountText.setText("");
         freeItemText.setText("");
         itemTotalAmount.setText("");
@@ -564,23 +644,50 @@ if(isFieldHasValidAmount()) {
 }
 
     }
+
+    /*
+   Update field data
+    */
     private boolean isProductBatchAlreadyAdded(String batchName){
         boolean returnValue= false;
+        if(section == Constants.Section.ADD_SALE_RETURNS) {
+            Iterator iterator = returnOrderItemMap.keySet().iterator();
+            while(iterator.hasNext()) {
+                String key=(String)iterator.next();
+                ROSReturnOrderItem rosReturnOrderItem=(ROSReturnOrderItem)returnOrderItemMap.get(key);
+                if(rosReturnOrderItem.getProductCode()==rosProduct.getProductCode() && rosReturnOrderItem.getProductBatchCode()==batchName ){
+                    returnValue=true;
+                }
 
-        Iterator iterator = newOrderItemMap.keySet().iterator();
-        while(iterator.hasNext()) {
-            String key=(String)iterator.next();
-            ROSNewOrderItem rosNewOrderItem=(ROSNewOrderItem)newOrderItemMap.get(key);
-            if(rosNewOrderItem.getProductCode()==stock.getProductCode() && rosNewOrderItem.getProductBatchCode()==batchName ){
-                returnValue=true;
             }
+        }else{
+            Iterator iterator = newOrderItemMap.keySet().iterator();
+            while(iterator.hasNext()) {
+                String key=(String)iterator.next();
+                ROSNewOrderItem rosNewOrderItem=(ROSNewOrderItem)newOrderItemMap.get(key);
+                if(rosNewOrderItem.getProductCode()==stock.getProductCode() && rosNewOrderItem.getProductBatchCode()==batchName ){
+                    returnValue=true;
+                }
 
+            }
         }
+
         return returnValue;
     }
     private boolean isFieldHasValidAmount(){
         boolean returnValue= true;
-        String batchName= stock.getProductBatchCode();
+        String batchName="";
+       int availableQuantity= 0;
+
+        if(section == Constants.Section.ADD_SALE_RETURNS){
+            batchName= rosProduct.getProductBatchCode();
+            availableQuantity=rosProduct.getQuntityInStock();
+
+        }else{
+            batchName= stock.getProductBatchCode();
+            availableQuantity=stock.getAvailableQuantity();
+
+        }
         String quantity = quantityText.getText().toString();
         String orderDiscount = orderDiscountText.getText().toString();
 
@@ -590,8 +697,8 @@ if(isFieldHasValidAmount()) {
         }
         if(quantity != null && quantity.length()>0){
             int quantityValue=Integer.parseInt(quantity);
-            if(stock.getAvailableQuantity() <quantityValue){
-                AppUtils.showAlertDialog(this, "Over stock Quantity", "Can not add this much of quantity. You have only "+stock.getAvailableQuantity()+" quantity");
+            if(availableQuantity <quantityValue){
+                AppUtils.showAlertDialog(this, "Over stock Quantity", "Can not add this much of quantity. You have only "+availableQuantity+" quantity");
                 returnValue=false;
             }
         }
@@ -606,38 +713,23 @@ if(isFieldHasValidAmount()) {
         return returnValue;
 
     }
-    private void loadInvoiceData(){
-        isLoadFromInvoice=false;
-     String  invoiceValue=  invoiceValueText.getText().toString();
-        if(ConnectionDetector.isConnected(getApplicationContext()) && invoiceValue != null && invoiceValue.length()>0){
-            ReturnOrderServiceHandler returnOrderServiceHandler=new ReturnOrderServiceHandler(getApplicationContext());
-            returnOrderServiceHandler.getInvoice(selectedCustomer.getCustCode(),invoiceValue,"get_invoice",new ReturnOrderServiceHandler.InvoiceDetailsListener() {
-                @Override
-                public void onGetInvoiceSuccess(ROSInvoice invoice) {
-                    rosInvoice=invoice;
-                    if(rosInvoice !=null){
-                        loadInvoiceProductNamesForReturns();
 
-                    }else {
-                        loadAllProductNamesForReturns();
-                    }
-
-                }
-
-                @Override
-                public void onGetInvoiceError(VolleyError error) {
-                    loadAllProductNamesForReturns();
-
-                }
-            });
+    private void updateItemTotalAmount(){
+        String productName="";
+        String batchName="";
+        if (section == Constants.Section.ADD_SALE_RETURNS){
+            if(rosProduct !=null){
+                productName = rosProduct.getProductCode();
+                batchName = rosProduct.getProductBatchCode();
+            }
 
         }else{
-            isLoadFromInvoice=false;
+            if(stock !=null){
+                productName = stock.getProductCode();
+                batchName = stock.getProductBatchCode();
+            }
         }
-    }
-    private void updateItemTotalAmount(){
-            String productName = stock.getProductCode();
-            String batchName = stock.getProductBatchCode();
+
             String quantity = quantityText.getText().toString();
             String orderPrice = orderPriceText.getText().toString();
             String orderDiscount = orderDiscountText.getText().toString();
@@ -663,12 +755,22 @@ if(isFieldHasValidAmount()) {
     }
     private void updateOrderGrossValue(){
         double total=0.00;
-        Iterator iterator = newOrderItemMap.keySet().iterator();
-        while(iterator.hasNext()) {
-            String key=(String)iterator.next();
-            ROSNewOrderItem rosNewOrderItem=(ROSNewOrderItem)newOrderItemMap.get(key);
-            total=total+rosNewOrderItem.getEffPrice();
+        if(section == Constants.Section.ADD_SALE_RETURNS) {
+            Iterator iterator = returnOrderItemMap.keySet().iterator();
+            while (iterator.hasNext()) {
+                String key = (String) iterator.next();
+                ROSReturnOrderItem rosReturnOrderItem = (ROSReturnOrderItem) returnOrderItemMap.get(key);
+                total = total + rosReturnOrderItem.getEffPrice();
 
+            }
+        }else {
+            Iterator iterator = newOrderItemMap.keySet().iterator();
+            while (iterator.hasNext()) {
+                String key = (String) iterator.next();
+                ROSNewOrderItem rosNewOrderItem = (ROSNewOrderItem) newOrderItemMap.get(key);
+                total = total + rosNewOrderItem.getEffPrice();
+
+            }
         }
         grossValueLabel.setText(String.format("%.2f", total));
         updateTotalOrderValue();
@@ -708,74 +810,143 @@ if(isFieldHasValidAmount()) {
     }
 
     private void clearField(){
-       //Set<String> keys= newOrderItemMap.keySet();
-        Object[] keys =newOrderItemMap.keySet().toArray();
-        for(int i=0;i<keys.length;i++) {
-            removeOrder(Integer.parseInt((String)keys[i]));
-        }
-        stock=null;
+        if(section == Constants.Section.ADD_SALE_RETURNS) {
 
-        newOrderItemMap.clear();
+            Object[] keys = returnOrderItemMap.keySet().toArray();
+            for (int i = 0; i < keys.length; i++) {
+                removeOrder(Integer.parseInt((String) keys[i]));
+            }
+            rosProduct=null;
+            returnOrderItemMap.clear();
+        }else {
+
+            Object[] keys = newOrderItemMap.keySet().toArray();
+            for (int i = 0; i < keys.length; i++) {
+                removeOrder(Integer.parseInt((String) keys[i]));
+            }
+            stock=null;
+            newOrderItemMap.clear();
+
+        }
+
         overallDisPreText.setText("0");
 
     }
 
+    /*
+  save new order
+   */
     private void saveOrder(){
         String orderValueText = orderValue.getText().toString();
         String grossValueText = grossValueLabel.getText().toString();
         String discountPre = overallDisPreText.getText().toString();
 
-        if(orderValueText != null && orderValueText.length()>0) {
-            ArrayList<ROSNewOrderItem> newOrderItemArrayList = new ArrayList<ROSNewOrderItem>(newOrderItemMap.values());
-            ROSNewOrder rosNewOrder = new ROSNewOrder();
-            rosNewOrder.setProducts(newOrderItemArrayList);
-            rosNewOrder.setOrderValue(Double.valueOf(orderValueText));
-            rosNewOrder.setGrossValue(Double.valueOf(grossValueText));
-            rosNewOrder.setDiscountValue(Double.valueOf(grossValueText) - Double.valueOf(orderValueText));
-            rosNewOrder.setCustCode(selectedCustomer.getCustCode());
+        if(section == Constants.Section.ADD_SALE_RETURNS) {
 
-            if(discountPre != null && discountPre.length()>0)
-            rosNewOrder.setOVDiscount(Double.valueOf(discountPre));
-           final String orderIdStr= dbHelper.insertNewOrder(getApplicationContext(),rosNewOrder);
+            if (orderValueText != null && orderValueText.length() > 0) {
+                ArrayList<ROSReturnOrderItem> returnOrderItemArrayList = new ArrayList<ROSReturnOrderItem>(returnOrderItemMap.values());
+                ROSReturnOrder returnOrder = new ROSReturnOrder();
+                returnOrder.setProducts(returnOrderItemArrayList);
+                returnOrder.setOrderValue(Double.valueOf(orderValueText));
+                returnOrder.setGrossValue(Double.valueOf(grossValueText));
+                returnOrder.setDiscountValue(Double.valueOf(grossValueText) - Double.valueOf(orderValueText));
+                returnOrder.setCustCode(selectedCustomer.getCustCode());
 
-            if(orderIdStr !=null){
-                double customerOutstanding=selectedCustomer.getOutstanding()+Double.valueOf(orderValueText);
-                dbHelper.updateCustomerOutstanding(getApplicationContext(),selectedCustomer.getCustomerId(),customerOutstanding);
-                totalOutstanding.setText(String.format("%.2f", customerOutstanding));
+                if (discountPre != null && discountPre.length() > 0)
+                    returnOrder.setOVDiscount(Double.valueOf(discountPre));
+                final String orderIdStr = dbHelper.insertReturnOrder(getApplicationContext(), returnOrder);
 
-                if (ConnectionDetector.isConnected(this)) {
-                    AppUtils.showProgressDialog(NewOrderActivity.this);
-                    NewOrderServiceHandler newOrderServiceHandler = new NewOrderServiceHandler(getApplicationContext());
-                    newOrderServiceHandler.syncNewOrder(rosNewOrder, "new_order_add", new NewOrderServiceHandler.NewOrderSyncListener() {
-                        @Override
-                        public void onOrderSyncSuccess(String orderId) {
-                            Log.v("onOrderSyncSuccess", "orderId: " + orderId);
-                            dbHelper.updateNewOrderStatusToSynced(getApplicationContext(),orderIdStr);
-                            AppUtils.showAlertDialog(NewOrderActivity.this, "Order update Success", "Successfully updated order ");
-                            AppUtils.dismissProgressDialog();
-                        }
+                if (orderIdStr != null) {
+                    double customerOutstanding = selectedCustomer.getOutstanding() - Double.valueOf(orderValueText);
+                    dbHelper.updateCustomerOutstanding(getApplicationContext(), selectedCustomer.getCustomerId(), customerOutstanding);
+                    totalOutstanding.setText(String.format("%.2f", customerOutstanding));
 
-                        @Override
-                        public void onOrderSyncError(String orderId, VolleyError error) {
-                            Log.v("onOrderSyncError", "orderId: " + orderId);
-                            AppUtils.showAlertDialog(NewOrderActivity.this, "Order update Error", "Order only stored in locally. You must Sync it later");
-                            AppUtils.dismissProgressDialog();
-                            AppUtils.broadcastAction(NewOrderActivity.this,Constants.LocalDataChange.ACTION_ORDER_ADDED);
+                    if (ConnectionDetector.isConnected(this)) {
+                        AppUtils.showProgressDialog(NewOrderActivity.this);
+                        ReturnOrderServiceHandler returnOrderServiceHandler= new ReturnOrderServiceHandler(getApplicationContext());
+                        returnOrderServiceHandler.syncReturnOrder(returnOrder,"return_order_add", new ReturnOrderServiceHandler.ReturnOrderSyncListener() {
+                            @Override
+                            public void onOrderSyncSuccess(String orderId) {
+                                dbHelper.updateReturnOrderStatusToSynced(getApplicationContext(),orderIdStr);
+                                AppUtils.showAlertDialog(NewOrderActivity.this, "Return Order update Success", "Successfully updated return order ");
+                                AppUtils.dismissProgressDialog();
+                            }
 
-                        }
-                    });
-                }else{
-                    AppUtils.broadcastAction(NewOrderActivity.this,Constants.LocalDataChange.ACTION_ORDER_ADDED);
-                    AppUtils.showAlertDialog(this, "No Network", "Order only stored in locally. You must Sync it later");
+                            @Override
+                            public void onOrderSyncError(String orderId, VolleyError error) {
+                                AppUtils.showAlertDialog(NewOrderActivity.this, "Return Order update Error", "Return Order only stored in locally. You must Sync it later");
+                                AppUtils.dismissProgressDialog();
+                                //AppUtils.broadcastAction(NewOrderActivity.this, Constants.LocalDataChange.ACTION_);
+                            }
+                        });
+
+
+                    } else {
+                      //  AppUtils.broadcastAction(NewOrderActivity.this, Constants.LocalDataChange.ACTION_ORDER_ADDED);
+                        AppUtils.showAlertDialog(this, "No Network", "Return Order only stored in locally. You must Sync it later");
+
+                    }
+                    clearField();
+
+                } else {
+                    AppUtils.showAlertDialog(this, "Return Order Added Error!", "Try again later.");
 
                 }
-                clearField();
-
-            }else{
-                AppUtils.showAlertDialog(this, "New Order Added Error!", "Try again later.");
 
             }
+        }else {
+            if (orderValueText != null && orderValueText.length() > 0) {
+                ArrayList<ROSNewOrderItem> newOrderItemArrayList = new ArrayList<ROSNewOrderItem>(newOrderItemMap.values());
+                ROSNewOrder rosNewOrder = new ROSNewOrder();
+                rosNewOrder.setProducts(newOrderItemArrayList);
+                rosNewOrder.setOrderValue(Double.valueOf(orderValueText));
+                rosNewOrder.setGrossValue(Double.valueOf(grossValueText));
+                rosNewOrder.setDiscountValue(Double.valueOf(grossValueText) - Double.valueOf(orderValueText));
+                rosNewOrder.setCustCode(selectedCustomer.getCustCode());
 
+                if (discountPre != null && discountPre.length() > 0)
+                    rosNewOrder.setOVDiscount(Double.valueOf(discountPre));
+                final String orderIdStr = dbHelper.insertNewOrder(getApplicationContext(), rosNewOrder);
+
+                if (orderIdStr != null) {
+                    double customerOutstanding = selectedCustomer.getOutstanding() + Double.valueOf(orderValueText);
+                    dbHelper.updateCustomerOutstanding(getApplicationContext(), selectedCustomer.getCustomerId(), customerOutstanding);
+                    totalOutstanding.setText(String.format("%.2f", customerOutstanding));
+
+                    if (ConnectionDetector.isConnected(this)) {
+                        AppUtils.showProgressDialog(NewOrderActivity.this);
+                        NewOrderServiceHandler newOrderServiceHandler = new NewOrderServiceHandler(getApplicationContext());
+                        newOrderServiceHandler.syncNewOrder(rosNewOrder, "new_order_add", new NewOrderServiceHandler.NewOrderSyncListener() {
+                            @Override
+                            public void onOrderSyncSuccess(String orderId) {
+                                Log.v("onOrderSyncSuccess", "orderId: " + orderId);
+                                dbHelper.updateNewOrderStatusToSynced(getApplicationContext(), orderIdStr);
+                                AppUtils.showAlertDialog(NewOrderActivity.this, "Order update Success", "Successfully updated order ");
+                                AppUtils.dismissProgressDialog();
+                            }
+
+                            @Override
+                            public void onOrderSyncError(String orderId, VolleyError error) {
+                                Log.v("onOrderSyncError", "orderId: " + orderId);
+                                AppUtils.showAlertDialog(NewOrderActivity.this, "Order update Error", "Order only stored in locally. You must Sync it later");
+                                AppUtils.dismissProgressDialog();
+                                AppUtils.broadcastAction(NewOrderActivity.this, Constants.LocalDataChange.ACTION_ORDER_ADDED);
+
+                            }
+                        });
+                    } else {
+                        AppUtils.broadcastAction(NewOrderActivity.this, Constants.LocalDataChange.ACTION_ORDER_ADDED);
+                        AppUtils.showAlertDialog(this, "No Network", "Order only stored in locally. You must Sync it later");
+
+                    }
+                    clearField();
+
+                } else {
+                    AppUtils.showAlertDialog(this, "New Order Added Error!", "Try again later.");
+
+                }
+
+            }
         }
 
     }
@@ -800,7 +971,13 @@ if(isFieldHasValidAmount()) {
                 TableRow row = (TableRow) child;
                 Log.v("row","getId:"+row.getId() +"index: "+index);
                 if(row.getId()==index){
-                    newOrderItemMap.remove(""+row.getId());
+                    if(section == Constants.Section.ADD_SALE_RETURNS) {
+                        returnOrderItemMap.remove(""+row.getId());
+
+                    }else{
+                        newOrderItemMap.remove(""+row.getId());
+
+                    }
                     updateOrderGrossValue();
                     orderTableLayout.removeView(row);
                 }
