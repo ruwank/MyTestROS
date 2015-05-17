@@ -25,9 +25,6 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 import com.relianceit.relianceorder.AppController;
 import com.relianceit.relianceorder.R;
 import com.relianceit.relianceorder.appsupport.tab.SlidingTabLayout;
@@ -49,7 +46,6 @@ import com.relianceit.relianceorder.util.Constants;
 
 import org.json.JSONObject;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -79,6 +75,8 @@ public class HomeActivity extends RelianceBaseActivity {
 		setContentView(R.layout.activity_home);
 
         mTab =(SlidingTabLayout)findViewById(R.id.sliding_tabs);
+        mTab.setCustomTabView(R.layout.custom_tab, 0);
+
         mPager=(ViewPager)findViewById(R.id.view_pager);
         mPager.setAdapter(new sectionPageAdapter(getSupportFragmentManager()));
         mTab.setViewPager(mPager);
