@@ -319,10 +319,10 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
         tableRow.setLayoutParams(layoutParamsTableRow);
         tableRow.setBackgroundResource(R.drawable.border);
 
-        TableRow.LayoutParams layoutParamsTextView = new TableRow.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT,1.0f);
+        TableRow.LayoutParams layoutParamsTextView = new TableRow.LayoutParams(0,ViewGroup.LayoutParams.MATCH_PARENT,1.0f);
         layoutParamsTextView.gravity = Gravity.CENTER_VERTICAL;
         layoutParamsTextView.setMargins(1,5,1,5);
+        layoutParamsTextView.weight=1.5f;
 
         TextView productTextView = new TextView(this);
         productTextView.setText(order.getSalesOrdNum());
@@ -338,12 +338,30 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
         batchTextView.setTextColor(getResources().getColor(R.color.color_black));
         batchTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
 
+        TableRow.LayoutParams layoutParamsStatusTextView2 = new TableRow.LayoutParams(
+                0,ViewGroup.LayoutParams.MATCH_PARENT,1.0f);
+        layoutParamsStatusTextView2.gravity = Gravity.CENTER_VERTICAL;
+        layoutParamsStatusTextView2.setMargins(1,5,1,5);
+        layoutParamsStatusTextView2.weight=1.0f;
+
         TextView qtyTextView = new TextView(this);
         qtyTextView.setText(String.format("%.2f", order.getOrderValue()));
         qtyTextView.setGravity(Gravity.CENTER);
-        qtyTextView.setLayoutParams(layoutParamsTextView);
+        qtyTextView.setLayoutParams(layoutParamsStatusTextView2);
         qtyTextView.setTextColor(getResources().getColor(R.color.color_black));
         qtyTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
+
+        String statusText="Sent";
+        if(order.getOrderStatus()== Constants.OrderStatus.PENDING){
+            statusText="Pending";
+        }
+
+        TextView statusTextView = new TextView(this);
+        statusTextView.setText(statusText);
+        statusTextView.setGravity(Gravity.CENTER);
+        statusTextView.setLayoutParams(layoutParamsStatusTextView2);
+        statusTextView.setTextColor(getResources().getColor(R.color.color_black));
+        statusTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
 
         final int index = itemIndex;
 
@@ -351,6 +369,7 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
         tableRow.addView(productTextView,0);
         tableRow.addView(batchTextView,1);
         tableRow.addView(qtyTextView,2);
+        tableRow.addView(statusTextView,3);
 
         tableRow.setOnClickListener(new View.OnClickListener()
         {
@@ -377,10 +396,11 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
         tableRow.setLayoutParams(layoutParamsTableRow);
         tableRow.setBackgroundResource(R.drawable.border);
 
-        TableRow.LayoutParams layoutParamsTextView = new TableRow.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.MATCH_PARENT,1.0f);
+        TableRow.LayoutParams layoutParamsTextView = new TableRow.LayoutParams(0,ViewGroup.LayoutParams.MATCH_PARENT,1.0f);
         layoutParamsTextView.gravity = Gravity.CENTER_VERTICAL;
         layoutParamsTextView.setMargins(1,5,1,5);
+        layoutParamsTextView.weight=1.5f;
+
 
         TextView productTextView = new TextView(this);
         productTextView.setText(order.getReturnNumb());
@@ -396,19 +416,37 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
         batchTextView.setTextColor(getResources().getColor(R.color.color_black));
         batchTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
 
+        TableRow.LayoutParams layoutParamsStatusTextView2 = new TableRow.LayoutParams(
+                0,ViewGroup.LayoutParams.MATCH_PARENT,1.0f);
+        layoutParamsStatusTextView2.gravity = Gravity.CENTER_VERTICAL;
+        layoutParamsStatusTextView2.setMargins(1,5,1,5);
+        layoutParamsStatusTextView2.weight=1.0f;
+
         TextView qtyTextView = new TextView(this);
         qtyTextView.setText(String.format("%.2f", order.getOrderValue()));
         qtyTextView.setGravity(Gravity.CENTER);
-        qtyTextView.setLayoutParams(layoutParamsTextView);
+        qtyTextView.setLayoutParams(layoutParamsStatusTextView2);
         qtyTextView.setTextColor(getResources().getColor(R.color.color_black));
         qtyTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
 
+        String statusText="Sent";
+        if(order.getOrderStatus()== Constants.OrderStatus.PENDING){
+            statusText="Pending";
+        }
+
+        TextView statusTextView = new TextView(this);
+        statusTextView.setText(statusText);
+        statusTextView.setGravity(Gravity.CENTER);
+        statusTextView.setLayoutParams(layoutParamsStatusTextView2);
+        statusTextView.setTextColor(getResources().getColor(R.color.color_black));
+        statusTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
         final int index = itemIndex;
 
         tableRow.setId(index);
         tableRow.addView(productTextView,0);
         tableRow.addView(batchTextView,1);
         tableRow.addView(qtyTextView,2);
+        tableRow.addView(statusTextView,3);
 
         tableRow.setOnClickListener(new View.OnClickListener()
         {
