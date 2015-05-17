@@ -98,13 +98,16 @@
         android:id="@+id/Button06"
         android:layout_width="200dp"
         android:layout_height="70dp"
+        android:layout_marginTop="31dp"
+
         android:background="@drawable/button_bg"
         android:text="Visit"
         android:textColor="#fff"
         android:textStyle="bold"
         android:textSize="@dimen/tb_header_text_size"
-        android:layout_centerVertical="true"
-        android:layout_alignLeft="@+id/saleReturnBtn"
-        android:layout_alignStart="@+id/saleReturnBtn" />
+        android:layout_alignLeft="@+id/customer_label"
+
+        android:layout_below="@+id/saleReturnBtn"
+         />
 
 </RelativeLayout>

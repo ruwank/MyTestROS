@@ -21,7 +21,7 @@ package com.relianceit.relianceorder.appsupport.tab;
  */
 
 
-        import android.content.Context;
+import android.content.Context;
 import android.graphics.Typeface;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -219,8 +219,6 @@ public class SlidingTabLayout extends HorizontalScrollView {
             }
 
             tabTitleView.setText(adapter.getPageTitle(i));
-            tabTitleView.setTextSize(getResources().getDimension(R.dimen.tb_header_text_size));
-
             tabView.setOnClickListener(tabClickListener);
             String desc = mContentDescriptions.get(i, null);
             if (desc != null) {
@@ -328,4 +326,3 @@ public class SlidingTabLayout extends HorizontalScrollView {
     }
 
 }
-

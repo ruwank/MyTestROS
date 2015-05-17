@@ -322,9 +322,14 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
         }
     }
     private void hiddenBatchSpinner(){
-        if (section == Constants.Section.ADD_SALE_RETURNS && !isLoadFromInvoice) batchSpinner.setVisibility(View.INVISIBLE);
+        if (section == Constants.Section.ADD_SALE_RETURNS && !isLoadFromInvoice) {
+            batchSpinner.setVisibility(View.INVISIBLE);
+            batchNumber.setVisibility(View.VISIBLE);
+
+        }
     }
     private void showProductBatch() {
+        batchNumber.setVisibility(View.INVISIBLE);
         batchSpinner.setVisibility(View.VISIBLE);
         batchSpinner.performClick();
     }
@@ -432,9 +437,17 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
 
         if(isLoadFromInvoice) {
             rosProduct=rosInvoice.getProduct(productName,batchName);
+            batchSpinner.setVisibility(View.VISIBLE);
+            batchNumber.setVisibility(View.INVISIBLE);
+
         }else{
+            batchSpinner.setVisibility(View.INVISIBLE);
+            batchNumber.setVisibility(View.VISIBLE);
+            batchNumber.setText(batchName);
+
             rosProduct= dbHelper.getProductForReturns(getApplicationContext(), productName, batchName);
         }
+
         orderPriceText.setText(String.format("%.2f", rosProduct.getUnitPrice()));
 
         Log.v("productName :",productName);
