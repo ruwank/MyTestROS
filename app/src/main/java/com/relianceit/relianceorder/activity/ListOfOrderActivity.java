@@ -351,9 +351,11 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
         qtyTextView.setTextColor(getResources().getColor(R.color.color_black));
         qtyTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
 
-        String statusText="Sent";
-        if(order.getOrderStatus()== Constants.OrderStatus.PENDING){
+        String statusText="Online";
+        if(order.getOrderStatus() == Constants.OrderStatus.PENDING){
             statusText="Pending";
+        }else if(order.getOrderStatus() == Constants.OrderStatus.SYNCED){
+            statusText="Sent";
         }
 
         TextView statusTextView = new TextView(this);
@@ -429,9 +431,11 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
         qtyTextView.setTextColor(getResources().getColor(R.color.color_black));
         qtyTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
 
-        String statusText="Sent";
-        if(order.getOrderStatus()== Constants.OrderStatus.PENDING){
+        String statusText="Online";
+        if(order.getOrderStatus() == Constants.OrderStatus.PENDING){
             statusText="Pending";
+        }else if(order.getOrderStatus() == Constants.OrderStatus.SYNCED){
+            statusText="Sent";
         }
 
         TextView statusTextView = new TextView(this);
@@ -690,7 +694,11 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
             @Override
             public void onGetOrderSuccess(ROSReturnOrder order) {
                 AppUtils.dismissProgressDialog();
-                getReturnDetailsSuccess(order);
+                if (order == null) {
+                    getReturnDetailsFailed(0);
+                }else {
+                    getReturnDetailsSuccess(order);
+                }
             }
 
             @Override
