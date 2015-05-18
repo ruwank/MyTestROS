@@ -11,6 +11,7 @@ import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
@@ -111,15 +112,23 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
         totalOutstanding=(TextView)findViewById(R.id.total_outstanding);
         invoiceValueText=(EditText)findViewById(R.id.invoice_value);
 
-        invoiceValueText.setOnKeyListener(new View.OnKeyListener() {
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                // If the event is a key-down event on the "enter" button
-                if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
-                        (keyCode == KeyEvent.KEYCODE_ENTER)) {
-                    // Perform action on key press
+//        invoiceValueText.setOnKeyListener(new View.OnKeyListener() {
+//            public boolean onKey(View v, int keyCode, KeyEvent event) {
+//                // If the event is a key-down event on the "enter" button
+//                if ((event.getAction() == KeyEvent.ACTION_DOWN) &&
+//                        (keyCode == KeyEvent.KEYCODE_ENTER)) {
+//                    // Perform action on key press
+//                    loadInvoiceData();
+//
+//                    return true;
+//                }
+//                return false;
+//            }
+//        });
+        invoiceValueText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER)) || (actionId == EditorInfo.IME_ACTION_DONE)) {
                     loadInvoiceData();
-
-                    return true;
                 }
                 return false;
             }
@@ -322,9 +331,14 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
         }
     }
     private void hiddenBatchSpinner(){
-        if (section == Constants.Section.ADD_SALE_RETURNS && !isLoadFromInvoice) batchSpinner.setVisibility(View.INVISIBLE);
+        if (section == Constants.Section.ADD_SALE_RETURNS && !isLoadFromInvoice) {
+            batchSpinner.setVisibility(View.INVISIBLE);
+            batchNumber.setVisibility(View.VISIBLE);
+
+        }
     }
     private void showProductBatch() {
+        batchNumber.setVisibility(View.INVISIBLE);
         batchSpinner.setVisibility(View.VISIBLE);
         batchSpinner.performClick();
     }
@@ -406,25 +420,41 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
 
     }
     private void loadInvoiceProductNamesForReturns(){
+        batches=null;
         batchNumber.setVisibility(View.INVISIBLE);
         selectReturnBatch.setVisibility(View.INVISIBLE);
         batchSpinner.setVisibility(View.VISIBLE);
         isLoadFromInvoice=true;
         products= rosInvoice.getProductNames();
 
+
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, products);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         productSpinner.setAdapter(dataAdapter);
 
+        if(products ==null || products.size()<1){
+            ArrayAdapter<String> batchDataAdapter = new ArrayAdapter<String>(this,
+                    android.R.layout.simple_spinner_item, products);
+            dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            batchSpinner.setAdapter(batchDataAdapter);
+        }
+
     }
     private void loadAllProductNamesForReturns(){
+        batches=null;
         products= dbHelper.getProductNamesForReturns(getApplicationContext());
 
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, products);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         productSpinner.setAdapter(dataAdapter);
+        if(products ==null || products.size()<1){
+            ArrayAdapter<String> batchDataAdapter = new ArrayAdapter<String>(this,
+                    android.R.layout.simple_spinner_item, products);
+            dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            batchSpinner.setAdapter(batchDataAdapter);
+        }
     }
     private void loadProductForReturns(){
         String productName= productSpinner.getSelectedItem().toString();
@@ -432,9 +462,17 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
 
         if(isLoadFromInvoice) {
             rosProduct=rosInvoice.getProduct(productName,batchName);
+            batchSpinner.setVisibility(View.VISIBLE);
+            batchNumber.setVisibility(View.INVISIBLE);
+
         }else{
+            batchSpinner.setVisibility(View.INVISIBLE);
+            batchNumber.setVisibility(View.VISIBLE);
+            batchNumber.setText(batchName);
+
             rosProduct= dbHelper.getProductForReturns(getApplicationContext(), productName, batchName);
         }
+
         orderPriceText.setText(String.format("%.2f", rosProduct.getUnitPrice()));
 
         Log.v("productName :",productName);
@@ -444,10 +482,14 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
         isLoadFromInvoice=false;
         String  invoiceValue=  invoiceValueText.getText().toString();
         if(ConnectionDetector.isConnected(getApplicationContext()) && invoiceValue != null && invoiceValue.length()>0){
+            AppUtils.showProgressDialog(this);
+
             ReturnOrderServiceHandler returnOrderServiceHandler=new ReturnOrderServiceHandler(getApplicationContext());
             returnOrderServiceHandler.getInvoice(selectedCustomer.getCustCode(),invoiceValue,"get_invoice",new ReturnOrderServiceHandler.InvoiceDetailsListener() {
                 @Override
                 public void onGetInvoiceSuccess(ROSInvoice invoice) {
+                    AppUtils.dismissProgressDialog();
+
                     rosInvoice=invoice;
                     if(rosInvoice !=null){
                         loadInvoiceProductNamesForReturns();
@@ -460,6 +502,8 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
 
                 @Override
                 public void onGetInvoiceError(VolleyError error) {
+                    AppUtils.dismissProgressDialog();
+
                     loadAllProductNamesForReturns();
 
                 }

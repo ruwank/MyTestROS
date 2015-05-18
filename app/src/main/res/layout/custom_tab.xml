@@ -4,6 +4,7 @@
     android:layout_height="wrap_content"
     android:textSize="@dimen/tab_text_size"
     android:textStyle="bold"
+    android:textColor="@color/color_white"
     android:padding="16dp"
     android:gravity="center"
     />

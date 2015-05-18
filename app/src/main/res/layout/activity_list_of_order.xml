@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:paddingTop="10dp"
         android:orientation="vertical"
-        android:id="@+id/order_list_table_header"
+        android:id="@+id/order_list_table_header_content"
         >
 
         <TableRow
@@ -90,7 +90,15 @@
                     android:textSize="@dimen/tb_header_text_size"/>
 
         </TableRow>
-
+    </TableLayout>
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp"
+        android:orientation="vertical"
+        android:layout_below="@+id/order_list_table_header_content"
+        android:id="@+id/order_list_table_header"
+        >
         <TableRow
             android:layout_width="match_parent"
             android:layout_height="60dp"
@@ -102,7 +110,8 @@
         <TextView
             android:id="@+id/tbl_header_col1"
             android:text="@string/tbl_label_new_order_product"
-            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_weight="1.5"
             android:gravity="center_horizontal"
             android:textStyle="bold"
             android:layout_margin="1px"
@@ -113,7 +122,8 @@
         <TextView
             android:id="@+id/tbl_header_col2"
             android:text="@string/tbl_label_new_order_batch"
-            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_weight="1.5"
             android:gravity="center_horizontal"
             android:textStyle="bold"
             android:layout_margin="1px"
@@ -124,6 +134,8 @@
         <TextView
             android:id="@+id/tbl_header_col3"
             android:text="@string/tbl_label_new_order_qty"
+            android:layout_width="0dp"
+
             android:layout_weight="1"
             android:gravity="center_horizontal"
             android:textStyle="bold"
@@ -132,6 +144,18 @@
             android:layout_marginBottom="5dp"
             android:textColor="@android:color/white"
             android:textSize="@dimen/tb_header_text_size"></TextView>
+            <TextView
+                android:id="@+id/tbl_header_col4"
+                android:text="@string/tbl_label_new_order_status"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:gravity="center_horizontal"
+                android:textStyle="bold"
+                android:layout_margin="1px"
+                android:layout_marginTop="5dp"
+                android:layout_marginBottom="5dp"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/tb_header_text_size"></TextView>
         </TableRow>
         </TableLayout>
     <ScrollView

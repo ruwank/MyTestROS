@@ -102,7 +102,7 @@ public class StockStatementFragment extends Fragment{
         batchNoTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
 
         TextView stockAmountTextView = new TextView(getActivity());
-        stockAmountTextView.setText(stock.getAvailableQuantity()+" / "+stock.getQuntityInStock());
+        stockAmountTextView.setText(""+stock.getAvailableQuantity());
         stockAmountTextView.setGravity(Gravity.CENTER);
         stockAmountTextView.setLayoutParams(layoutParamsTextView);
         stockAmountTextView.setBackgroundColor(getResources().getColor( R.color.app_bg_color));
