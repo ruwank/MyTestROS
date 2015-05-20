@@ -33,8 +33,6 @@ public class ROSDbHelper extends SQLiteOpenHelper {
     private static final String DECIMAL_TYPE = " DECIMAL(10,5)";
     private static final String COMMA_SEP = ",";
 
-    private boolean dbCreated = false;
-
     private static final String SQL_CREATE_CUSTOMER = "CREATE TABLE " + ROSDbConstants.Customer.TABLE_NAME +
             "(" +
             ROSDbConstants.Customer._ID + " INTEGER PRIMARY KEY," +
@@ -181,8 +179,6 @@ public class ROSDbHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_CREATE_RETURN_ORDER_ITEM);
         db.execSQL(SQL_CREATE_STOCK);
         db.execSQL(SQL_CREATE_PRODUCT);
-
-        dbCreated = true;
     }
 
     @Override
@@ -776,24 +772,6 @@ public class ROSDbHelper extends SQLiteOpenHelper {
             db.close();
 
             return null;
-        } else {
-            for (int i = 0; i < order.getProducts().size(); i++) {
-                ROSReturnOrderItem orderItem = order.getProducts().get(i);
-                ROSStock stock = new ROSStock();
-
-                stock.setQuntityInStock(orderItem.getQtyBonus() + orderItem.getQtyOrdered());
-                stock.setProductDescription(orderItem.getProductDescription());
-                stock.setProductBatchCode(orderItem.getProductBatchCode());
-                stock.setAgenCode(orderItem.getAgenCode());
-                stock.setBrandCode(orderItem.getBrandCode());
-                stock.setProductCode(orderItem.getProductCode());
-                stock.setUnitPrice(orderItem.getUnitPrice());
-                stock.setSuppCode(orderItem.getSuppCode());
-                stock.setStockLocationCode(orderItem.getStockLocationCode());
-                stock.setStatus(Constants.OrderType.Return);
-
-                insertReturnStock(context,stock);
-            }
         }
 
         return orderIdStr;
@@ -1307,16 +1285,8 @@ public class ROSDbHelper extends SQLiteOpenHelper {
     }
 
     /*
-    Temp data
+    Test methods
      */
-    public void addTempData(Context context) {
-        if (dbCreated) {
-            addCustomers(context);
-            addStocks(context);
-            addProducts(context);
-        }
-    }
-
     private void addCustomers(Context context) {
         for (int i = 0; i < 20; i++) {
             ROSCustomer customer = new ROSCustomer();

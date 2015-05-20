@@ -29,9 +29,9 @@ public class Constants {
     }
 
     public static final class OrderStatus {
-        public static final int PENDING = 0;
+        public static final int PENDING = 2;
         public static final int SYNCED = 1;
-        public static final int ONLINE = 2;
+        public static final int ONLINE = 0;
     }
 
     public static final class OrderType {

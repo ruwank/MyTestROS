@@ -107,7 +107,7 @@ public class AppController extends Application {
            }
        }
 
-       user.setAccessToken("313F6B87-402E-4A72-96AB-5E882316B88B");
+       //user.setAccessToken("f2a69e42-bfad-43ab-90d8-11b61baa9b88");
        user.setDeviceToken(getDeviceId());
    }
 
