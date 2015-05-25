@@ -1,7 +1,5 @@
 package com.relianceit.relianceorder.adapter;
 
-import java.util.ArrayList;
-
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,6 +10,8 @@ import android.widget.TextView;
 import com.relianceit.relianceorder.R;
 import com.relianceit.relianceorder.models.ROSCustomer;
 
+import java.util.ArrayList;
+
 /**
  * Created by Admin on 5/9/15.
  */
@@ -20,13 +20,18 @@ public class CustomerListAdapter extends BaseAdapter {
     private Context context;
     private LayoutInflater inflater;
     private ArrayList<ROSCustomer> customerList;
-
+    private int selectedIndex;
 
     public CustomerListAdapter(Context context, ArrayList<ROSCustomer> customerList) {
         this.context = context;
         this.customerList = customerList;
+        selectedIndex=0;
     }
-
+    public void setSelectedIndex(int ind)
+    {
+        selectedIndex = ind;
+        notifyDataSetChanged();
+    }
     @Override
     public int getCount() {
         return customerList.size();
@@ -66,7 +71,14 @@ public class CustomerListAdapter extends BaseAdapter {
             nameTextView = holder.name;
             addressTextView = holder.address;
         }
-
+        if(position == selectedIndex)
+        {
+            convertView.setBackgroundResource(R.color.app_base_color_2);
+        }
+        else
+        {
+            convertView.setBackgroundResource(R.color.app_base_color);
+        }
         nameTextView.setText(customer.getFirstName()+ ""+customer.getLastName());
         addressTextView.setText(customer.getTownName());
 

@@ -25,7 +25,6 @@ public class StockStatementFragment extends Fragment{
 			Bundle savedInstanceState) {
 		View rootView = inflater.inflate(
 				R.layout.fragment_stock_statement, container, false);
-
         stockStatementTable=(TableLayout)rootView.findViewById(R.id.stock_statement_table);
 
 		return rootView;
@@ -108,7 +107,6 @@ public class StockStatementFragment extends Fragment{
         stockAmountTextView.setBackgroundColor(getResources().getColor( R.color.app_bg_color));
         stockAmountTextView.setTextColor(getResources().getColor(R.color.color_black));
         stockAmountTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
-
 
         tableRow.addView(agencyNameTextView,0);
         tableRow.addView(brandNameTextView,1);

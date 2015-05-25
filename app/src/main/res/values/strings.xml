@@ -9,32 +9,11 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string-array name="navigation_section">
-        <item>REL Operation</item>
-        <item>Stock Statement</item>
-        <item>Customer Outstanding</item>
+        <item>Operations</item>
+        <item>Stock Statement Report</item>
+        <item>Customer Outstanding Report</item>
     </string-array>
-    <string-array name="temp_customer_list">
-        <item>Customer 1</item>
-        <item>Customer 2</item>
-        <item>Customer 3</item>
-        <item>Customer 4</item>
-        <item>Customer 5</item>
-        <item>Customer 6</item>
-        <item>Customer 7</item>
-        <item>Customer 8</item>
-        <item>Customer 9</item>
-        <item>Customer 10</item>
-        <item>Customer 11</item>
-        <item>Customer 12</item>
-        <item>Customer 13</item>
-        <item>Customer 14</item>
-        <item>Customer 15</item>
-        <item>Customer 16</item>
-        <item>Customer 17</item>
-        <item>Customer 18</item>
-        <item>Customer 19</item>
-        <item>Customer 20</item>
-    </string-array>
+
 
     <string name="action_refresh">Refresh</string>
     <string name="action_logout">LogOut</string>
@@ -50,7 +29,7 @@
     <string name="tbl_label_brand_name">Brand Name</string>
     <string name="tbl_label_product_name">Product Name</string>
     <string name="tbl_label_batch_no">Batch No</string>
-    <string name="tbl_label_stock">In Stock / Allocated</string>
+    <string name="tbl_label_stock">In Stock</string>
 
     <string name="tbl_label_new_order_product">Product</string>
     <string name="tbl_label_new_order_batch">Batch</string>
