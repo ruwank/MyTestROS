@@ -13,7 +13,6 @@ import android.widget.TextView;
 import com.relianceit.relianceorder.R;
 import com.relianceit.relianceorder.db.ROSDbHelper;
 import com.relianceit.relianceorder.models.ROSCustomer;
-import com.relianceit.relianceorder.models.ROSStock;
 
 import java.util.ArrayList;
 
@@ -59,9 +58,10 @@ public class CustomerOutstandingFragment extends Fragment{
 
         TextView customerNameTextView = new TextView(getActivity());
         customerNameTextView.setText(customer.getCustName());
-        customerNameTextView.setGravity(Gravity.CENTER);
+        customerNameTextView.setGravity(Gravity.LEFT);
         customerNameTextView.setLayoutParams(layoutParamsTextView);
         customerNameTextView.setWidth(0);
+        customerNameTextView.setPadding(5,0,0,0);
         customerNameTextView.setBackgroundColor(getResources().getColor( R.color.app_bg_color));
         customerNameTextView.setTextColor(getResources().getColor(R.color.color_black));
         customerNameTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
@@ -69,9 +69,10 @@ public class CustomerOutstandingFragment extends Fragment{
 
         TextView townNameTextView = new TextView(getActivity());
         townNameTextView.setText(customer.getTownName());
-        townNameTextView.setGravity(Gravity.CENTER);
+        townNameTextView.setGravity(Gravity.LEFT);
         townNameTextView.setLayoutParams(layoutParamsTextView);
         townNameTextView.setWidth(0);
+        townNameTextView.setPadding(5,0,0,0);
         townNameTextView.setBackgroundColor(getResources().getColor( R.color.app_bg_color));
         townNameTextView.setTextColor(getResources().getColor(R.color.color_black));
         townNameTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
@@ -84,9 +85,11 @@ public class CustomerOutstandingFragment extends Fragment{
         layoutParamsTextView1.width=0;
 
         TextView outstandingAmountTextView = new TextView(getActivity());
-        outstandingAmountTextView.setText(""+customer.getOutstanding());
-        outstandingAmountTextView.setGravity(Gravity.CENTER);
+        outstandingAmountTextView.setText(String.format("%.2f", customer.getOutstanding()));
+        outstandingAmountTextView.setGravity(Gravity.RIGHT);
         outstandingAmountTextView.setWidth(0);
+        outstandingAmountTextView.setPadding(0,0,5,0);
+
         outstandingAmountTextView.setLayoutParams(layoutParamsTextView1);
         outstandingAmountTextView.setBackgroundColor(getResources().getColor( R.color.app_bg_color));
         outstandingAmountTextView.setTextColor(getResources().getColor(R.color.color_black));

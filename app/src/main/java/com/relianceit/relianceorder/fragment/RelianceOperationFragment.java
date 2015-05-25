@@ -34,6 +34,7 @@ public class RelianceOperationFragment extends Fragment{
     int selectedCustomerIndex;
     TextView customerName;
     ROSCustomer selectedCustomer;
+    CustomerListAdapter customerListAdapter;
     @Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -101,12 +102,13 @@ public class RelianceOperationFragment extends Fragment{
             saleReturnBtn.setVisibility(View.VISIBLE);
             returnListBtn.setVisibility(View.VISIBLE);
 
-            CustomerListAdapter customerListAdapter = new CustomerListAdapter(getActivity().getApplicationContext(), customers);
+            customerListAdapter = new CustomerListAdapter(getActivity().getApplicationContext(), customers);
             customerListView.setAdapter(customerListAdapter);
             customerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                     selectedCustomerIndex = position;
+                    customerListAdapter.setSelectedIndex(position);
                     updateCustomerData();
                 }
             });
