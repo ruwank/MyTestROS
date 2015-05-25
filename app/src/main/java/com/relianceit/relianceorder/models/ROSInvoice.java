@@ -65,6 +65,8 @@ public class ROSInvoice extends ROSNewOrder{
             product.setProductCode(foundItem.getProductCode());
             product.setUnitPrice(foundItem.getUnitPrice());
             product.setQuntityInStock(foundItem.getQtyOrdered() + foundItem.getQtyBonus());
+            product.setBrandCode(foundItem.getBrandCode());
+            product.setBrandName(foundItem.getBrandName());
 
             return product;
         }

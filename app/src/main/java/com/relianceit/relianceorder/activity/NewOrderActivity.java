@@ -42,7 +42,9 @@ import com.relianceit.relianceorder.util.AppUtils;
 import com.relianceit.relianceorder.util.ConnectionDetector;
 import com.relianceit.relianceorder.util.Constants;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 
@@ -550,7 +552,7 @@ if(isFieldHasValidAmount()) {
             returnOrderItem.setEffPrice(Float.valueOf(total));
             returnOrderItem.setProductCode(rosProduct.getProductCode());
             returnOrderItem.setSuppCode(rosProduct.getSuppCode());
-           // returnOrderItem.setStockLocationCode(rosProduct.get);
+            //returnOrderItem.setStockLocationCode(rosProduct.ge);
             returnOrderItem.setUnitPrice(Double.parseDouble(orderPrice));
             returnOrderItem.setProdDiscount(orderDiscountValue);
 
@@ -947,6 +949,12 @@ if(isFieldHasValidAmount()) {
                 rosNewOrder.setGrossValue(Double.valueOf(grossValueText));
                 rosNewOrder.setDiscountValue(Double.valueOf(grossValueText) - Double.valueOf(orderValueText));
                 rosNewOrder.setCustCode(selectedCustomer.getCustCode());
+                rosNewOrder.setLatitude(6.909639);
+                rosNewOrder.setLongitude(79.888427);
+                Date now = new Date();
+                SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                rosNewOrder.setAddedDate(df.format(now));
+                //6.909639, 79.888427
 
                 if (discountPre != null && discountPre.length() > 0)
                     rosNewOrder.setOVDiscount(Double.valueOf(discountPre));

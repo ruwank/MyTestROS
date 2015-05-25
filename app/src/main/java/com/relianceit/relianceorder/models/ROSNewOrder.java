@@ -17,6 +17,8 @@ public class ROSNewOrder {
     @Expose protected double DiscountValue = 0.0;
     @Expose protected double OrderValue = 0.0;
     @Expose protected String AddedDate = null;
+    @Expose protected double Longitude = 0.0;
+    @Expose protected double Latitude = 0.0;
     @Expose protected ArrayList<ROSNewOrderItem> Products = null;
 
     public ROSNewOrder() {
@@ -27,6 +29,8 @@ public class ROSNewOrder {
         this.OVDiscount = 0.0;
         this.DiscountValue = 0.0;
         this.OrderValue = 0.0;
+        this.Longitude = 0.0;
+        this.Latitude = 0.0;
         this.AddedDate = null;
         this.Products = null;
     }
@@ -110,5 +114,21 @@ public class ROSNewOrder {
 
     public void setProducts(ArrayList<ROSNewOrderItem> products) {
         this.Products = products;
+    }
+
+    public double getLongitude() {
+        return Longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        Longitude = longitude;
+    }
+
+    public double getLatitude() {
+        return Latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        Latitude = latitude;
     }
 }

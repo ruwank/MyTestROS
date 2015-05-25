@@ -25,7 +25,7 @@ public class ROSDbHelper extends SQLiteOpenHelper {
     public static final String TAG = ROSDbHelper.class.getSimpleName();
 
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 6;
+    public static final int DATABASE_VERSION = 7;
     public static final String DATABASE_NAME = "ROS.db";
 
     private static final String TEXT_TYPE = " TEXT";
@@ -61,6 +61,8 @@ public class ROSDbHelper extends SQLiteOpenHelper {
             ROSDbConstants.NewOrder.CL_NAME_DISCOUNT + DECIMAL_TYPE + COMMA_SEP +
             ROSDbConstants.NewOrder.CL_NAME_DISCOUNT_VALUE + DECIMAL_TYPE + COMMA_SEP +
             ROSDbConstants.NewOrder.CL_NAME_ORDER_VALUE + DECIMAL_TYPE + COMMA_SEP +
+            ROSDbConstants.NewOrder.CL_NAME_LATITUDE + DECIMAL_TYPE + COMMA_SEP +
+            ROSDbConstants.NewOrder.CL_NAME_LONGITUDE + DECIMAL_TYPE + COMMA_SEP +
             ROSDbConstants.NewOrder.CL_NAME_ORDER_DATE + TEXT_TYPE +
             ")";
 
@@ -78,6 +80,8 @@ public class ROSDbHelper extends SQLiteOpenHelper {
             ROSDbConstants.NewOrderItem.CL_NAME_FREE_ISSUES + INT_TYPE + COMMA_SEP +
             ROSDbConstants.NewOrderItem.CL_NAME_ITEM_VALUE + DECIMAL_TYPE + COMMA_SEP +
             ROSDbConstants.NewOrderItem.CL_NAME_SUPP_CODE + TEXT_TYPE + COMMA_SEP +
+            ROSDbConstants.NewOrderItem.CL_NAME_BRAND_NAME + TEXT_TYPE + COMMA_SEP +
+            ROSDbConstants.NewOrderItem.CL_NAME_BRAND_CODE + TEXT_TYPE + COMMA_SEP +
             ROSDbConstants.NewOrderItem.CL_NAME_LOCATION_CODE + TEXT_TYPE +
             ")";
 
@@ -335,6 +339,8 @@ public class ROSDbHelper extends SQLiteOpenHelper {
                 order.setDiscountValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_DISCOUNT_VALUE)));
                 order.setGrossValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_GROSS_VALUE)));
                 order.setOrderValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_VALUE)));
+                order.setLatitude(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_LATITUDE)));
+                order.setLongitude(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_LONGITUDE)));
                 order.setOrderStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_STATUS)));
                 orderList.add(order);
             }
@@ -366,6 +372,8 @@ public class ROSDbHelper extends SQLiteOpenHelper {
                 order.setDiscountValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_DISCOUNT_VALUE)));
                 order.setGrossValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_GROSS_VALUE)));
                 order.setOrderValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_VALUE)));
+                order.setLatitude(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_LATITUDE)));
+                order.setLongitude(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_LONGITUDE)));
                 order.setOrderStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_STATUS)));
                 orderList.add(order);
             }
@@ -422,6 +430,8 @@ public class ROSDbHelper extends SQLiteOpenHelper {
             order.setDiscountValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_DISCOUNT_VALUE)));
             order.setGrossValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_GROSS_VALUE)));
             order.setOrderValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_VALUE)));
+            order.setLatitude(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_LATITUDE)));
+            order.setLongitude(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_LONGITUDE)));
             order.setOrderStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_STATUS)));
 
             c.close();
@@ -455,6 +465,8 @@ public class ROSDbHelper extends SQLiteOpenHelper {
         values.put(ROSDbConstants.NewOrder.CL_NAME_DISCOUNT_VALUE, order.getDiscountValue());
         values.put(ROSDbConstants.NewOrder.CL_NAME_GROSS_VALUE, order.getGrossValue());
         values.put(ROSDbConstants.NewOrder.CL_NAME_ORDER_VALUE, order.getOrderValue());
+        values.put(ROSDbConstants.NewOrder.CL_NAME_LATITUDE, order.getLatitude());
+        values.put(ROSDbConstants.NewOrder.CL_NAME_LONGITUDE, order.getLongitude());
         values.put(ROSDbConstants.NewOrder.CL_NAME_ORDER_STATUS, Constants.OrderStatus.PENDING);
 
         long orderId = db.insert(ROSDbConstants.NewOrder.TABLE_NAME, null, values);
@@ -531,6 +543,8 @@ public class ROSDbHelper extends SQLiteOpenHelper {
                 orderItem.setQtyOrdered(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_QUANTITY)));
                 orderItem.setQtyBonus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_FREE_ISSUES)));
                 orderItem.setSuppCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_SUPP_CODE)));
+                orderItem.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_BRAND_NAME)));
+                orderItem.setBrandCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_BRAND_CODE)));
                 orderItem.setStockLocationCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_LOCATION_CODE)));
 
                 orderItemList.add(orderItem);
@@ -564,6 +578,8 @@ public class ROSDbHelper extends SQLiteOpenHelper {
             values.put(ROSDbConstants.NewOrderItem.CL_NAME_QUANTITY, orderItem.getQtyOrdered());
             values.put(ROSDbConstants.NewOrderItem.CL_NAME_FREE_ISSUES, orderItem.getQtyBonus());
             values.put(ROSDbConstants.NewOrderItem.CL_NAME_SUPP_CODE, orderItem.getSuppCode());
+            values.put(ROSDbConstants.NewOrderItem.CL_NAME_BRAND_NAME, orderItem.getBrandName());
+            values.put(ROSDbConstants.NewOrderItem.CL_NAME_BRAND_CODE, orderItem.getBrandCode());
             values.put(ROSDbConstants.NewOrderItem.CL_NAME_LOCATION_CODE, orderItem.getStockLocationCode());
 
             long itemId = db.insert(ROSDbConstants.NewOrderItem.TABLE_NAME, null, values);
