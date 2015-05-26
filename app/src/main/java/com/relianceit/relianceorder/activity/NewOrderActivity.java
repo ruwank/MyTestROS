@@ -526,7 +526,7 @@ if(isFieldHasValidAmount()) {
     String orderPrice = orderPriceText.getText().toString();
     String orderDiscount = orderDiscountText.getText().toString();
     String freeItem = freeItemText.getText().toString();
-
+String displayProductName="";
     final String total = itemTotalAmount.getText().toString();
     if (productName != null && productName.length() > 0 && batchName != null && batchName.length() > 0 &&
             quantity != null && quantity.length() > 0 && orderPrice != null && orderPrice.length() > 0) {
@@ -558,6 +558,7 @@ if(isFieldHasValidAmount()) {
 
             returnOrderItemMap.put("" + itemCount, returnOrderItem);
             unitPrice= rosProduct.getUnitPrice();
+            displayProductName=rosProduct.getBrandName()+" - "+productName;
 
         }else {
             ROSNewOrderItem newOrderItem = new ROSNewOrderItem();
@@ -574,6 +575,8 @@ if(isFieldHasValidAmount()) {
 
             newOrderItemMap.put("" + itemCount, newOrderItem);
             unitPrice= stock.getUnitPrice();
+            displayProductName=stock.getBrandName()+" - "+productName;
+
 
         }
 
@@ -595,7 +598,7 @@ if(isFieldHasValidAmount()) {
         layoutParamsTextView.weight = 1.5f;
 
         TextView productTextView = new TextView(this);
-        productTextView.setText(productName);
+        productTextView.setText(displayProductName);
         productTextView.setGravity(Gravity.LEFT);
         productTextView.setLayoutParams(layoutParamsTextView);
         productTextView.setTextColor(getResources().getColor(R.color.color_black));
