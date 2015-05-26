@@ -213,7 +213,7 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
 
         String titleText=getString(R.string.app_name);
         if(section == Constants.Section.VIEW_SALE_RETURNS_LIST){
-            titleText=titleText+" - "+getString(R.string.section_sales_return);
+            titleText=titleText+" - "+getString(R.string.section_sales_return_list);
         }else{
             titleText=titleText+" - "+getString(R.string.section_order_list);
 

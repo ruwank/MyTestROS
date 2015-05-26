@@ -37,6 +37,8 @@ public final class ROSDbConstants {
         public static final String CL_NAME_DISCOUNT_VALUE = "discount_value";
         public static final String CL_NAME_ORDER_VALUE = "order_value";
         public static final String CL_NAME_ORDER_DATE = "order_date";
+        public static final String CL_NAME_LATITUDE = "latitude";
+        public static final String CL_NAME_LONGITUDE = "longitude";
     }
 
     public static abstract class NewOrderItem implements BaseColumns {
@@ -53,6 +55,8 @@ public final class ROSDbConstants {
         public static final String CL_NAME_ITEM_VALUE = "item_value";
         public static final String CL_NAME_SUPP_CODE = "supp_code";
         public static final String CL_NAME_LOCATION_CODE = "location_code";
+        public static final String CL_NAME_BRAND_NAME = "brand_name";
+        public static final String CL_NAME_BRAND_CODE = "brand_code";
     }
 
     public static abstract class ReturnOrder implements BaseColumns {

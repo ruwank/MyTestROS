@@ -67,8 +67,6 @@ public class HomeActivity extends RelianceBaseActivity {
     SlidingTabLayout mTab;
     ViewPager mPager;
 
-    private long lastLogoutTime = 0;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -92,9 +90,9 @@ public class HomeActivity extends RelianceBaseActivity {
         super.onResume();
 
         if (isPendingDataAvailable()) {
-            if (ConnectionDetector.isConnected(this)) {
-                AppUtils.showAlertDialog(this, "Sync required!", "There is some local data in the app. Please sync them.");
-            }
+//            if (ConnectionDetector.isConnected(this)) {
+//                AppUtils.showAlertDialog(this, "Sync required!", "There is some local data in the app. Please sync them.");
+//            }
         }else if (shouldShowDailySync()) {
             downloadDailyData();
         }
@@ -195,25 +193,9 @@ public class HomeActivity extends RelianceBaseActivity {
 
     private void logOutButtonTapped() {
 
-        Date date = new Date();
-        boolean showMessage = false;
-        if (date.getTime() - lastLogoutTime < 1000*60) {
-            lastLogoutTime = 0;
-            if (isPendingDataAvailable()) {
-                showMessage = true;
-            }
-        }else {
-            if (isPendingDataAvailable()) {
-                AppUtils.showAlertDialog(this, "Sync required!", "There is some local data in the app. Please sync them before logout.");
-                lastLogoutTime = date.getTime();
-                return;
-            }
-        }
-
-        lastLogoutTime = 0;
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Are you sure you want to logout?");
-        if(showMessage) builder.setMessage("There is some local data in the app. If you continue logout that data will loss.");
+        if(isPendingDataAvailable()) builder.setMessage("There is some local data in the app. If you continue logout that data will loss.");
         builder.setNegativeButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -269,6 +251,10 @@ public class HomeActivity extends RelianceBaseActivity {
         finish();
     }
 
+    private void logoutFailed() {
+        AppUtils.showAlertDialog(this, "Logout Failed!", "Something went wrong. Please try again.");
+    }
+
     private void sendLogoutRequest() {
 
         if (!ConnectionDetector.isConnected(this)) {
@@ -301,6 +287,7 @@ public class HomeActivity extends RelianceBaseActivity {
                 }
 
                 AppUtils.dismissProgressDialog();
+                logoutFailed();
             }
         })
         {
