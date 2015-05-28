@@ -342,6 +342,7 @@
                 android:gravity="left"
                 android:height="40dp"
                 android:padding="5dp"
+
                 android:layout_gravity="center_vertical"
                 android:textColor="@android:color/black"
                 android:background="@drawable/border"
@@ -360,12 +361,9 @@
                 android:layout_weight="1.5"
                 android:layout_margin="3px"
                 android:gravity="left"
-                android:height="40dp"
-                android:padding="5dp"
                 android:layout_gravity="center_vertical"
                 android:textColor="@android:color/black"
                 android:textSize="@dimen/common_text_size"
-                android:lines="1"
                 android:longClickable="false" />
             <TextView android:id="@+id/order_value_label"
                 android:text="@string/tbl_label_order_value"

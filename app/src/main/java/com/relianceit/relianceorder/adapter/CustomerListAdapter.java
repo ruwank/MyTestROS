@@ -51,7 +51,7 @@ public class CustomerListAdapter extends BaseAdapter {
     public View getView(int position, View convertView, ViewGroup parent) {
 
         final ViewHolder holder;
-        TextView nameTextView, addressTextView;
+        TextView nameTextView;
         ROSCustomer customer = customerList.get(position);
 
 
@@ -62,14 +62,14 @@ public class CustomerListAdapter extends BaseAdapter {
 
             convertView = inflater.inflate(R.layout.customer_list_row, null);
             nameTextView = (TextView) convertView.findViewById(R.id.customer_name);
-            addressTextView = (TextView) convertView.findViewById(R.id.customer_address);
+           // addressTextView = (TextView) convertView.findViewById(R.id.customer_address);
 
-            holder = new ViewHolder(nameTextView, addressTextView);
+            holder = new ViewHolder(nameTextView);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();
             nameTextView = holder.name;
-            addressTextView = holder.address;
+           // addressTextView = holder.address;
         }
         if(position == selectedIndex)
         {
@@ -79,18 +79,18 @@ public class CustomerListAdapter extends BaseAdapter {
         {
             convertView.setBackgroundResource(R.color.app_base_color);
         }
-        nameTextView.setText(customer.getFirstName()+ ""+customer.getLastName());
-        addressTextView.setText(customer.getTownName());
+        nameTextView.setText(customer.getFirstName()+ ""+customer.getLastName()+" - "+customer.getTownName());
+       // addressTextView.setText(customer.getTownName());
 
         return convertView;
     }
 
     private static class ViewHolder {
-        public TextView name, address;
+        public TextView name;
 
-        public ViewHolder(TextView name, TextView address) {
+        public ViewHolder(TextView name) {
             this.name = name;
-            this.address = address;
+          //  this.address = address;
         }
 
     }

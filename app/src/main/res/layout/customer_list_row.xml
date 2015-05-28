@@ -6,15 +6,16 @@
     >
 
     <TextView
+        android:layout_margin="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="@android:color/white"
         android:id="@+id/customer_name" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@android:color/white"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:id="@+id/customer_address" />
+    <!--<TextView-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:textColor="@android:color/white"-->
+        <!--android:textAppearance="?android:attr/textAppearanceSmall"-->
+        <!--android:id="@+id/customer_address" />-->
 </LinearLayout>

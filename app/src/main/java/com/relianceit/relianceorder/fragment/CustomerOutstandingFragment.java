@@ -25,9 +25,13 @@ public class CustomerOutstandingFragment extends Fragment{
 				R.layout.fragment_customer_outstanding, container, false);
 
         customerOutstandingTable=(TableLayout)rootView.findViewById(R.id.customer_outstanding_table);
-        loadData();
 		return rootView;
 	}
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadData();
+    }
     private void loadData(){
         ROSDbHelper dbHelper = new ROSDbHelper(getActivity().getApplicationContext());
         ArrayList<ROSCustomer> stockArrayList=dbHelper.getCustomers(getActivity().getApplicationContext());
