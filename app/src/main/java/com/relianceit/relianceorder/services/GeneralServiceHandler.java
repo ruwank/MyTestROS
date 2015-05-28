@@ -4,9 +4,11 @@ import android.content.Context;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -16,12 +18,15 @@ import com.relianceit.relianceorder.models.ROSCustomer;
 import com.relianceit.relianceorder.models.ROSProduct;
 import com.relianceit.relianceorder.models.ROSStock;
 import com.relianceit.relianceorder.models.ROSUser;
+import com.relianceit.relianceorder.models.ROSVisit;
 import com.relianceit.relianceorder.util.AppDataManager;
 import com.relianceit.relianceorder.util.AppURLs;
 import com.relianceit.relianceorder.util.AppUtils;
 import com.relianceit.relianceorder.util.Constants;
 
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -281,4 +286,64 @@ public class GeneralServiceHandler {
         AppController.getInstance().addToRequestQueue(productRequest, requestTag);
     }
 
+    /*
+    Visit service
+     */
+    public static interface CustomerVisitSyncListener {
+        public abstract void onVisitSyncSuccess(int visitId);
+        public abstract void onVisitSyncError(VolleyError error);
+    }
+
+    public void sendVisit(final String requestTag, ROSVisit visit, final CustomerVisitSyncListener listener) {
+        ROSUser user = ROSUser.getInstance();
+        //Authorization: Token <auth token>:<deviceId>
+        final String params = "Token " + user.getAccessToken() + ":" + user.getDeviceToken();
+        Log.i(TAG, "Visit Authorization: " + params);
+
+        final int orderId = visit.getVisitId();
+
+        Gson gson = new GsonBuilder().excludeFieldsWithoutExposeAnnotation().create();
+        String jsonString = gson.toJson(visit);
+
+        Log.i(TAG, "Visit Json: " + jsonString);
+
+        JSONObject postBody = null;
+        try {
+            postBody = new JSONObject(jsonString);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        if (postBody == null) {
+            listener.onVisitSyncError(null);
+            return;
+        }
+
+        JsonObjectRequest syncRequest = new JsonObjectRequest(Request.Method.POST, AppURLs.VISIT_SEND_ENDPOINT, postBody,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject jsonObject) {
+                        Log.i(TAG, "Sync Visit success " + jsonObject.toString());
+                        listener.onVisitSyncSuccess(orderId);
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError volleyError) {
+                        //TODO 401 if unauthorized
+                        Log.i(TAG, "Sync Visit error " + volleyError.toString());
+                        listener.onVisitSyncError(volleyError);
+                    }
+                })
+        {
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                headers.put("Authorization", params);
+                return headers;
+            }
+        };
+
+        AppController.getInstance().addToRequestQueue(syncRequest, requestTag);
+    }
 }

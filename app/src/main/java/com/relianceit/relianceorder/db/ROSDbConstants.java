@@ -124,4 +124,13 @@ public final class ROSDbConstants {
         public static final String CL_NAME_UNIT_PRICE = "unit_price";
         public static final String CL_NAME_SUPP_CODE = "supp_code";
     }
+
+    public static abstract class Visit implements BaseColumns {
+        public static final String TABLE_NAME = "visit";
+        public static final String CL_NAME_CUST_CODE = "cust_code";
+        public static final String CL_NAME_LATITUDE = "latitude";
+        public static final String CL_NAME_LONGITUDE = "longitude";
+        public static final String CL_NAME_ADDED_DATE = "added_date";
+        public static final String CL_NAME_STATUS = "visit_status";
+    }
 }

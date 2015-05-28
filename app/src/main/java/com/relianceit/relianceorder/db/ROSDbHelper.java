@@ -13,6 +13,7 @@ import com.relianceit.relianceorder.models.ROSProduct;
 import com.relianceit.relianceorder.models.ROSReturnOrder;
 import com.relianceit.relianceorder.models.ROSReturnOrderItem;
 import com.relianceit.relianceorder.models.ROSStock;
+import com.relianceit.relianceorder.models.ROSVisit;
 import com.relianceit.relianceorder.util.Constants;
 
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ public class ROSDbHelper extends SQLiteOpenHelper {
     public static final String TAG = ROSDbHelper.class.getSimpleName();
 
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 7;
+    public static final int DATABASE_VERSION = 8;
     public static final String DATABASE_NAME = "ROS.db";
 
     private static final String TEXT_TYPE = " TEXT";
@@ -155,6 +156,16 @@ public class ROSDbHelper extends SQLiteOpenHelper {
             ROSDbConstants.Product.CL_NAME_SUPP_CODE + TEXT_TYPE +
             ")";
 
+    private static final String SQL_CREATE_VISIT = "CREATE TABLE " + ROSDbConstants.Visit.TABLE_NAME +
+            "(" +
+            ROSDbConstants.Visit._ID + " INTEGER PRIMARY KEY," +
+            ROSDbConstants.Visit.CL_NAME_CUST_CODE + TEXT_TYPE + COMMA_SEP +
+            ROSDbConstants.Visit.CL_NAME_STATUS + INT_TYPE + COMMA_SEP +
+            ROSDbConstants.Visit.CL_NAME_LATITUDE + DECIMAL_TYPE + COMMA_SEP +
+            ROSDbConstants.Visit.CL_NAME_LONGITUDE + DECIMAL_TYPE + COMMA_SEP +
+            ROSDbConstants.Visit.CL_NAME_ADDED_DATE + TEXT_TYPE +
+            ")";
+
     private static final String SQL_DELETE_CUSTOMER =
             "DROP TABLE IF EXISTS " + ROSDbConstants.Customer.TABLE_NAME;
     private static final String SQL_DELETE_NEW_ORDER =
@@ -169,6 +180,8 @@ public class ROSDbHelper extends SQLiteOpenHelper {
             "DROP TABLE IF EXISTS " + ROSDbConstants.Stock.TABLE_NAME;
     private static final String SQL_DELETE_PRODUCT =
             "DROP TABLE IF EXISTS " + ROSDbConstants.Product.TABLE_NAME;
+    private static final String SQL_DELETE_VISIT =
+            "DROP TABLE IF EXISTS " + ROSDbConstants.Visit.TABLE_NAME;
 
     public ROSDbHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -183,6 +196,7 @@ public class ROSDbHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_CREATE_RETURN_ORDER_ITEM);
         db.execSQL(SQL_CREATE_STOCK);
         db.execSQL(SQL_CREATE_PRODUCT);
+        db.execSQL(SQL_CREATE_VISIT);
     }
 
     @Override
@@ -194,6 +208,7 @@ public class ROSDbHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_DELETE_STOCK);
         db.execSQL(SQL_DELETE_CUSTOMER);
         db.execSQL(SQL_DELETE_PRODUCT);
+        db.execSQL(SQL_DELETE_VISIT);
         onCreate(db);
     }
 
@@ -1273,18 +1288,18 @@ public class ROSDbHelper extends SQLiteOpenHelper {
             ROSProduct product = products.get(i);
             ContentValues values = new ContentValues();
 
-            values.put(ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME, product.getProductDescription());
-            values.put(ROSDbConstants.Stock.CL_NAME_BATCH_NAME, product.getProductBatchCode());
-            values.put(ROSDbConstants.Stock.CL_NAME_BRAND_NAME, product.getBrandName());
-            values.put(ROSDbConstants.Stock.CL_NAME_AGENCY_NAME, product.getAgenName());
-            values.put(ROSDbConstants.Stock.CL_NAME_ALLOCATED_QTY, product.getQuntityInStock());
-            values.put(ROSDbConstants.Stock.CL_NAME_AGENT_CODE, product.getAgenCode());
-            values.put(ROSDbConstants.Stock.CL_NAME_BRAND_CODE, product.getBrandCode());
-            values.put(ROSDbConstants.Stock.CL_NAME_PRODUCT_CODE, product.getProductCode());
-            values.put(ROSDbConstants.Stock.CL_NAME_COMP_CODE, product.getCompCode());
-            values.put(ROSDbConstants.Stock.CL_NAME_DISTRIB_CODE, product.getDistributorCode());
-            values.put(ROSDbConstants.Stock.CL_NAME_UNIT_PRICE, product.getUnitPrice());
-            values.put(ROSDbConstants.Stock.CL_NAME_SUPP_CODE, product.getSuppCode());
+            values.put(ROSDbConstants.Product.CL_NAME_PRODUCT_NAME, product.getProductDescription());
+            values.put(ROSDbConstants.Product.CL_NAME_BATCH_NAME, product.getProductBatchCode());
+            values.put(ROSDbConstants.Product.CL_NAME_BRAND_NAME, product.getBrandName());
+            values.put(ROSDbConstants.Product.CL_NAME_AGENCY_NAME, product.getAgenName());
+            values.put(ROSDbConstants.Product.CL_NAME_ALLOCATED_QTY, product.getQuntityInStock());
+            values.put(ROSDbConstants.Product.CL_NAME_AGENT_CODE, product.getAgenCode());
+            values.put(ROSDbConstants.Product.CL_NAME_BRAND_CODE, product.getBrandCode());
+            values.put(ROSDbConstants.Product.CL_NAME_PRODUCT_CODE, product.getProductCode());
+            values.put(ROSDbConstants.Product.CL_NAME_COMP_CODE, product.getCompCode());
+            values.put(ROSDbConstants.Product.CL_NAME_DISTRIB_CODE, product.getDistributorCode());
+            values.put(ROSDbConstants.Product.CL_NAME_UNIT_PRICE, product.getUnitPrice());
+            values.put(ROSDbConstants.Product.CL_NAME_SUPP_CODE, product.getSuppCode());
 
             db.insert(ROSDbConstants.Product.TABLE_NAME, null, values);
         }
@@ -1299,6 +1314,93 @@ public class ROSDbHelper extends SQLiteOpenHelper {
         db.execSQL(SQL_DELETE_PRODUCT);
         db.close();
     }
+
+    /*
+    Visit section
+     */
+    public void insertVisit(Context context, ROSVisit visit) {
+        SQLiteDatabase db = getWritableDb(context);
+
+        ContentValues values = new ContentValues();
+
+        values.put(ROSDbConstants.Visit.CL_NAME_CUST_CODE, visit.getCustCode());
+        values.put(ROSDbConstants.Visit.CL_NAME_ADDED_DATE, visit.getAddedDate());
+        values.put(ROSDbConstants.Visit.CL_NAME_STATUS, visit.getVisitStatus());
+        values.put(ROSDbConstants.Visit.CL_NAME_LATITUDE, visit.getLatitude());
+        values.put(ROSDbConstants.Visit.CL_NAME_LONGITUDE, visit.getLongitude());
+
+        db.insert(ROSDbConstants.Visit.TABLE_NAME, null, values);
+
+        db.close();
+    }
+
+    public ArrayList<ROSVisit> getPendingVisits(Context context) {
+
+        SQLiteDatabase db = getReadableDb(context);
+
+        final String SQL_SELECT_ALL_CUSTOMERS = "SELECT * FROM " + ROSDbConstants.Visit.TABLE_NAME + ";";
+        Cursor c = db.rawQuery(SQL_SELECT_ALL_CUSTOMERS, null);
+
+        ArrayList<ROSVisit> visitList = new ArrayList<ROSVisit>();
+
+        if (c != null) {
+            while (c.moveToNext()){
+
+                ROSVisit visit = new ROSVisit();
+
+                visit.setCustCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Visit.CL_NAME_CUST_CODE)));
+                visit.setAddedDate(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Visit.CL_NAME_ADDED_DATE)));
+                visit.setVisitId(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Visit._ID)));
+                visit.setVisitStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Visit.CL_NAME_STATUS)));
+                visit.setLatitude(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.Visit.CL_NAME_LATITUDE)));
+                visit.setLongitude(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.Visit.CL_NAME_LONGITUDE)));
+
+                visitList.add(visit);
+            }
+
+            c.close();
+            db.close();
+        }
+
+        return  visitList;
+    }
+
+    public void deleteVisit(Context context, int visitId) {
+        SQLiteDatabase db = getWritableDb(context);
+
+        final String SQL_DELETE_NEW_ORDER_ITEMS = "DELETE FROM " + ROSDbConstants.Visit.TABLE_NAME
+                + " WHERE " + ROSDbConstants.Visit._ID + " = " + visitId + ";";
+        db.execSQL(SQL_DELETE_NEW_ORDER_ITEMS);
+        db.close();
+    }
+
+    public int getVisitCountPending(Context context) {
+        SQLiteDatabase db = getReadableDb(context);
+
+        final String SQL_SELECT_NEW_ORDERS = "SELECT * FROM " + ROSDbConstants.Visit.TABLE_NAME +
+                " WHERE " + ROSDbConstants.Visit.CL_NAME_STATUS + " = " + 0 + ";";
+        Cursor c = db.rawQuery(SQL_SELECT_NEW_ORDERS, null);
+
+        int count = 0;
+
+        if (c != null) {
+            count = c.getCount();
+            c.close();
+        }
+
+        db.close();
+
+        return  count;
+    }
+
+    public void clearVisitTable(Context context) {
+        SQLiteDatabase db = getWritableDb(context);
+
+        final String SQL_DELETE_PRODUCT = "DELETE FROM " + ROSDbConstants.Visit.TABLE_NAME + ";";
+        db.execSQL(SQL_DELETE_PRODUCT);
+        db.close();
+    }
+
 
     /*
     Test methods

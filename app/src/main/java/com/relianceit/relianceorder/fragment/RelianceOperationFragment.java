@@ -16,6 +16,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.android.volley.VolleyError;
 import com.relianceit.relianceorder.AppController;
 import com.relianceit.relianceorder.R;
 import com.relianceit.relianceorder.activity.ListOfOrderActivity;
@@ -23,18 +24,28 @@ import com.relianceit.relianceorder.activity.NewOrderActivity;
 import com.relianceit.relianceorder.adapter.CustomerListAdapter;
 import com.relianceit.relianceorder.db.ROSDbHelper;
 import com.relianceit.relianceorder.models.ROSCustomer;
+import com.relianceit.relianceorder.models.ROSVisit;
+import com.relianceit.relianceorder.services.GeneralServiceHandler;
+import com.relianceit.relianceorder.util.AppUtils;
+import com.relianceit.relianceorder.util.ConnectionDetector;
 import com.relianceit.relianceorder.util.Constants;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class RelianceOperationFragment extends Fragment{
-	ListView customerListView;
-	Button newOrderBtn,orderListBtn,saleReturnBtn,returnListBtn;
+
+    public static final String TAG = RelianceOperationFragment.class.getSimpleName();
+
+            ListView customerListView;
+	Button newOrderBtn,orderListBtn,saleReturnBtn,returnListBtn,visitBtn;
     ArrayList<ROSCustomer> customers;
     int selectedCustomerIndex;
     TextView customerName;
     ROSCustomer selectedCustomer;
     CustomerListAdapter customerListAdapter;
+    ROSVisit visit;
     @Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -73,6 +84,7 @@ public class RelianceOperationFragment extends Fragment{
             }
 
         });
+
         returnListBtn=(Button)rootView.findViewById(R.id.returnListBtn);
         returnListBtn.setOnClickListener(new OnClickListener() {
             @Override
@@ -82,6 +94,15 @@ public class RelianceOperationFragment extends Fragment{
             }
 
         });
+
+        visitBtn=(Button)rootView.findViewById(R.id.visitBtn);
+        visitBtn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                visitButtonTapped();
+            }
+        });
+
         getActivity().registerReceiver(localDataChangeReceiver, new IntentFilter(Constants.LocalDataChange.ACTION_DAILY_SYNCED));
 
         loadCustomerList();
@@ -90,6 +111,7 @@ public class RelianceOperationFragment extends Fragment{
     @Override
     public void onDestroy() {
         super.onDestroy();
+        AppController.getInstance().cancelPendingRequests(TAG);
         getActivity().unregisterReceiver(localDataChangeReceiver);
     }
     private void loadCustomerList(){
@@ -158,4 +180,46 @@ public class RelianceOperationFragment extends Fragment{
                 loadCustomerList();
         }
     };
+
+    private void visitButtonTapped() {
+        visit = new ROSVisit();
+        visit.setLongitude(0.0);
+        visit.setLatitude(0.0);
+        visit.setCustCode(selectedCustomer.getCustCode());
+        Date now = new Date();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        visit.setAddedDate(df.format(now));
+
+        if (ConnectionDetector.isConnected(getActivity())) {
+
+            AppUtils.showProgressDialog(getActivity());
+
+            GeneralServiceHandler generalServiceHandler = new GeneralServiceHandler(getActivity().getApplicationContext());
+            generalServiceHandler.sendVisit(TAG, visit, new GeneralServiceHandler.CustomerVisitSyncListener() {
+                @Override
+                public void onVisitSyncSuccess(int visitId) {
+                    AppUtils.dismissProgressDialog();
+                    sendVisitSuccess();
+                }
+
+                @Override
+                public void onVisitSyncError(VolleyError error) {
+                    AppUtils.dismissProgressDialog();
+                    sendVisitFailed();
+                }
+            });
+        }else {
+            sendVisitFailed();
+        }
+    }
+
+    private void sendVisitSuccess() {
+        AppUtils.showAlertDialog(getActivity(), "Visited", "The customer was marked as visited.");
+    }
+
+    private void sendVisitFailed() {
+        ROSDbHelper dbHelper = new ROSDbHelper(getActivity());
+        dbHelper.insertVisit(getActivity(), visit);
+        AppUtils.showAlertDialog(getActivity(), "Visit sending failed!", "Visit saved locally. You can send it later.");
+    }
 }
