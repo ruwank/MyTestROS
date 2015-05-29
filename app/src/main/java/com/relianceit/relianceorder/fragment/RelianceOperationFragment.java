@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -26,6 +27,7 @@ import com.relianceit.relianceorder.db.ROSDbHelper;
 import com.relianceit.relianceorder.models.ROSCustomer;
 import com.relianceit.relianceorder.models.ROSVisit;
 import com.relianceit.relianceorder.services.GeneralServiceHandler;
+import com.relianceit.relianceorder.services.ROSLocationService;
 import com.relianceit.relianceorder.util.AppUtils;
 import com.relianceit.relianceorder.util.ConnectionDetector;
 import com.relianceit.relianceorder.util.Constants;
@@ -184,9 +186,32 @@ public class RelianceOperationFragment extends Fragment{
     };
 
     private void visitButtonTapped() {
+
+        AppUtils.showProgressDialog(getActivity());
+        ROSLocationService locationService = new ROSLocationService();
+        locationService.getCurrentLocation(getActivity(), new ROSLocationService.ROSLocationServiceListener() {
+            @Override
+            public void onLocationFound(Location location) {
+                AppUtils.showProgressDialog(getActivity());
+                continueVisit(location);
+            }
+
+            @Override
+            public void onLocationFailed() {
+                AppUtils.showProgressDialog(getActivity());
+            }
+        });
+    }
+
+    private void continueVisit(Location location) {
         visit = new ROSVisit();
-        visit.setLongitude(0.0);
-        visit.setLatitude(0.0);
+        if (location != null) {
+            visit.setLongitude(location.getLongitude());
+            visit.setLatitude(location.getLatitude());
+        }else {
+            visit.setLongitude(0.0);
+            visit.setLatitude(0.0);
+        }
         visit.setCustCode(selectedCustomer.getCustCode());
         Date now = new Date();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
