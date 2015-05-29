@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -16,6 +17,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.android.volley.VolleyError;
 import com.relianceit.relianceorder.AppController;
 import com.relianceit.relianceorder.R;
 import com.relianceit.relianceorder.activity.ListOfOrderActivity;
@@ -23,18 +25,29 @@ import com.relianceit.relianceorder.activity.NewOrderActivity;
 import com.relianceit.relianceorder.adapter.CustomerListAdapter;
 import com.relianceit.relianceorder.db.ROSDbHelper;
 import com.relianceit.relianceorder.models.ROSCustomer;
+import com.relianceit.relianceorder.models.ROSVisit;
+import com.relianceit.relianceorder.services.GeneralServiceHandler;
+import com.relianceit.relianceorder.services.ROSLocationService;
+import com.relianceit.relianceorder.util.AppUtils;
+import com.relianceit.relianceorder.util.ConnectionDetector;
 import com.relianceit.relianceorder.util.Constants;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class RelianceOperationFragment extends Fragment{
-	ListView customerListView;
-	Button newOrderBtn,orderListBtn,saleReturnBtn,returnListBtn;
+
+    public static final String TAG = RelianceOperationFragment.class.getSimpleName();
+
+            ListView customerListView;
+	Button newOrderBtn,orderListBtn,saleReturnBtn,returnListBtn,visitBtn;
     ArrayList<ROSCustomer> customers;
     int selectedCustomerIndex;
     TextView customerName;
     ROSCustomer selectedCustomer;
     CustomerListAdapter customerListAdapter;
+    ROSVisit visit;
     @Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -73,6 +86,7 @@ public class RelianceOperationFragment extends Fragment{
             }
 
         });
+
         returnListBtn=(Button)rootView.findViewById(R.id.returnListBtn);
         returnListBtn.setOnClickListener(new OnClickListener() {
             @Override
@@ -82,6 +96,15 @@ public class RelianceOperationFragment extends Fragment{
             }
 
         });
+
+        visitBtn=(Button)rootView.findViewById(R.id.visitBtn);
+        visitBtn.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View arg0) {
+                visitButtonTapped();
+            }
+        });
+
         getActivity().registerReceiver(localDataChangeReceiver, new IntentFilter(Constants.LocalDataChange.ACTION_DAILY_SYNCED));
 
         loadCustomerList();
@@ -90,6 +113,7 @@ public class RelianceOperationFragment extends Fragment{
     @Override
     public void onDestroy() {
         super.onDestroy();
+        AppController.getInstance().cancelPendingRequests(TAG);
         getActivity().unregisterReceiver(localDataChangeReceiver);
     }
     private void loadCustomerList(){
@@ -101,6 +125,7 @@ public class RelianceOperationFragment extends Fragment{
             orderListBtn.setVisibility(View.VISIBLE);
             saleReturnBtn.setVisibility(View.VISIBLE);
             returnListBtn.setVisibility(View.VISIBLE);
+            visitBtn.setVisibility(View.VISIBLE);
 
             customerListAdapter = new CustomerListAdapter(getActivity().getApplicationContext(), customers);
             customerListView.setAdapter(customerListAdapter);
@@ -119,6 +144,7 @@ public class RelianceOperationFragment extends Fragment{
             orderListBtn.setVisibility(View.INVISIBLE);
             saleReturnBtn.setVisibility(View.INVISIBLE);
             returnListBtn.setVisibility(View.INVISIBLE);
+            visitBtn.setVisibility(View.INVISIBLE);
         }
     }
     private void updateCustomerData(){
@@ -158,4 +184,73 @@ public class RelianceOperationFragment extends Fragment{
                 loadCustomerList();
         }
     };
+
+    private void visitButtonTapped() {
+
+        AppUtils.showProgressDialog(getActivity());
+        ROSLocationService locationService = new ROSLocationService();
+        locationService.getCurrentLocation(getActivity(), new ROSLocationService.ROSLocationServiceListener() {
+            @Override
+            public void onLocationFound(Location location) {
+                AppUtils.showProgressDialog(getActivity());
+                continueVisit(location);
+            }
+
+            @Override
+            public void onLocationFailed() {
+                AppUtils.showProgressDialog(getActivity());
+            }
+        });
+    }
+
+    private void continueVisit(Location location) {
+        visit = new ROSVisit();
+        if (location != null) {
+            visit.setLongitude(location.getLongitude());
+            visit.setLatitude(location.getLatitude());
+        }else {
+            visit.setLongitude(0.0);
+            visit.setLatitude(0.0);
+        }
+        visit.setCustCode(selectedCustomer.getCustCode());
+        Date now = new Date();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        visit.setAddedDate(df.format(now));
+
+        if (ConnectionDetector.isConnected(getActivity())) {
+
+            AppUtils.showProgressDialog(getActivity());
+
+            GeneralServiceHandler generalServiceHandler = new GeneralServiceHandler(getActivity().getApplicationContext());
+            generalServiceHandler.sendVisit(TAG, visit, new GeneralServiceHandler.CustomerVisitSyncListener() {
+                @Override
+                public void onVisitSyncSuccess(int visitId) {
+                    AppUtils.dismissProgressDialog();
+                    sendVisitSuccess();
+                }
+
+                @Override
+                public void onVisitSyncError(VolleyError error) {
+                    AppUtils.dismissProgressDialog();
+                    sendVisitFailed(false);
+                }
+            });
+        }else {
+            sendVisitFailed(true);
+        }
+    }
+
+    private void sendVisitSuccess() {
+        AppUtils.showAlertDialog(getActivity(), "Visited", "The customer was marked as visited.");
+    }
+
+    private void sendVisitFailed(boolean offline) {
+        ROSDbHelper dbHelper = new ROSDbHelper(getActivity());
+        dbHelper.insertVisit(getActivity(), visit);
+        if (offline) {
+            AppUtils.showAlertDialog(getActivity(), "You are offline!", "Visit saved locally. You can send it later.");
+        } else {
+            AppUtils.showAlertDialog(getActivity(), "Visit sending failed!", "Visit saved locally. You can send it later.");
+        }
+    }
 }

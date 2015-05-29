@@ -35,6 +35,7 @@ import com.relianceit.relianceorder.fragment.StockStatementFragment;
 import com.relianceit.relianceorder.models.ROSNewOrder;
 import com.relianceit.relianceorder.models.ROSReturnOrder;
 import com.relianceit.relianceorder.models.ROSUser;
+import com.relianceit.relianceorder.models.ROSVisit;
 import com.relianceit.relianceorder.services.GeneralServiceHandler;
 import com.relianceit.relianceorder.services.NewOrderServiceHandler;
 import com.relianceit.relianceorder.services.ReturnOrderServiceHandler;
@@ -57,6 +58,8 @@ public class HomeActivity extends RelianceBaseActivity {
     public static final String TAG = HomeActivity.class.getSimpleName();
 
     private AlertDialog logoutAlertDialog = null;
+    private AlertDialog exitAlertDialog = null;
+    private boolean exitConfirmed = false;
 
      /**
 	 * The serialization (saved instance state) Bundle key representing the
@@ -90,9 +93,7 @@ public class HomeActivity extends RelianceBaseActivity {
         super.onResume();
 
         if (isPendingDataAvailable()) {
-//            if (ConnectionDetector.isConnected(this)) {
-//                AppUtils.showAlertDialog(this, "Sync required!", "There is some local data in the app. Please sync them.");
-//            }
+            //don't remove this if statement
         }else if (shouldShowDailySync()) {
             downloadDailyData();
         }
@@ -107,8 +108,33 @@ public class HomeActivity extends RelianceBaseActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        //TODO show local data message if exist
+
+        if(exitConfirmed || !isPendingDataAvailable()) {
+            exitConfirmed = false;
+            super.onBackPressed();
+        } else {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Are you sure you want to exit?");
+            builder.setMessage("There is some local data in the app. It is better sync them before you exit.");
+            builder.setNegativeButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    exitAlertDialog.dismiss();
+                    exitConfirmed = true;
+                    onBackPressed();
+                }
+            });
+            builder.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    exitAlertDialog.dismiss();
+                }
+            });
+            exitAlertDialog = builder.create();
+            exitAlertDialog.setCanceledOnTouchOutside(false);
+            exitAlertDialog.setCancelable(false);
+            exitAlertDialog.show();
+        }
     }
 
     private void customizeActionBar(int section){
@@ -183,14 +209,6 @@ public class HomeActivity extends RelianceBaseActivity {
 		return super.onOptionsItemSelected(item);
 	}
 
-    private void testMethod() {
-        ReturnOrderServiceHandler returnOrderServiceHandler = new ReturnOrderServiceHandler(this);
-        //returnOrderServiceHandler.testSyncNewOrder();
-        //returnOrderServiceHandler.testGetList();
-        //returnOrderServiceHandler.testGetOrder();
-        returnOrderServiceHandler.testGetInvoice();
-    }
-
     private void logOutButtonTapped() {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -245,6 +263,7 @@ public class HomeActivity extends RelianceBaseActivity {
         dbHelper.clearNewOrderTable(this);
         dbHelper.clearReturnOrderItemTable(this);
         dbHelper.clearReturnOrderTable(this);
+        dbHelper.clearVisitTable(this);
 
         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
         startActivity(intent);
@@ -302,16 +321,11 @@ public class HomeActivity extends RelianceBaseActivity {
         AppController.getInstance().addToRequestQueue(lRequest, TAG);
     }
 
-    private void refreshHome() {
-        //TODO
-    }
-
     /*
     Data and sync section
      */
     private void dailyDownloadSuccess() {
         AppUtils.dismissProgressDialog();
-        refreshHome();
     }
 
     private void dailyDownloadFailed(int errorCode) {
@@ -385,8 +399,9 @@ public class HomeActivity extends RelianceBaseActivity {
         ROSDbHelper dbHelper = new ROSDbHelper(this);
         int newCount = dbHelper.getNewOrderCountPending(this);
         int retCount = dbHelper.getReturnOrderCountPending(this);
+        int visitCount = dbHelper.getVisitCountPending(this);
 
-        int total = newCount + retCount;
+        int total = newCount + retCount + visitCount;
         if (total > 0) {
             setPendingSyncButtonStatus(true);
             return true;
@@ -402,6 +417,7 @@ public class HomeActivity extends RelianceBaseActivity {
 
     private ArrayList<ROSNewOrder> pendingNewOrders = null;
     private ArrayList<ROSReturnOrder> pendingRetOrders = null;
+    private ArrayList<ROSVisit> pendingVisits = null;
     private void doSyncPendingOrders() {
 
         if (!ConnectionDetector.isConnected(this)) {
@@ -410,6 +426,7 @@ public class HomeActivity extends RelianceBaseActivity {
             ROSDbHelper dbHelper = new ROSDbHelper(this);
             this.pendingNewOrders = dbHelper.getNewOrdersPending(this);
             this.pendingRetOrders = dbHelper.getReturnOrdersPending(this);
+            this.pendingVisits = dbHelper.getPendingVisits(this);
             AppUtils.showProgressDialog(this, "Syncing data...");
             doSyncPendingOrdersContinue();
         }
@@ -427,6 +444,7 @@ public class HomeActivity extends RelianceBaseActivity {
         AppUtils.dismissProgressDialog();
         pendingNewOrders.clear();
         pendingRetOrders.clear();
+        pendingVisits.clear();
         AppUtils.showAlertDialog(this, "Sync Failed!", "Data syncing failed due to Server error. Please try again.");
         setPendingSyncButtonStatus(true);
     }
@@ -435,9 +453,12 @@ public class HomeActivity extends RelianceBaseActivity {
         if (pendingNewOrders.size() > 0) {
             ROSNewOrder newOrder = pendingNewOrders.get(0);
             doNewOrderSync(newOrder);
-        }else if (pendingRetOrders.size() > 0) {
+        } else if (pendingRetOrders.size() > 0) {
             ROSReturnOrder returnOrder = pendingRetOrders.get(0);
             doReturnOrderSync(returnOrder);
+        } else if (pendingVisits.size() > 0) {
+            ROSVisit visit = pendingVisits.get(0);
+            doVisitSync(visit);
         } else {
             if(pendingNewOrders != null) pendingNewOrders.clear();
             if(pendingRetOrders != null) pendingRetOrders.clear();
@@ -484,6 +505,28 @@ public class HomeActivity extends RelianceBaseActivity {
 
             @Override
             public void onOrderSyncError(String orderId, VolleyError error) {
+                orderSyncFailed();
+            }
+        });
+    }
+
+    private void updateVisitOnSyncComplete(int visitId) {
+        ROSDbHelper dbHelper = new ROSDbHelper(this);
+        dbHelper.deleteVisit(this, visitId);
+    }
+
+    private void doVisitSync(ROSVisit visit) {
+        GeneralServiceHandler generalServiceHandler = new GeneralServiceHandler(this);
+        generalServiceHandler.sendVisit(TAG, visit, new GeneralServiceHandler.CustomerVisitSyncListener() {
+            @Override
+            public void onVisitSyncSuccess(int visitId) {
+                pendingVisits.remove(0);
+                updateVisitOnSyncComplete(visitId);
+                doSyncPendingOrdersContinue();
+            }
+
+            @Override
+            public void onVisitSyncError(VolleyError error) {
                 orderSyncFailed();
             }
         });

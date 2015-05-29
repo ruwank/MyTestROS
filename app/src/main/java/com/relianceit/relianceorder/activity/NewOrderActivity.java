@@ -1,6 +1,7 @@
 package com.relianceit.relianceorder.activity;
 
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.text.Editable;
@@ -37,6 +38,7 @@ import com.relianceit.relianceorder.models.ROSReturnOrder;
 import com.relianceit.relianceorder.models.ROSReturnOrderItem;
 import com.relianceit.relianceorder.models.ROSStock;
 import com.relianceit.relianceorder.services.NewOrderServiceHandler;
+import com.relianceit.relianceorder.services.ROSLocationService;
 import com.relianceit.relianceorder.services.ReturnOrderServiceHandler;
 import com.relianceit.relianceorder.util.AppUtils;
 import com.relianceit.relianceorder.util.ConnectionDetector;
@@ -73,6 +75,7 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
     boolean isLoadFromInvoice;
     ROSInvoice rosInvoice;
     ROSProduct rosProduct;
+    private Location orderLocation = null;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -295,9 +298,26 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
         });
         dbHelper = new ROSDbHelper(getApplicationContext());
 
+        getLocation();
         loadData();
 
 	}
+
+    private void getLocation() {
+        ROSLocationService locationService = new ROSLocationService();
+        locationService.getCurrentLocation(this, new ROSLocationService.ROSLocationServiceListener() {
+            @Override
+            public void onLocationFound(Location location) {
+                orderLocation = location;
+            }
+
+            @Override
+            public void onLocationFailed() {
+
+            }
+        });
+    }
+
     /*
     load initial data
      */
@@ -952,8 +972,13 @@ String displayProductName="";
                 rosNewOrder.setGrossValue(Double.valueOf(grossValueText));
                 rosNewOrder.setDiscountValue(Double.valueOf(grossValueText) - Double.valueOf(orderValueText));
                 rosNewOrder.setCustCode(selectedCustomer.getCustCode());
-                rosNewOrder.setLatitude(6.909639);
-                rosNewOrder.setLongitude(79.888427);
+                if (orderLocation != null) {
+                    rosNewOrder.setLatitude(orderLocation.getLatitude());
+                    rosNewOrder.setLongitude(orderLocation.getLongitude());
+                }else {
+                    rosNewOrder.setLatitude(0.0);
+                    rosNewOrder.setLongitude(0.0);
+                }
                 Date now = new Date();
                 SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 rosNewOrder.setAddedDate(df.format(now));
