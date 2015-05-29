@@ -58,6 +58,8 @@ public class HomeActivity extends RelianceBaseActivity {
     public static final String TAG = HomeActivity.class.getSimpleName();
 
     private AlertDialog logoutAlertDialog = null;
+    private AlertDialog exitAlertDialog = null;
+    private boolean exitConfirmed = false;
 
      /**
 	 * The serialization (saved instance state) Bundle key representing the
@@ -106,7 +108,33 @@ public class HomeActivity extends RelianceBaseActivity {
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+
+        if(exitConfirmed || !isPendingDataAvailable()) {
+            exitConfirmed = false;
+            super.onBackPressed();
+        } else {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Are you sure you want to exit?");
+            builder.setMessage("There is some local data in the app. It is better sync them before you exit.");
+            builder.setNegativeButton("Yes", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    exitAlertDialog.dismiss();
+                    exitConfirmed = true;
+                    onBackPressed();
+                }
+            });
+            builder.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    exitAlertDialog.dismiss();
+                }
+            });
+            exitAlertDialog = builder.create();
+            exitAlertDialog.setCanceledOnTouchOutside(false);
+            exitAlertDialog.setCancelable(false);
+            exitAlertDialog.show();
+        }
     }
 
     private void customizeActionBar(int section){
@@ -293,16 +321,11 @@ public class HomeActivity extends RelianceBaseActivity {
         AppController.getInstance().addToRequestQueue(lRequest, TAG);
     }
 
-    private void refreshHome() {
-        //TODO
-    }
-
     /*
     Data and sync section
      */
     private void dailyDownloadSuccess() {
         AppUtils.dismissProgressDialog();
-        refreshHome();
     }
 
     private void dailyDownloadFailed(int errorCode) {

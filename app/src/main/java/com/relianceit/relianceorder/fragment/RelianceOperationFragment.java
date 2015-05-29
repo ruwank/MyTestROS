@@ -123,6 +123,7 @@ public class RelianceOperationFragment extends Fragment{
             orderListBtn.setVisibility(View.VISIBLE);
             saleReturnBtn.setVisibility(View.VISIBLE);
             returnListBtn.setVisibility(View.VISIBLE);
+            visitBtn.setVisibility(View.VISIBLE);
 
             customerListAdapter = new CustomerListAdapter(getActivity().getApplicationContext(), customers);
             customerListView.setAdapter(customerListAdapter);
@@ -141,6 +142,7 @@ public class RelianceOperationFragment extends Fragment{
             orderListBtn.setVisibility(View.INVISIBLE);
             saleReturnBtn.setVisibility(View.INVISIBLE);
             returnListBtn.setVisibility(View.INVISIBLE);
+            visitBtn.setVisibility(View.INVISIBLE);
         }
     }
     private void updateCustomerData(){
@@ -205,11 +207,11 @@ public class RelianceOperationFragment extends Fragment{
                 @Override
                 public void onVisitSyncError(VolleyError error) {
                     AppUtils.dismissProgressDialog();
-                    sendVisitFailed();
+                    sendVisitFailed(false);
                 }
             });
         }else {
-            sendVisitFailed();
+            sendVisitFailed(true);
         }
     }
 
@@ -217,9 +219,13 @@ public class RelianceOperationFragment extends Fragment{
         AppUtils.showAlertDialog(getActivity(), "Visited", "The customer was marked as visited.");
     }
 
-    private void sendVisitFailed() {
+    private void sendVisitFailed(boolean offline) {
         ROSDbHelper dbHelper = new ROSDbHelper(getActivity());
         dbHelper.insertVisit(getActivity(), visit);
-        AppUtils.showAlertDialog(getActivity(), "Visit sending failed!", "Visit saved locally. You can send it later.");
+        if (offline) {
+            AppUtils.showAlertDialog(getActivity(), "You are offline!", "Visit saved locally. You can send it later.");
+        } else {
+            AppUtils.showAlertDialog(getActivity(), "Visit sending failed!", "Visit saved locally. You can send it later.");
+        }
     }
 }
