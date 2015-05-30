@@ -3,7 +3,7 @@ package com.relianceit.relianceorder.models;
 import com.google.gson.annotations.Expose;
 
 /**
- * Created by sura on 5/28/15.
+ * Created by Suresh on 5/28/15.
  */
 public class ROSVisit {
 

@@ -11,7 +11,7 @@ import android.util.Log;
 import java.util.List;
 
 /**
- * Created by sura on 5/29/15.
+ * Created by Suresh on 5/29/15.
  */
 public class ROSLocationService {
 

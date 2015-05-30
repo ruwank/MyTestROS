@@ -1,7 +1,7 @@
 package com.relianceit.relianceorder.util;
 
 /**
- * Created by sura on 5/6/15.
+ * Created by Suresh on 5/6/15.
  */
 public class AppURLs {
 

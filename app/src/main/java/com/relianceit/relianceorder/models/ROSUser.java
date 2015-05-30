@@ -1,7 +1,7 @@
 package com.relianceit.relianceorder.models;
 
 /**
- * Created by sura on 4/27/15.
+ * Created by Suresh on 4/27/15.
  */
 public class ROSUser {
 

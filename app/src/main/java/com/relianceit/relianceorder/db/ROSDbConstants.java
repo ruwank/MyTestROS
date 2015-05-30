@@ -3,7 +3,7 @@ package com.relianceit.relianceorder.db;
 import android.provider.BaseColumns;
 
 /**
- * Created by sura on 4/28/15.
+ * Created by Suresh on 4/28/15.
  */
 public final class ROSDbConstants {
 
