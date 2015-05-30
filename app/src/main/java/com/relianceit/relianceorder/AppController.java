@@ -78,9 +78,8 @@ public class AppController extends Application {
 
         UUID deviceUuid = new UUID(androidId.hashCode(), ((long)tmDevice.hashCode() << 32) | tmSerial.hashCode());
         String deviceId = deviceUuid.toString();
-        Log.d(TAG, "Device Id: " + deviceId);
-        //return deviceId;
-        return "18388499282";
+        Log.i(TAG, "Device Id: " + deviceId);
+        return deviceId;
     }
 
    public void fillUserUsingSavedData() {
@@ -98,7 +97,6 @@ public class AppController extends Application {
            }
        }
 
-       //user.setAccessToken("f2a69e42-bfad-43ab-90d8-11b61baa9b88");
        user.setDeviceToken(getDeviceId());
    }
 
