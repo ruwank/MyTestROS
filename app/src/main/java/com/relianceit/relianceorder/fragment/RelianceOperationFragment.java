@@ -1,11 +1,14 @@
 package com.relianceit.relianceorder.fragment;
 
+import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.Location;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,6 +51,11 @@ public class RelianceOperationFragment extends Fragment{
     ROSCustomer selectedCustomer;
     CustomerListAdapter customerListAdapter;
     ROSVisit visit;
+
+    private AlertDialog locationAlertDialog = null;
+
+
+
     @Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -116,6 +124,7 @@ public class RelianceOperationFragment extends Fragment{
         AppController.getInstance().cancelPendingRequests(TAG);
         getActivity().unregisterReceiver(localDataChangeReceiver);
     }
+
     private void loadCustomerList(){
         selectedCustomerIndex=0;
         ROSDbHelper dbHelper = new ROSDbHelper(getActivity().getApplicationContext());
@@ -187,20 +196,64 @@ public class RelianceOperationFragment extends Fragment{
 
     private void visitButtonTapped() {
 
-        AppUtils.showProgressDialog(getActivity());
         ROSLocationService locationService = new ROSLocationService();
-        locationService.getCurrentLocation(getActivity(), new ROSLocationService.ROSLocationServiceListener() {
-            @Override
-            public void onLocationFound(Location location) {
-                AppUtils.showProgressDialog(getActivity());
-                continueVisit(location);
-            }
+        if (!locationService.isLocationEnabled(getActivity())) {
 
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle("Please enable location access.");
+            builder.setMessage("The location is required to send Visit.");
+            builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    locationAlertDialog.dismiss();
+                    Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    startActivity(intent);
+                }
+            });
+            locationAlertDialog = builder.create();
+            locationAlertDialog.setCanceledOnTouchOutside(false);
+            locationAlertDialog.setCancelable(false);
+            locationAlertDialog.show();
+        }else {
+            AppUtils.showProgressDialog(getActivity());
+
+            locationService.getCurrentLocation(getActivity(), new ROSLocationService.ROSLocationServiceListener() {
+                @Override
+                public void onLocationFound(Location location) {
+                    AppUtils.showProgressDialog(getActivity());
+                    continueVisit(location);
+                }
+
+                @Override
+                public void onLocationFailed() {
+                    AppUtils.showProgressDialog(getActivity());
+                    locationFailed();
+                }
+            });
+        }
+    }
+
+    private void locationFailed() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Location found error!");
+        builder.setMessage("The system cannot find a location. Do you want to continue without a location?");
+        builder.setNegativeButton("Yes", new DialogInterface.OnClickListener() {
             @Override
-            public void onLocationFailed() {
-                AppUtils.showProgressDialog(getActivity());
+            public void onClick(DialogInterface dialog, int which) {
+                locationAlertDialog.dismiss();
+                continueVisit(null);
             }
         });
+        builder.setPositiveButton("No", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                locationAlertDialog.dismiss();
+            }
+        });
+        locationAlertDialog = builder.create();
+        locationAlertDialog.setCanceledOnTouchOutside(false);
+        locationAlertDialog.setCancelable(false);
+        locationAlertDialog.show();
     }
 
     private void continueVisit(Location location) {
@@ -241,7 +294,7 @@ public class RelianceOperationFragment extends Fragment{
     }
 
     private void sendVisitSuccess() {
-        AppUtils.showAlertDialog(getActivity(), "Visited", "The customer was marked as visited.");
+        AppUtils.showAlertDialog(getActivity(), "Visited", "The customer marked as visited.");
     }
 
     private void sendVisitFailed(boolean offline) {

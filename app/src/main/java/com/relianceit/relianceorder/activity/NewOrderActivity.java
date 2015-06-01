@@ -1,8 +1,11 @@
 package com.relianceit.relianceorder.activity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v7.app.ActionBar;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -76,6 +79,9 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
     ROSInvoice rosInvoice;
     ROSProduct rosProduct;
     private Location orderLocation = null;
+
+    private AlertDialog locationAlertDialog = null;
+    private final int locationReqCode = 200;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -298,12 +304,50 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
         });
         dbHelper = new ROSDbHelper(getApplicationContext());
 
-        getLocation();
-        loadData();
+        if(section != Constants.Section.ADD_SALE_RETURNS) {
+            getLocation();
+        }
 
+        loadData();
 	}
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == locationReqCode) {
+            getLocation();
+        }
+    }
+
     private void getLocation() {
+
+        ROSLocationService locationService = new ROSLocationService();
+
+        if (!locationService.isLocationEnabled(NewOrderActivity.this)) {
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(NewOrderActivity.this);
+            builder.setTitle("Please enable location access.");
+            builder.setMessage("The location is required to add New Order.");
+            builder.setNegativeButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    locationAlertDialog.dismiss();
+                    Intent intent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    startActivityForResult(intent, locationReqCode);
+                }
+            });
+            locationAlertDialog = builder.create();
+            locationAlertDialog.setCanceledOnTouchOutside(false);
+            locationAlertDialog.setCancelable(false);
+            locationAlertDialog.show();
+
+        }else {
+            updateLocation();
+        }
+    }
+
+    private void updateLocation() {
         ROSLocationService locationService = new ROSLocationService();
         locationService.getCurrentLocation(this, new ROSLocationService.ROSLocationServiceListener() {
             @Override
@@ -926,9 +970,9 @@ String displayProductName="";
                 final String orderIdStr = dbHelper.insertReturnOrder(getApplicationContext(), returnOrder);
 
                 if (orderIdStr != null) {
-                    double customerOutstanding = selectedCustomer.getOutstanding() - Double.valueOf(orderValueText);
-                    dbHelper.updateCustomerOutstanding(getApplicationContext(), selectedCustomer.getCustomerId(), customerOutstanding);
-                    totalOutstanding.setText(String.format("%.2f", customerOutstanding));
+                    //double customerOutstanding = selectedCustomer.getOutstanding() - Double.valueOf(orderValueText);
+                    //dbHelper.updateCustomerOutstanding(getApplicationContext(), selectedCustomer.getCustomerId(), customerOutstanding);
+                    //totalOutstanding.setText(String.format("%.2f", customerOutstanding));
 
                     if (ConnectionDetector.isConnected(this)) {
                         AppUtils.showProgressDialog(NewOrderActivity.this);
@@ -945,15 +989,13 @@ String displayProductName="";
                             public void onOrderSyncError(String orderId, VolleyError error) {
                                 AppUtils.showAlertDialog(NewOrderActivity.this, "Return Order update Error", "Return Order only stored in locally. You must Sync it later");
                                 AppUtils.dismissProgressDialog();
-                                //AppUtils.broadcastAction(NewOrderActivity.this, Constants.LocalDataChange.ACTION_);
+                                AppUtils.broadcastAction(NewOrderActivity.this, Constants.LocalDataChange.ACTION_ORDER_ADDED);
                             }
                         });
 
-
                     } else {
-                      //  AppUtils.broadcastAction(NewOrderActivity.this, Constants.LocalDataChange.ACTION_ORDER_ADDED);
+                        AppUtils.broadcastAction(NewOrderActivity.this, Constants.LocalDataChange.ACTION_ORDER_ADDED);
                         AppUtils.showAlertDialog(this, "No Network", "Return Order only stored in locally. You must Sync it later");
-
                     }
                     clearField();
 
@@ -982,16 +1024,15 @@ String displayProductName="";
                 Date now = new Date();
                 SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
                 rosNewOrder.setAddedDate(df.format(now));
-                //6.909639, 79.888427
 
                 if (discountPre != null && discountPre.length() > 0)
                     rosNewOrder.setOVDiscount(Double.valueOf(discountPre));
                 final String orderIdStr = dbHelper.insertNewOrder(getApplicationContext(), rosNewOrder);
 
                 if (orderIdStr != null) {
-                    double customerOutstanding = selectedCustomer.getOutstanding() + Double.valueOf(orderValueText);
-                    dbHelper.updateCustomerOutstanding(getApplicationContext(), selectedCustomer.getCustomerId(), customerOutstanding);
-                    totalOutstanding.setText(String.format("%.2f", customerOutstanding));
+                    //double customerOutstanding = selectedCustomer.getOutstanding() + Double.valueOf(orderValueText);
+                    //dbHelper.updateCustomerOutstanding(getApplicationContext(), selectedCustomer.getCustomerId(), customerOutstanding);
+                    //totalOutstanding.setText(String.format("%.2f", customerOutstanding));
 
                     if (ConnectionDetector.isConnected(this)) {
                         AppUtils.showProgressDialog(NewOrderActivity.this);

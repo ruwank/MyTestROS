@@ -5,7 +5,7 @@ import android.util.Log;
 import com.google.gson.annotations.Expose;
 
 /**
- * Created by sura on 5/5/15.
+ * Created by Suresh on 5/5/15.
  */
 public class ROSProduct {
 

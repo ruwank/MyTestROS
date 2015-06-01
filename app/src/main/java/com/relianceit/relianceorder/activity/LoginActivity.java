@@ -123,7 +123,7 @@ public class LoginActivity extends ActionBarActivity {
         ROSUser user = ROSUser.getInstance();
 
         //Authorization: Basic <username>:<password>:<deviceId>
-        final String params = "Basic " + username + ":" + password + ":" + "18388499282";
+        final String params = "Basic " + username + ":" + password + ":" + user.getDeviceToken();
         Log.i(TAG, "Login Authorization: " + params);
 
         JsonObjectRequest loginRequest = new JsonObjectRequest(Request.Method.POST, AppURLs.LOGIN_ENDPOINT, null,
@@ -182,7 +182,6 @@ public class LoginActivity extends ActionBarActivity {
         user.setUsername(username);
         user.setPassword(password);
         user.setAccessToken(accessToken);
-        user.setDeviceToken("18388499282");
 
         String encodedToken = accessToken;
 

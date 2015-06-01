@@ -3,7 +3,7 @@ package com.relianceit.relianceorder.models;
 import java.util.ArrayList;
 
 /**
- * Created by sura on 5/14/15.
+ * Created by Suresh on 5/14/15.
  */
 public class ROSInvoice extends ROSNewOrder{
 

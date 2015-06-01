@@ -218,7 +218,7 @@ public class HomeActivity extends RelianceBaseActivity {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 logoutAlertDialog.dismiss();
-                sendLogoutRequest();
+                logout();
             }
         });
         builder.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
@@ -254,11 +254,11 @@ public class HomeActivity extends RelianceBaseActivity {
         AppDataManager.saveData(getApplicationContext(), Constants.DM_ACCESS_TOKEN_KEY, "");
         AppDataManager.saveData(getApplicationContext(), Constants.DM_USERNAME_KEY, "");
         AppDataManager.saveData(getApplicationContext(), Constants.DM_LOGGED_KEY, "no");
-        AppDataManager.saveDataLong(getApplicationContext(), Constants.DM_DAILY_SYNC_TIME_KEY, 0);
+        //AppDataManager.saveDataLong(getApplicationContext(), Constants.DM_DAILY_SYNC_TIME_KEY, 0);
 
         ROSDbHelper dbHelper = new ROSDbHelper(this);
-        dbHelper.clearCustomerTable(this);
-        dbHelper.clearStockTable(this);
+        //dbHelper.clearCustomerTable(this);
+        //dbHelper.clearStockTable(this);
         dbHelper.clearNewOrderItemTable(this);
         dbHelper.clearNewOrderTable(this);
         dbHelper.clearReturnOrderItemTable(this);
