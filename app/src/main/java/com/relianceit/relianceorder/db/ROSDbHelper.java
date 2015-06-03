@@ -368,11 +368,85 @@ public class ROSDbHelper extends SQLiteOpenHelper {
         return  orderList;
     }
 
+    public ArrayList<ROSNewOrder> getNewOrders(Context context, String customerId, String startDateStr, String endDateStr) {
+        SQLiteDatabase db = getReadableDb(context);
+
+        final String SQL_SELECT_NEW_ORDERS = "SELECT * FROM " + ROSDbConstants.NewOrder.TABLE_NAME +
+                " WHERE " + ROSDbConstants.NewOrder.CL_NAME_CUSTOMER_ID + "= '" + customerId + "' AND ("
+                + ROSDbConstants.NewOrder.CL_NAME_ORDER_DATE + " BETWEEN '" + startDateStr + "' AND '" + endDateStr + "');";
+        Cursor c = db.rawQuery(SQL_SELECT_NEW_ORDERS, null);
+
+        ArrayList<ROSNewOrder> orderList = new ArrayList<ROSNewOrder>();
+
+        if (c != null) {
+            while (c.moveToNext()){
+                ROSNewOrder order = new ROSNewOrder();
+                order.setCustCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_CUSTOMER_ID)));
+                order.setSalesOrdNum(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_ID)));
+                order.setAddedDate(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_DATE)));
+                order.setOVDiscount(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_DISCOUNT)));
+                order.setDiscountValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_DISCOUNT_VALUE)));
+                order.setGrossValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_GROSS_VALUE)));
+                order.setOrderValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_VALUE)));
+                order.setLatitude(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_LATITUDE)));
+                order.setLongitude(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_LONGITUDE)));
+                order.setOrderStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_STATUS)));
+                orderList.add(order);
+            }
+
+            c.close();
+        }
+
+        db.close();
+
+        return  orderList;
+    }
+
     public ArrayList<ROSNewOrder> getNewOrdersPending(Context context) {
         SQLiteDatabase db = getReadableDb(context);
 
         final String SQL_SELECT_NEW_ORDERS = "SELECT * FROM " + ROSDbConstants.NewOrder.TABLE_NAME +
                 " WHERE " + ROSDbConstants.NewOrder.CL_NAME_ORDER_STATUS + " = " + Constants.OrderStatus.PENDING + ";";
+        Cursor c = db.rawQuery(SQL_SELECT_NEW_ORDERS, null);
+
+        ArrayList<ROSNewOrder> orderList = new ArrayList<ROSNewOrder>();
+
+        if (c != null) {
+            while (c.moveToNext()){
+                ROSNewOrder order = new ROSNewOrder();
+                order.setCustCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_CUSTOMER_ID)));
+                order.setSalesOrdNum(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_ID)));
+                order.setAddedDate(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_DATE)));
+                order.setOVDiscount(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_DISCOUNT)));
+                order.setDiscountValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_DISCOUNT_VALUE)));
+                order.setGrossValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_GROSS_VALUE)));
+                order.setOrderValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_VALUE)));
+                order.setLatitude(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_LATITUDE)));
+                order.setLongitude(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_LONGITUDE)));
+                order.setOrderStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_STATUS)));
+                orderList.add(order);
+            }
+
+            c.close();
+        }
+
+        db.close();
+
+        for (int i = 0; i < orderList.size(); i++) {
+            ROSNewOrder order = orderList.get(i);
+            order.setProducts(getNewOrderItems(context, order.getSalesOrdNum()));
+        }
+
+        return  orderList;
+    }
+
+    public ArrayList<ROSNewOrder> getNewOrdersPending(Context context, String customerId, String startDateStr, String endDateStr) {
+        SQLiteDatabase db = getReadableDb(context);
+
+        final String SQL_SELECT_NEW_ORDERS = "SELECT * FROM " + ROSDbConstants.NewOrder.TABLE_NAME +
+                " WHERE " + ROSDbConstants.NewOrder.CL_NAME_ORDER_STATUS + " = " + Constants.OrderStatus.PENDING +
+                " AND " + ROSDbConstants.NewOrder.CL_NAME_CUSTOMER_ID + " = '" + customerId +
+                "' AND (" + ROSDbConstants.NewOrder.CL_NAME_ORDER_DATE + " BETWEEN '" + startDateStr + "' AND '" + endDateStr + "');";
         Cursor c = db.rawQuery(SQL_SELECT_NEW_ORDERS, null);
 
         ArrayList<ROSNewOrder> orderList = new ArrayList<ROSNewOrder>();
@@ -665,11 +739,84 @@ public class ROSDbHelper extends SQLiteOpenHelper {
         return  orderList;
     }
 
+    public ArrayList<ROSReturnOrder> getReturnOrders(Context context, String customerId, String startDateStr, String endDateStr) {
+        SQLiteDatabase db = getReadableDb(context);
+
+        final String SQL_SELECT_NEW_ORDERS = "SELECT * FROM " + ROSDbConstants.ReturnOrder.TABLE_NAME +
+                " WHERE " + ROSDbConstants.ReturnOrder.CL_NAME_CUSTOMER_ID + " = '" + customerId + "' AND ("
+                + ROSDbConstants.ReturnOrder.CL_NAME_ORDER_DATE + " BETWEEN '" + startDateStr + "' AND '" + endDateStr + "');";
+        Cursor c = db.rawQuery(SQL_SELECT_NEW_ORDERS, null);
+
+        ArrayList<ROSReturnOrder> orderList = new ArrayList<ROSReturnOrder>();
+
+        if (c != null) {
+            while (c.moveToNext()){
+                ROSReturnOrder order = new ROSReturnOrder();
+
+                order.setCustCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_CUSTOMER_ID)));
+                order.setReturnNumb(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_ID)));
+                order.setAddedDate(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_DATE)));
+                order.setInvoiceNumb(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_INVOICE_NO)));
+                order.setOVDiscount(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_DISCOUNT)));
+                order.setDiscountValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_DISCOUNT_VALUE)));
+                order.setGrossValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_GROSS_VALUE)));
+                order.setOrderValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_VALUE)));
+                order.setOrderStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_STATUS)));
+
+                orderList.add(order);
+            }
+
+            c.close();
+        }
+        db.close();
+
+        return  orderList;
+    }
+
     public ArrayList<ROSReturnOrder> getReturnOrdersPending(Context context) {
         SQLiteDatabase db = getReadableDb(context);
 
         final String SQL_SELECT_RETURN_ORDERS = "SELECT * FROM " + ROSDbConstants.ReturnOrder.TABLE_NAME +
                 " WHERE " + ROSDbConstants.ReturnOrder.CL_NAME_ORDER_STATUS + " = " + Constants.OrderStatus.PENDING + ";";
+        Cursor c = db.rawQuery(SQL_SELECT_RETURN_ORDERS, null);
+
+        ArrayList<ROSReturnOrder> orderList = new ArrayList<ROSReturnOrder>();
+
+        if (c != null) {
+            while (c.moveToNext()){
+                ROSReturnOrder order = new ROSReturnOrder();
+                order.setCustCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_CUSTOMER_ID)));
+                order.setReturnNumb(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_ID)));
+                order.setAddedDate(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_DATE)));
+                order.setInvoiceNumb(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_INVOICE_NO)));
+                order.setOVDiscount(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_DISCOUNT)));
+                order.setDiscountValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_DISCOUNT_VALUE)));
+                order.setGrossValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_GROSS_VALUE)));
+                order.setOrderValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_VALUE)));
+                order.setOrderStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_STATUS)));
+                orderList.add(order);
+            }
+
+            c.close();
+        }
+
+        db.close();
+
+        for (int i = 0; i < orderList.size(); i++) {
+            ROSReturnOrder order = orderList.get(i);
+            order.setProducts(getReturnOrderItems(context, order.getReturnNumb()));
+        }
+
+        return  orderList;
+    }
+
+    public ArrayList<ROSReturnOrder> getReturnOrdersPending(Context context, String customerId, String startDateStr, String endDateStr) {
+        SQLiteDatabase db = getReadableDb(context);
+
+        final String SQL_SELECT_RETURN_ORDERS = "SELECT * FROM " + ROSDbConstants.ReturnOrder.TABLE_NAME +
+                " WHERE " + ROSDbConstants.ReturnOrder.CL_NAME_ORDER_STATUS + " = " + Constants.OrderStatus.PENDING +
+                " AND " + ROSDbConstants.ReturnOrder.CL_NAME_CUSTOMER_ID + " = '" + customerId +
+                "' AND (" + ROSDbConstants.ReturnOrder.CL_NAME_ORDER_DATE + " BETWEEN '" + startDateStr + "' AND '" + endDateStr + "');";
         Cursor c = db.rawQuery(SQL_SELECT_RETURN_ORDERS, null);
 
         ArrayList<ROSReturnOrder> orderList = new ArrayList<ROSReturnOrder>();

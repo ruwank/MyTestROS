@@ -970,9 +970,6 @@ String displayProductName="";
                 final String orderIdStr = dbHelper.insertReturnOrder(getApplicationContext(), returnOrder);
 
                 if (orderIdStr != null) {
-                    //double customerOutstanding = selectedCustomer.getOutstanding() - Double.valueOf(orderValueText);
-                    //dbHelper.updateCustomerOutstanding(getApplicationContext(), selectedCustomer.getCustomerId(), customerOutstanding);
-                    //totalOutstanding.setText(String.format("%.2f", customerOutstanding));
 
                     if (ConnectionDetector.isConnected(this)) {
                         AppUtils.showProgressDialog(NewOrderActivity.this);
@@ -1030,9 +1027,6 @@ String displayProductName="";
                 final String orderIdStr = dbHelper.insertNewOrder(getApplicationContext(), rosNewOrder);
 
                 if (orderIdStr != null) {
-                    //double customerOutstanding = selectedCustomer.getOutstanding() + Double.valueOf(orderValueText);
-                    //dbHelper.updateCustomerOutstanding(getApplicationContext(), selectedCustomer.getCustomerId(), customerOutstanding);
-                    //totalOutstanding.setText(String.format("%.2f", customerOutstanding));
 
                     if (ConnectionDetector.isConnected(this)) {
                         AppUtils.showProgressDialog(NewOrderActivity.this);

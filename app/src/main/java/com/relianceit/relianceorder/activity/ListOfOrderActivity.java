@@ -30,6 +30,8 @@ import com.relianceit.relianceorder.util.AppUtils;
 import com.relianceit.relianceorder.util.ConnectionDetector;
 import com.relianceit.relianceorder.util.Constants;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -59,6 +61,8 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
     ArrayList<ROSNewOrder> salesOrderArrayList;
     ArrayList<ROSReturnOrder> returnOrderArrayList;
     private boolean loadedFromDb;
+    private String fromDateSelected;
+    private String toDateSelected;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -145,10 +149,12 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
         StringBuilder fromDateString=new StringBuilder().append(fromYear).
                 append("-").append(fromMonth + 1)
                 .append("-").append(fromDay);
+        fromDateSelected = fromDateString.toString();
 
         StringBuilder toDateString=new StringBuilder().append(toYear).
                 append("-").append(toMonth + 1)
                 .append("-").append(toDay);
+        toDateSelected = toDateString.toString();
 
         if(section == Constants.Section.VIEW_SALE_RETURNS_LIST){
             getReturnOrderList(selectedCustomer.getCustomerId(), fromDateString.toString(), toDateString.toString());
@@ -182,10 +188,22 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
 
         if(section == Constants.Section.VIEW_SALE_RETURNS_LIST){
             ROSReturnOrder order = returnOrderArrayList.get(index);
-            getReturnOrderDetails(order.getReturnNumb());
+            if (order.getOrderStatus() == Constants.OrderStatus.PENDING) {
+                ROSDbHelper dbHelper = new ROSDbHelper(this);
+                order = dbHelper.getReturnOrder(this, order.getReturnNumb());
+                getReturnDetailsSuccess(order);
+            }else {
+                getReturnOrderDetails(order.getReturnNumb());
+            }
         }else {
             ROSNewOrder order = salesOrderArrayList.get(index);
-            getSaleOrderDetails(order.getSalesOrdNum());
+            if (order.getOrderStatus() == Constants.OrderStatus.PENDING) {
+                ROSDbHelper dbHelper = new ROSDbHelper(this);
+                order = dbHelper.getNewOrder(this, order.getSalesOrdNum());
+                getSaleDetailsSuccess(order);
+            }else {
+                getSaleOrderDetails(order.getSalesOrdNum());
+            }
         }
     }
 
@@ -262,7 +280,7 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
                 order.setAddedDate(dateStr);
             }
             loadedFromDb = true;
-            getReturnsSuccess(orders);
+            showReturnOrders(orders);
         }else {
             ROSDbHelper dbHelper = new ROSDbHelper(this);
             ArrayList<ROSNewOrder> orders = dbHelper.getNewOrders(this, selectedCustomer.getCustomerId());
@@ -277,7 +295,7 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
                 order.setAddedDate(dateStr);
             }
             loadedFromDb = true;
-            getSalesSuccess(orders);
+            showSalesOrders(orders);
         }
     }
 
@@ -534,31 +552,58 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
 
     private void getSalesSuccess(ArrayList<ROSNewOrder> orders) {
         loadedFromDb = false;
-        if (orders != null && orders.size() == 0) {
-            Date now = new Date();
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(now);
-            int todayDate = calendar.get(Calendar.DATE);
+        if (orders != null && orders.size() == 0) {//no online orders for dates
 
-            if (toDay == todayDate) {
-                ROSDbHelper dbHelper = new ROSDbHelper(this);
-                orders = dbHelper.getNewOrders(this, selectedCustomer.getCustomerId());
-                StringBuilder toDateString=new StringBuilder().append(toDay).
-                        append("/").append(toMonth + 1)
-                        .append("/").append(toYear);
-                String dateStr = toDateString.toString();
+            ROSDbHelper dbHelper = new ROSDbHelper(this);
+            String startDateStr = fromDateSelected + " 00:00:00";
+            String endDateStr = toDateSelected + " 00:00:00";
+            ArrayList<ROSNewOrder> localOrders = dbHelper.getNewOrders(this, selectedCustomer.getCustomerId(), startDateStr, endDateStr);
 
-                for (int i = 0; i < orders.size(); i++) {
-                    ROSNewOrder order = orders.get(i);
-                    order.setAddedDate(dateStr);
+            SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat format2 = new SimpleDateFormat("dd/MM/yyyy");
+
+            for (int i = 0; i < localOrders.size(); i++) {
+                ROSNewOrder order = localOrders.get(i);
+                String dateStr = order.getAddedDate();
+
+                try {
+                    Date date = format1.parse(dateStr);
+                    order.setAddedDate(format2.format(date));
+                } catch (ParseException e) {
+                    e.printStackTrace();
                 }
-
-                loadedFromDb = true;
             }
+
+            loadedFromDb = true;
+            showSalesOrders(localOrders);
+        }else {
+
+            ROSDbHelper dbHelper = new ROSDbHelper(this);
+            String startDateStr = fromDateSelected + " 00:00:00";
+            String endDateStr = toDateSelected + " 00:00:00";
+            ArrayList<ROSNewOrder> pendingOrders = dbHelper.getNewOrdersPending(this, selectedCustomer.getCustomerId(), startDateStr, endDateStr);
+
+            SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat format2 = new SimpleDateFormat("dd/MM/yyyy");
+
+            for (int i = 0; i < pendingOrders.size(); i++) {
+                ROSNewOrder order = pendingOrders.get(i);
+                String dateStr = order.getAddedDate();
+
+                try {
+                    Date date = format1.parse(dateStr);
+                    order.setAddedDate(format2.format(date));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            pendingOrders.addAll(orders);
+            showSalesOrders(pendingOrders);
         }
 
         AppUtils.dismissProgressDialog();
-        showSalesOrders(orders);
+
     }
 
     private void getSalesFailed(int errorCode) {
@@ -623,30 +668,59 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
 
     private void getReturnsSuccess(ArrayList<ROSReturnOrder> orders) {
         loadedFromDb = false;
-        if (orders != null && orders.size() == 0) {
-            Date now = new Date();
-            Calendar calendar = Calendar.getInstance();
-            calendar.setTime(now);
-            int todayDate = calendar.get(Calendar.DATE);
+        if (orders != null && orders.size() == 0) {//no online orders for dates
 
-            if (toDay == todayDate) {
-                ROSDbHelper dbHelper = new ROSDbHelper(this);
-                orders = dbHelper.getReturnOrders(this, selectedCustomer.getCustomerId());
-                StringBuilder toDateString=new StringBuilder().append(toDay).
-                        append("/").append(toMonth + 1)
-                        .append("/").append(toYear);
-                String dateStr = toDateString.toString();
+            ROSDbHelper dbHelper = new ROSDbHelper(this);
+            String startDateStr = fromDateSelected + " 00:00:00";
+            String endDateStr = toDateSelected + " 00:00:00";
+            ArrayList<ROSReturnOrder> localOrders = dbHelper.getReturnOrders(this, selectedCustomer.getCustomerId(), startDateStr, endDateStr);
 
-                for (int i = 0; i < orders.size(); i++) {
-                    ROSReturnOrder order = orders.get(i);
-                    order.setAddedDate(dateStr);
+            SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat format2 = new SimpleDateFormat("dd/MM/yyyy");
+
+            for (int i = 0; i < localOrders.size(); i++) {
+                ROSReturnOrder order = localOrders.get(i);
+                String dateStr = order.getAddedDate();
+
+                try {
+                    Date date = format1.parse(dateStr);
+                    order.setAddedDate(format2.format(date));
+                } catch (ParseException e) {
+                    e.printStackTrace();
                 }
-                loadedFromDb = true;
             }
+
+            loadedFromDb = true;
+            showReturnOrders(localOrders);
+        }else {
+
+            ROSDbHelper dbHelper = new ROSDbHelper(this);
+            String startDateStr = fromDateSelected + " 00:00:00";
+            String endDateStr = toDateSelected + " 00:00:00";
+            ArrayList<ROSReturnOrder> pendingOrders = dbHelper.getReturnOrdersPending(this, selectedCustomer.getCustomerId(), startDateStr, endDateStr);
+
+            SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            SimpleDateFormat format2 = new SimpleDateFormat("dd/MM/yyyy");
+
+            for (int i = 0; i < pendingOrders.size(); i++) {
+                ROSReturnOrder order = pendingOrders.get(i);
+                String dateStr = order.getAddedDate();
+
+                try {
+                    Date date = format1.parse(dateStr);
+                    order.setAddedDate(format2.format(date));
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            pendingOrders.addAll(orders);
+            showReturnOrders(pendingOrders);
         }
 
         AppUtils.dismissProgressDialog();
-        showReturnOrders(orders);
+
+
     }
 
     private void getReturnsFailed(int errorCode) {

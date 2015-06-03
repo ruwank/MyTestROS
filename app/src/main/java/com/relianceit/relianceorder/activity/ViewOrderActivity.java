@@ -120,10 +120,12 @@ public class ViewOrderActivity extends ActionBarActivity {
             ArrayList<ROSReturnOrderItem> itemArrayList = order.getProducts();
             itemIndex = 0;
             orderTable.removeAllViews();
-            for (int i = 0; i < itemArrayList.size(); i++) {
-                itemIndex = i;
-                ROSReturnOrderItem item = itemArrayList.get(i);
-                addReturnOrderItem(item, itemIndex);
+            if (itemArrayList != null) {
+                for (int i = 0; i < itemArrayList.size(); i++) {
+                    itemIndex = i;
+                    ROSReturnOrderItem item = itemArrayList.get(i);
+                    addReturnOrderItem(item, itemIndex);
+                }
             }
         }else {
             ROSNewOrder order = AppController.getInstance().getSelectedOrder();
@@ -137,10 +139,12 @@ public class ViewOrderActivity extends ActionBarActivity {
             ArrayList<ROSNewOrderItem> itemArrayList = order.getProducts();
             itemIndex = 0;
             orderTable.removeAllViews();
-            for (int i = 0; i < itemArrayList.size(); i++) {
-                itemIndex = i;
-                ROSNewOrderItem item = itemArrayList.get(i);
-                addSaleOrderItem(item, itemIndex);
+            if (itemArrayList != null) {
+                for (int i = 0; i < itemArrayList.size(); i++) {
+                    itemIndex = i;
+                    ROSNewOrderItem item = itemArrayList.get(i);
+                    addSaleOrderItem(item, itemIndex);
+                }
             }
         }
     }
