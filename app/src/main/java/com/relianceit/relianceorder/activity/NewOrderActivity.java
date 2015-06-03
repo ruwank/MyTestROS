@@ -808,13 +808,24 @@ String displayProductName="";
             AppUtils.showAlertDialog(this, "Already added", "This product batch Already added try new batch");
             returnValue=false;
         }
+        int freeItemCount=0;
+        String freeItem = freeItemText.getText().toString();
+
+        if (freeItem != null && freeItem.length() > 0){
+            freeItemCount=  Integer.parseInt(freeItem);
+        }
+        int quantityValue=0;
         if(quantity != null && quantity.length()>0){
-            int quantityValue=Integer.parseInt(quantity);
-            if(availableQuantity <quantityValue){
-                AppUtils.showAlertDialog(this, "Over stock Quantity", "Can not add this much of quantity. You have only "+availableQuantity+" quantity");
+             quantityValue=Integer.parseInt(quantity);
+        }
+         if((quantityValue-freeItemCount) <1){
+             AppUtils.showAlertDialog(this, "Invalid stock quantity", "Enter valid quantity");
+             returnValue=false;
+         }
+            if(availableQuantity <(quantityValue+freeItemCount) && !isLoadFromInvoice){
+                AppUtils.showAlertDialog(this, "Over stock quantity", "Can not add this much of quantity. You have only "+availableQuantity+" quantity");
                 returnValue=false;
             }
-        }
         if(orderDiscount != null && orderDiscount.length()>0){
             double orderDiscountValue=Double.parseDouble(orderDiscount);
             if(orderDiscountValue> 100.0){
