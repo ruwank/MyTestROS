@@ -28,6 +28,10 @@ public class ROSStock {
     @Expose private String SuppCode = null;
     @Expose private String StockLocationCode = null;
 
+    @Expose private String ProductUserCode = null;
+    @Expose private int AccountYear = 0;
+    @Expose private int AccountMonth = 0;
+
     public ROSStock() {
         this.availableQuantity = 0;
         this.status = 0;
@@ -45,6 +49,9 @@ public class ROSStock {
         this.UnitPrice = 0.0;
         this.SuppCode = null;
         this.StockLocationCode = null;
+        this.ProductUserCode = null;
+        this.AccountYear = 0;
+        this.AccountMonth = 0;
     }
 
     public void print() {
@@ -62,6 +69,9 @@ public class ROSStock {
                 CompCode + " " +
                 SuppCode + " " +
                 StockLocationCode + " " +
+                ProductUserCode + " " +
+                AccountYear + " " +
+                AccountMonth + " " +
                 UnitPrice);
     }
 
@@ -191,5 +201,29 @@ public class ROSStock {
 
     public void setStockLocationCode(String stockLocationCode) {
         StockLocationCode = stockLocationCode;
+    }
+
+    public String getProductUserCode() {
+        return ProductUserCode;
+    }
+
+    public void setProductUserCode(String productUserCode) {
+        ProductUserCode = productUserCode;
+    }
+
+    public int getAccountYear() {
+        return AccountYear;
+    }
+
+    public void setAccountYear(int accountYear) {
+        AccountYear = accountYear;
+    }
+
+    public int getAccountMonth() {
+        return AccountMonth;
+    }
+
+    public void setAccountMonth(int accountMonth) {
+        AccountMonth = accountMonth;
     }
 }

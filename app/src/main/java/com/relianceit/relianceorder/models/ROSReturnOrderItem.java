@@ -26,6 +26,7 @@ public class ROSReturnOrderItem {
     @Expose private String StockLocationCode = null;
     @Expose private String BrandCode = null;
     @Expose private String AgenCode = null;
+    @Expose private String ProductUserCode = null;
 
 
     public ROSReturnOrderItem() {
@@ -43,6 +44,7 @@ public class ROSReturnOrderItem {
         this.StockLocationCode = null;
         this.BrandCode = null;
         this.AgenCode = null;
+        this.ProductUserCode = null;
     }
 
     public void print() {
@@ -54,6 +56,7 @@ public class ROSReturnOrderItem {
                 EffPrice + " " +
                 ProductCode + " " +
                 SuppCode + " " +
+                ProductUserCode + " " +
                 UnitPrice);
     }
 
@@ -167,5 +170,13 @@ public class ROSReturnOrderItem {
 
     public void setAgenCode(String agenCode) {
         AgenCode = agenCode;
+    }
+
+    public String getProductUserCode() {
+        return ProductUserCode;
+    }
+
+    public void setProductUserCode(String productUserCode) {
+        ProductUserCode = productUserCode;
     }
 }
