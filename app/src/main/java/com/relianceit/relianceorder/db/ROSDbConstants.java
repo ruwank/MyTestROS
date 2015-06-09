@@ -39,6 +39,8 @@ public final class ROSDbConstants {
         public static final String CL_NAME_ORDER_DATE = "order_date";
         public static final String CL_NAME_LATITUDE = "latitude";
         public static final String CL_NAME_LONGITUDE = "longitude";
+        public static final String CL_NAME_ACCOUNT_YEAR = "account_year";
+        public static final String CL_NAME_ACCOUNT_MONTH = "account_month";
     }
 
     public static abstract class NewOrderItem implements BaseColumns {
@@ -57,6 +59,7 @@ public final class ROSDbConstants {
         public static final String CL_NAME_LOCATION_CODE = "location_code";
         public static final String CL_NAME_BRAND_NAME = "brand_name";
         public static final String CL_NAME_BRAND_CODE = "brand_code";
+        public static final String CL_NAME_PRODUCT_USER_CODE = "product_user_code";
     }
 
     public static abstract class ReturnOrder implements BaseColumns {
@@ -88,6 +91,7 @@ public final class ROSDbConstants {
         public static final String CL_NAME_LOCATION_CODE = "location_code";
         public static final String CL_NAME_BRAND_CODE = "brand_code";
         public static final String CL_NAME_AGEN_CODE = "agen_code";
+        public static final String CL_NAME_PRODUCT_USER_CODE = "product_user_code";
     }
 
     public static abstract class Stock implements BaseColumns {
@@ -107,6 +111,9 @@ public final class ROSDbConstants {
         public static final String CL_NAME_UNIT_PRICE = "unit_price";
         public static final String CL_NAME_SUPP_CODE = "supp_code";
         public static final String CL_NAME_LOCATION_CODE = "location_code";
+        public static final String CL_NAME_PRODUCT_USER_CODE = "product_user_code";
+        public static final String CL_NAME_ACCOUNT_YEAR = "account_year";
+        public static final String CL_NAME_ACCOUNT_MONTH = "account_month";
     }
 
     public static abstract class Product implements BaseColumns {
@@ -123,6 +130,7 @@ public final class ROSDbConstants {
         public static final String CL_NAME_DISTRIB_CODE = "distrib_code";
         public static final String CL_NAME_UNIT_PRICE = "unit_price";
         public static final String CL_NAME_SUPP_CODE = "supp_code";
+        public static final String CL_NAME_PRODUCT_USER_CODE = "product_user_code";
     }
 
     public static abstract class Visit implements BaseColumns {

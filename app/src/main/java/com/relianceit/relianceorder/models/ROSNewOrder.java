@@ -19,6 +19,8 @@ public class ROSNewOrder {
     @Expose protected String AddedDate = null;
     @Expose protected double Longitude = 0.0;
     @Expose protected double Latitude = 0.0;
+    @Expose private int AccountYear = 0;
+    @Expose private int AccountMonth = 0;
     @Expose protected ArrayList<ROSNewOrderItem> Products = null;
 
     public ROSNewOrder() {
@@ -33,6 +35,8 @@ public class ROSNewOrder {
         this.Latitude = 0.0;
         this.AddedDate = null;
         this.Products = null;
+        this.AccountMonth = 0;
+        this.AccountYear = 0;
     }
 
     public void fillDbFields() {
@@ -130,5 +134,21 @@ public class ROSNewOrder {
 
     public void setLatitude(double latitude) {
         Latitude = latitude;
+    }
+
+    public int getAccountYear() {
+        return AccountYear;
+    }
+
+    public void setAccountYear(int accountYear) {
+        AccountYear = accountYear;
+    }
+
+    public int getAccountMonth() {
+        return AccountMonth;
+    }
+
+    public void setAccountMonth(int accountMonth) {
+        AccountMonth = accountMonth;
     }
 }

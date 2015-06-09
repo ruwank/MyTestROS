@@ -25,6 +25,7 @@ public class ROSNewOrderItem {
     @Expose private String StockLocationCode = null;
     @Expose private String BrandName = null;
     @Expose private String BrandCode = null;
+    @Expose private String ProductUserCode = null;
 
     public ROSNewOrderItem() {
         this.itemId = null;
@@ -41,6 +42,7 @@ public class ROSNewOrderItem {
         this.StockLocationCode = null;
         this.BrandName = null;
         this.BrandCode = null;
+        this.ProductUserCode = null;
     }
 
     public void print() {
@@ -52,6 +54,7 @@ public class ROSNewOrderItem {
                 EffPrice + " " +
                 ProductCode + " " +
                 SuppCode + " " +
+                ProductUserCode + " " +
                 UnitPrice);
     }
 
@@ -165,5 +168,13 @@ public class ROSNewOrderItem {
 
     public void setBrandCode(String brandCode) {
         BrandCode = brandCode;
+    }
+
+    public String getProductUserCode() {
+        return ProductUserCode;
+    }
+
+    public void setProductUserCode(String productUserCode) {
+        ProductUserCode = productUserCode;
     }
 }
