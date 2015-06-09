@@ -47,13 +47,12 @@ public class RelianceOperationFragment extends Fragment{
 	Button newOrderBtn,orderListBtn,saleReturnBtn,returnListBtn,visitBtn;
     ArrayList<ROSCustomer> customers;
     int selectedCustomerIndex;
-    TextView customerName;
+    TextView customerName,customerOutstanding;
     ROSCustomer selectedCustomer;
     CustomerListAdapter customerListAdapter;
     ROSVisit visit;
 
     private AlertDialog locationAlertDialog = null;
-
 
 
     @Override
@@ -64,6 +63,7 @@ public class RelianceOperationFragment extends Fragment{
 
         customerListView=(ListView)rootView.findViewById(R.id.customerListView);
         customerName=(TextView)rootView.findViewById(R.id.customer_name);
+        customerOutstanding=(TextView)rootView.findViewById(R.id.customer_outstanding);
 
 		newOrderBtn=(Button)rootView.findViewById(R.id.newOrderBtn);
 		newOrderBtn.setOnClickListener(new OnClickListener() {
@@ -160,6 +160,7 @@ public class RelianceOperationFragment extends Fragment{
         if(customers != null && customers.size()>selectedCustomerIndex){
             selectedCustomer=customers.get(selectedCustomerIndex);
             AppController.getInstance().setRosCustomer(selectedCustomer);
+            customerOutstanding.setText(String.format("%.2f", selectedCustomer.getOutstandingAmount()));
             customerName.setText(selectedCustomer.getCustName());
         }
     }
