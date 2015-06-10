@@ -38,6 +38,27 @@
         android:textColor="@android:color/black"
         android:textSize="@dimen/tb_header_text_size" />
 
+    <TextView
+        android:id="@+id/customer_outstanding_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="27dp"
+        android:layout_toLeftOf="@+id/customer_outstanding"
+        android:textColor="@android:color/black"
+        android:text="Outstanding : "
+        android:textSize="@dimen/tb_header_text_size" />
+    <TextView
+        android:id="@+id/customer_outstanding"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginRight="50dp"
+        android:layout_marginTop="27dp"
+        android:textColor="@android:color/black"
+        android:textSize="@dimen/tb_header_text_size" />
+
     <Button
         android:id="@+id/newOrderBtn"
         android:layout_width="200dp"

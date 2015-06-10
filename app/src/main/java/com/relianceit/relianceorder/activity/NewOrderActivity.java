@@ -66,8 +66,8 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
     int itemCount;
     Constants.Section section;
     ROSDbHelper dbHelper;
-    ArrayList<String> products;
-    ArrayList<String> batches;
+   // ArrayList<String> products;
+    ArrayList<String> batches= new ArrayList<String>();
     ROSStock stock;
     HashMap<String,ROSNewOrderItem> newOrderItemMap =  new HashMap<String,ROSNewOrderItem>();
     HashMap<String,ROSReturnOrderItem> returnOrderItemMap =  new HashMap<String,ROSReturnOrderItem>();
@@ -439,16 +439,30 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
         new  Order section
          */
     private void loadProductForSale(){
-        products= dbHelper.getProductNamesForSale(getApplicationContext());
+        ArrayList<ROSStock> productStock=dbHelper.getProductForSale(getApplicationContext());
+        ArrayList<String> products=new ArrayList<String>(productStock.size());
+        for (int i = 0; i <productStock.size() ; i++) {
+            ROSStock stock1=productStock.get(i);
+            String productName=stock1.getProductUserCode() +" - "+stock1.getProductDescription();
+            products.add(productName);
+        }
 
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, products);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         productSpinner.setAdapter(dataAdapter);
     }
-    private void loadProductBatchForSale(String productName){
-        Log.v("productName :",productName);
-        batches= dbHelper.getBatchNamesForSale(getApplicationContext(),productName);
+    private void loadProductBatchForSale(){
+        String productSpinnerText= productSpinner.getSelectedItem().toString();
+        String[] separated = productSpinnerText.split("-");
+        String productName=separated[separated.length-1].trim();
+        batches.clear();
+       ArrayList<ROSStock> batchesList= dbHelper.getBatchesForSale(getApplicationContext(),productName);
+        for (int i = 0; i <batchesList.size() ; i++) {
+            ROSStock stock1=batchesList.get(i);
+            batches.add(stock1.getProductBatchCode());
+        }
+
 
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, batches);
@@ -457,7 +471,10 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
 
     }
     private void loadStockForSale(){
-        String productName= productSpinner.getSelectedItem().toString();
+        String productSpinnerText= productSpinner.getSelectedItem().toString();
+        String[] separated = productSpinnerText.split("-");
+        String productName=separated[separated.length-1].trim();
+
         String batchName= batchSpinner.getSelectedItem().toString();
 
         stock= dbHelper.getStockForSale(getApplicationContext(), productName, batchName);
@@ -469,16 +486,29 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
     /*
     Return Order section
      */
-    private void loadProductBatchForReturnOrder(String productName){
+    private void loadProductBatchForReturnOrder(){
+        String productSpinnerText= productSpinner.getSelectedItem().toString();
+        String[] separated = productSpinnerText.split("-");
+        String productName=separated[separated.length-1].trim();
+
         Log.v("productName :",productName);
+        ArrayList<ROSProduct> batchesList = null;
+
+        batches.clear();
         if(isLoadFromInvoice){
-            batches= rosInvoice.getBatchNames(productName);
+            //batches= rosInvoice.getBatchNames(productName);
+            batchesList=rosInvoice.getBatchesForReturns(productName);
 
         }else{
-            batches= dbHelper.getBatchNamesForReturns(getApplicationContext(), productName);
+            //batches= dbHelper.getBatchNamesForReturns(getApplicationContext(), productName);
+            batchesList= dbHelper.getBatchesForReturns(getApplicationContext(), productName);
 
         }
 
+        for (int i = 0; i <batchesList.size() ; i++) {
+            ROSProduct rosProduct1=batchesList.get(i);
+            batches.add(rosProduct1.getProductBatchCode());
+        }
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, batches);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -491,7 +521,14 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
         selectReturnBatch.setVisibility(View.INVISIBLE);
         batchSpinner.setVisibility(View.VISIBLE);
         isLoadFromInvoice=true;
-        products= rosInvoice.getProductNames();
+        ArrayList<ROSProduct> rosProducts=rosInvoice.getProductsForReturns();
+        ArrayList<String> products=new ArrayList<String>(rosProducts.size());
+        for (int i = 0; i <rosProducts.size() ; i++) {
+            ROSProduct rosProduct1=rosProducts.get(i);
+            String productName=rosProduct1.getProductUserCode() +" - "+rosProduct1.getProductDescription();
+            products.add(productName);
+        }
+       // products= rosInvoice.getProductNames();
 
 
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
@@ -509,6 +546,14 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
     }
     private void loadAllProductNamesForReturns(){
         batches=null;
+        ArrayList<ROSProduct> rosProducts=dbHelper.getProductsForReturns(getApplicationContext());
+        ArrayList<String> products=new ArrayList<String>(rosProducts.size());
+        for (int i = 0; i <rosProducts.size() ; i++) {
+            ROSProduct rosProduct1=rosProducts.get(i);
+            String productName=rosProduct1.getProductUserCode() +" - "+rosProduct1.getProductDescription();
+            products.add(productName);
+        }
+
         products= dbHelper.getProductNamesForReturns(getApplicationContext());
 
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
@@ -523,7 +568,9 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
         }
     }
     private void loadProductForReturns(){
-        String productName= productSpinner.getSelectedItem().toString();
+        String productSpinnerText= productSpinner.getSelectedItem().toString();
+        String[] separated = productSpinnerText.split("-");
+        String productName=separated[separated.length-1].trim();
         String batchName= batchSpinner.getSelectedItem().toString();
 
         if(isLoadFromInvoice) {
@@ -584,13 +631,16 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
 
     private void addNewOrder(){
 if(isFieldHasValidAmount()) {
-    String productName = productSpinner.getSelectedItem().toString();
+    String displayProductName = productSpinner.getSelectedItem().toString();
     String batchName = batchSpinner.getSelectedItem().toString();
     String quantity = quantityText.getText().toString();
     String orderPrice = orderPriceText.getText().toString();
     String orderDiscount = orderDiscountText.getText().toString();
     String freeItem = freeItemText.getText().toString();
-String displayProductName="";
+    String[] separated = displayProductName.split("-");
+    String productName=separated[separated.length-1].trim();
+
+//String displayProductName="";
     final String total = itemTotalAmount.getText().toString();
     if (productName != null && productName.length() > 0 && batchName != null && batchName.length() > 0 &&
             quantity != null && quantity.length() > 0 && orderPrice != null && orderPrice.length() > 0) {
@@ -619,10 +669,10 @@ String displayProductName="";
             //returnOrderItem.setStockLocationCode(rosProduct.ge);
             returnOrderItem.setUnitPrice(Double.parseDouble(orderPrice));
             returnOrderItem.setProdDiscount(orderDiscountValue);
-
+            returnOrderItem.setProductUserCode(rosProduct.getProductUserCode());
             returnOrderItemMap.put("" + itemCount, returnOrderItem);
             unitPrice= rosProduct.getUnitPrice();
-            displayProductName=rosProduct.getBrandName()+" - "+productName;
+          //  displayProductName=rosProduct.getBrandName()+" - "+productName;
 
         }else {
             ROSNewOrderItem newOrderItem = new ROSNewOrderItem();
@@ -636,10 +686,11 @@ String displayProductName="";
             newOrderItem.setStockLocationCode(stock.getStockLocationCode());
             newOrderItem.setUnitPrice(Double.parseDouble(orderPrice));
             newOrderItem.setProdDiscount(orderDiscountValue);
+            newOrderItem.setProductUserCode(stock.getProductUserCode());
 
             newOrderItemMap.put("" + itemCount, newOrderItem);
             unitPrice= stock.getUnitPrice();
-            displayProductName=stock.getBrandName()+" - "+productName;
+           // displayProductName=stock.getBrandName()+" - "+productName;
 
 
         }
@@ -948,7 +999,7 @@ String displayProductName="";
             for (int i = 0; i < keys.length; i++) {
                 removeOrder(Integer.parseInt((String) keys[i]));
             }
-            stock=null;
+            //stock=null;
             newOrderItemMap.clear();
 
         }
@@ -1022,6 +1073,8 @@ String displayProductName="";
                 rosNewOrder.setGrossValue(Double.valueOf(grossValueText));
                 rosNewOrder.setDiscountValue(Double.valueOf(grossValueText) - Double.valueOf(orderValueText));
                 rosNewOrder.setCustCode(selectedCustomer.getCustCode());
+                rosNewOrder.setAccountYear(stock.getAccountYear());
+                rosNewOrder.setAccountMonth(stock.getAccountMonth());
                 if (orderLocation != null) {
                     rosNewOrder.setLatitude(orderLocation.getLatitude());
                     rosNewOrder.setLongitude(orderLocation.getLongitude());
@@ -1119,10 +1172,10 @@ String displayProductName="";
             case R.id.product_spinner:
 
                 if(section == Constants.Section.ADD_SALE_RETURNS){
-                    loadProductBatchForReturnOrder(products.get(position));
+                    loadProductBatchForReturnOrder();
 
                 }else{
-                    loadProductBatchForSale(products.get(position));
+                    loadProductBatchForSale();
 
                 }
                 break;

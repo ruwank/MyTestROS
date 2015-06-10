@@ -8,7 +8,7 @@
         android:orderInCategory="100"
         android:icon="@mipmap/ic_action_refresh"
         android:title="@string/action_refresh"
-        app:showAsAction="ifRoom"/>
+        app:showAsAction="never"/>
 
     <item
         android:id="@+id/action_force_sync"
