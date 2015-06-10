@@ -16,7 +16,10 @@ import com.relianceit.relianceorder.models.ROSStock;
 import com.relianceit.relianceorder.models.ROSVisit;
 import com.relianceit.relianceorder.util.Constants;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by Suresh on 4/28/15.
@@ -26,7 +29,7 @@ public class ROSDbHelper extends SQLiteOpenHelper {
     public static final String TAG = ROSDbHelper.class.getSimpleName();
 
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 9;
+    public static final int DATABASE_VERSION = 10;
     public static final String DATABASE_NAME = "ROS.db";
 
     private static final String TEXT_TYPE = " TEXT";
@@ -118,6 +121,7 @@ public class ROSDbHelper extends SQLiteOpenHelper {
             ROSDbConstants.ReturnOrderItem.CL_NAME_ITEM_VALUE + DECIMAL_TYPE + COMMA_SEP +
             ROSDbConstants.ReturnOrderItem.CL_NAME_SUPP_CODE + TEXT_TYPE + COMMA_SEP +
             ROSDbConstants.ReturnOrderItem.CL_NAME_LOCATION_CODE + TEXT_TYPE + COMMA_SEP +
+            ROSDbConstants.ReturnOrderItem.CL_NAME_BRAND_NAME + TEXT_TYPE + COMMA_SEP +
             ROSDbConstants.ReturnOrderItem.CL_NAME_BRAND_CODE + TEXT_TYPE + COMMA_SEP +
             ROSDbConstants.ReturnOrderItem.CL_NAME_PRODUCT_USER_CODE + TEXT_TYPE + COMMA_SEP +
             ROSDbConstants.ReturnOrderItem.CL_NAME_AGEN_CODE + TEXT_TYPE +
@@ -457,16 +461,41 @@ public class ROSDbHelper extends SQLiteOpenHelper {
     public ArrayList<ROSNewOrder> getNewOrdersPending(Context context, String customerId, String startDateStr, String endDateStr) {
         SQLiteDatabase db = getReadableDb(context);
 
+//        final String SQL_SELECT_NEW_ORDERS = "SELECT * FROM " + ROSDbConstants.NewOrder.TABLE_NAME +
+//                " WHERE " + ROSDbConstants.NewOrder.CL_NAME_ORDER_STATUS + " = " + Constants.OrderStatus.PENDING +
+//                " AND " + ROSDbConstants.NewOrder.CL_NAME_CUSTOMER_ID + " = '" + customerId +
+//                "' AND " + ROSDbConstants.NewOrder.CL_NAME_ORDER_DATE + " >= Datetime('" + startDateStr +
+//                "') AND " + ROSDbConstants.NewOrder.CL_NAME_ORDER_DATE + " <= Datetime('" + endDateStr + "');";
+
         final String SQL_SELECT_NEW_ORDERS = "SELECT * FROM " + ROSDbConstants.NewOrder.TABLE_NAME +
                 " WHERE " + ROSDbConstants.NewOrder.CL_NAME_ORDER_STATUS + " = " + Constants.OrderStatus.PENDING +
-                " AND " + ROSDbConstants.NewOrder.CL_NAME_CUSTOMER_ID + " = '" + customerId +
-                "' AND (" + ROSDbConstants.NewOrder.CL_NAME_ORDER_DATE + " BETWEEN '" + startDateStr + "' AND '" + endDateStr + "');";
+                " AND " + ROSDbConstants.NewOrder.CL_NAME_CUSTOMER_ID + " = '" + customerId + "';";
         Cursor c = db.rawQuery(SQL_SELECT_NEW_ORDERS, null);
 
         ArrayList<ROSNewOrder> orderList = new ArrayList<ROSNewOrder>();
 
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
         if (c != null) {
             while (c.moveToNext()){
+                boolean inRange = false;
+                try {
+                    Date orderDate = dateFormat.parse(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_DATE)));
+                    Date stDate = dateFormat.parse(startDateStr);
+                    Date endDate = dateFormat.parse(endDateStr);
+
+                    if (orderDate.after(stDate) && orderDate.before(endDate)) {
+                        inRange = true;
+                    }
+
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+                if (!inRange) {
+                    continue;
+                }
+
                 ROSNewOrder order = new ROSNewOrder();
                 order.setCustCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_CUSTOMER_ID)));
                 order.setSalesOrdNum(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_ID)));
@@ -834,16 +863,43 @@ public class ROSDbHelper extends SQLiteOpenHelper {
     public ArrayList<ROSReturnOrder> getReturnOrdersPending(Context context, String customerId, String startDateStr, String endDateStr) {
         SQLiteDatabase db = getReadableDb(context);
 
+//        final String SQL_SELECT_RETURN_ORDERS = "SELECT * FROM " + ROSDbConstants.ReturnOrder.TABLE_NAME +
+//                " WHERE " + ROSDbConstants.ReturnOrder.CL_NAME_ORDER_STATUS + " = " + Constants.OrderStatus.PENDING +
+//                " AND " + ROSDbConstants.ReturnOrder.CL_NAME_CUSTOMER_ID + " = '" + customerId +
+//                "' AND (" + ROSDbConstants.ReturnOrder.CL_NAME_ORDER_DATE + " BETWEEN '" + startDateStr + "' AND '" + endDateStr + "');";
+
         final String SQL_SELECT_RETURN_ORDERS = "SELECT * FROM " + ROSDbConstants.ReturnOrder.TABLE_NAME +
                 " WHERE " + ROSDbConstants.ReturnOrder.CL_NAME_ORDER_STATUS + " = " + Constants.OrderStatus.PENDING +
-                " AND " + ROSDbConstants.ReturnOrder.CL_NAME_CUSTOMER_ID + " = '" + customerId +
-                "' AND (" + ROSDbConstants.ReturnOrder.CL_NAME_ORDER_DATE + " BETWEEN '" + startDateStr + "' AND '" + endDateStr + "');";
+                " AND " + ROSDbConstants.ReturnOrder.CL_NAME_CUSTOMER_ID + " = '" + customerId + "';";
+
         Cursor c = db.rawQuery(SQL_SELECT_RETURN_ORDERS, null);
 
         ArrayList<ROSReturnOrder> orderList = new ArrayList<ROSReturnOrder>();
 
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
         if (c != null) {
             while (c.moveToNext()){
+
+
+                boolean inRange = false;
+                try {
+                    Date orderDate = dateFormat.parse(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_DATE)));
+                    Date stDate = dateFormat.parse(startDateStr);
+                    Date endDate = dateFormat.parse(endDateStr);
+
+                    if (orderDate.after(stDate) && orderDate.before(endDate)) {
+                        inRange = true;
+                    }
+
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+                if (!inRange) {
+                    continue;
+                }
+
                 ROSReturnOrder order = new ROSReturnOrder();
                 order.setCustCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_CUSTOMER_ID)));
                 order.setReturnNumb(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_ID)));
@@ -1462,6 +1518,7 @@ public class ROSDbHelper extends SQLiteOpenHelper {
                 product.setQuntityInStock(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_ALLOCATED_QTY)));
                 product.setAgenCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_AGENT_CODE)));
                 product.setBrandCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BRAND_CODE)));
+                product.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BRAND_NAME)));
                 product.setProductCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_PRODUCT_CODE)));
                 product.setCompCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_COMP_CODE)));
                 product.setDistributorCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_DISTRIB_CODE)));
@@ -1537,6 +1594,7 @@ public class ROSDbHelper extends SQLiteOpenHelper {
                 product.setQuntityInStock(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_ALLOCATED_QTY)));
                 product.setAgenCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_AGENT_CODE)));
                 product.setBrandCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BRAND_CODE)));
+                product.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BRAND_NAME)));
                 product.setProductCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_PRODUCT_CODE)));
                 product.setCompCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_COMP_CODE)));
                 product.setDistributorCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_DISTRIB_CODE)));
@@ -1575,6 +1633,7 @@ public class ROSDbHelper extends SQLiteOpenHelper {
             product.setQuntityInStock(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_ALLOCATED_QTY)));
             product.setAgenCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_AGENT_CODE)));
             product.setBrandCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BRAND_CODE)));
+            product.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BRAND_NAME)));
             product.setProductCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_PRODUCT_CODE)));
             product.setCompCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_COMP_CODE)));
             product.setDistributorCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_DISTRIB_CODE)));
@@ -1603,6 +1662,7 @@ public class ROSDbHelper extends SQLiteOpenHelper {
             values.put(ROSDbConstants.Product.CL_NAME_ALLOCATED_QTY, product.getQuntityInStock());
             values.put(ROSDbConstants.Product.CL_NAME_AGENT_CODE, product.getAgenCode());
             values.put(ROSDbConstants.Product.CL_NAME_BRAND_CODE, product.getBrandCode());
+            values.put(ROSDbConstants.Product.CL_NAME_BRAND_NAME, product.getBrandName());
             values.put(ROSDbConstants.Product.CL_NAME_PRODUCT_CODE, product.getProductCode());
             values.put(ROSDbConstants.Product.CL_NAME_COMP_CODE, product.getCompCode());
             values.put(ROSDbConstants.Product.CL_NAME_DISTRIB_CODE, product.getDistributorCode());

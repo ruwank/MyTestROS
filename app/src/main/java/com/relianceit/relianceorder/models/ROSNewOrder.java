@@ -1,5 +1,7 @@
 package com.relianceit.relianceorder.models;
 
+import android.util.Log;
+
 import com.google.gson.annotations.Expose;
 
 import java.util.ArrayList;
@@ -8,6 +10,8 @@ import java.util.ArrayList;
  * Created by Suresh on 4/28/15.
  */
 public class ROSNewOrder {
+
+    public static final String TAG = ROSNewOrder.class.getSimpleName();
 
     @Expose protected String SalesOrdNum = null;
     protected int orderStatus = 0;
@@ -37,6 +41,13 @@ public class ROSNewOrder {
         this.Products = null;
         this.AccountMonth = 0;
         this.AccountYear = 0;
+    }
+
+    public void print() {
+        Log.i(TAG, SalesOrdNum + " " +
+                CustCode + " " +
+                AddedDate + " " +
+                orderStatus);
     }
 
     public void fillDbFields() {
