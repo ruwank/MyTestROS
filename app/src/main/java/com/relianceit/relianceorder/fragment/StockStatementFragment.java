@@ -1,5 +1,9 @@
 package com.relianceit.relianceorder.fragment;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.Gravity;
@@ -13,6 +17,7 @@ import android.widget.TextView;
 import com.relianceit.relianceorder.R;
 import com.relianceit.relianceorder.db.ROSDbHelper;
 import com.relianceit.relianceorder.models.ROSStock;
+import com.relianceit.relianceorder.util.Constants;
 
 import java.util.ArrayList;
 
@@ -26,6 +31,7 @@ public class StockStatementFragment extends Fragment{
 		View rootView = inflater.inflate(
 				R.layout.fragment_stock_statement, container, false);
         stockStatementTable=(TableLayout)rootView.findViewById(R.id.stock_statement_table);
+        getActivity().registerReceiver(localDataChangeReceiver, new IntentFilter(Constants.LocalDataChange.ACTION_DAILY_SYNCED));
 
 		return rootView;
 	}
@@ -35,7 +41,11 @@ public class StockStatementFragment extends Fragment{
         super.onResume();
         loadData();
     }
-
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        getActivity().unregisterReceiver(localDataChangeReceiver);
+    }
     private void loadData(){
         stockStatementTable.removeAllViews();
 
@@ -117,4 +127,11 @@ public class StockStatementFragment extends Fragment{
         stockStatementTable.addView(tableRow, index);
 
     }
+    private BroadcastReceiver localDataChangeReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            loadData();
+        }
+    };
+
 }

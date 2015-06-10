@@ -79,6 +79,7 @@ public class AppController extends Application {
         UUID deviceUuid = new UUID(androidId.hashCode(), ((long)tmDevice.hashCode() << 32) | tmSerial.hashCode());
         String deviceId = deviceUuid.toString();
         Log.i(TAG, "Device Id: " + deviceId);
+        deviceId="ffffffff-f20f-bdd9-ffff-fffff2984d97";
         return deviceId;
     }
 
