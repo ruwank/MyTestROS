@@ -29,7 +29,7 @@ public class ROSDbHelper extends SQLiteOpenHelper {
     public static final String TAG = ROSDbHelper.class.getSimpleName();
 
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 9;
+    public static final int DATABASE_VERSION = 10;
     public static final String DATABASE_NAME = "ROS.db";
 
     private static final String TEXT_TYPE = " TEXT";
@@ -121,6 +121,7 @@ public class ROSDbHelper extends SQLiteOpenHelper {
             ROSDbConstants.ReturnOrderItem.CL_NAME_ITEM_VALUE + DECIMAL_TYPE + COMMA_SEP +
             ROSDbConstants.ReturnOrderItem.CL_NAME_SUPP_CODE + TEXT_TYPE + COMMA_SEP +
             ROSDbConstants.ReturnOrderItem.CL_NAME_LOCATION_CODE + TEXT_TYPE + COMMA_SEP +
+            ROSDbConstants.ReturnOrderItem.CL_NAME_BRAND_NAME + TEXT_TYPE + COMMA_SEP +
             ROSDbConstants.ReturnOrderItem.CL_NAME_BRAND_CODE + TEXT_TYPE + COMMA_SEP +
             ROSDbConstants.ReturnOrderItem.CL_NAME_PRODUCT_USER_CODE + TEXT_TYPE + COMMA_SEP +
             ROSDbConstants.ReturnOrderItem.CL_NAME_AGEN_CODE + TEXT_TYPE +
@@ -1517,6 +1518,7 @@ public class ROSDbHelper extends SQLiteOpenHelper {
                 product.setQuntityInStock(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_ALLOCATED_QTY)));
                 product.setAgenCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_AGENT_CODE)));
                 product.setBrandCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BRAND_CODE)));
+                product.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BRAND_NAME)));
                 product.setProductCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_PRODUCT_CODE)));
                 product.setCompCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_COMP_CODE)));
                 product.setDistributorCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_DISTRIB_CODE)));
@@ -1592,6 +1594,7 @@ public class ROSDbHelper extends SQLiteOpenHelper {
                 product.setQuntityInStock(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_ALLOCATED_QTY)));
                 product.setAgenCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_AGENT_CODE)));
                 product.setBrandCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BRAND_CODE)));
+                product.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BRAND_NAME)));
                 product.setProductCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_PRODUCT_CODE)));
                 product.setCompCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_COMP_CODE)));
                 product.setDistributorCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_DISTRIB_CODE)));
@@ -1630,6 +1633,7 @@ public class ROSDbHelper extends SQLiteOpenHelper {
             product.setQuntityInStock(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_ALLOCATED_QTY)));
             product.setAgenCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_AGENT_CODE)));
             product.setBrandCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BRAND_CODE)));
+            product.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BRAND_NAME)));
             product.setProductCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_PRODUCT_CODE)));
             product.setCompCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_COMP_CODE)));
             product.setDistributorCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_DISTRIB_CODE)));
@@ -1658,6 +1662,7 @@ public class ROSDbHelper extends SQLiteOpenHelper {
             values.put(ROSDbConstants.Product.CL_NAME_ALLOCATED_QTY, product.getQuntityInStock());
             values.put(ROSDbConstants.Product.CL_NAME_AGENT_CODE, product.getAgenCode());
             values.put(ROSDbConstants.Product.CL_NAME_BRAND_CODE, product.getBrandCode());
+            values.put(ROSDbConstants.Product.CL_NAME_BRAND_NAME, product.getBrandName());
             values.put(ROSDbConstants.Product.CL_NAME_PRODUCT_CODE, product.getProductCode());
             values.put(ROSDbConstants.Product.CL_NAME_COMP_CODE, product.getCompCode());
             values.put(ROSDbConstants.Product.CL_NAME_DISTRIB_CODE, product.getDistributorCode());

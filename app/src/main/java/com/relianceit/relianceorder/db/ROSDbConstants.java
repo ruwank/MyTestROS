@@ -90,6 +90,7 @@ public final class ROSDbConstants {
         public static final String CL_NAME_SUPP_CODE = "supp_code";
         public static final String CL_NAME_LOCATION_CODE = "location_code";
         public static final String CL_NAME_BRAND_CODE = "brand_code";
+        public static final String CL_NAME_BRAND_NAME = "brand_name";
         public static final String CL_NAME_AGEN_CODE = "agen_code";
         public static final String CL_NAME_PRODUCT_USER_CODE = "product_user_code";
     }

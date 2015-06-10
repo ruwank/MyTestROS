@@ -21,6 +21,7 @@ public class ROSReturnOrderItem {
     @Expose private double ProdDiscount = 0.0;
     @Expose private int QtyBonus = 0;
     @Expose private double EffPrice = 0.0;
+    @Expose private String BrandName = null;
 
     @Expose private String SuppCode = null;
     @Expose private String StockLocationCode = null;
@@ -45,11 +46,13 @@ public class ROSReturnOrderItem {
         this.BrandCode = null;
         this.AgenCode = null;
         this.ProductUserCode = null;
+        this.BrandName = null;
     }
 
     public void print() {
         Log.i(TAG, ProductDescription + " " +
                 ProductBatchCode + " " +
+                BrandName + " " +
                 QtyOrdered + " " +
                 ProdDiscount + " " +
                 QtyBonus + " " +
@@ -178,5 +181,13 @@ public class ROSReturnOrderItem {
 
     public void setProductUserCode(String productUserCode) {
         ProductUserCode = productUserCode;
+    }
+
+    public String getBrandName() {
+        return BrandName;
+    }
+
+    public void setBrandName(String brandName) {
+        BrandName = brandName;
     }
 }
