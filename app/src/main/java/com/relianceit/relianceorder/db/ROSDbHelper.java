@@ -16,7 +16,10 @@ import com.relianceit.relianceorder.models.ROSStock;
 import com.relianceit.relianceorder.models.ROSVisit;
 import com.relianceit.relianceorder.util.Constants;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by Suresh on 4/28/15.
@@ -457,16 +460,41 @@ public class ROSDbHelper extends SQLiteOpenHelper {
     public ArrayList<ROSNewOrder> getNewOrdersPending(Context context, String customerId, String startDateStr, String endDateStr) {
         SQLiteDatabase db = getReadableDb(context);
 
+//        final String SQL_SELECT_NEW_ORDERS = "SELECT * FROM " + ROSDbConstants.NewOrder.TABLE_NAME +
+//                " WHERE " + ROSDbConstants.NewOrder.CL_NAME_ORDER_STATUS + " = " + Constants.OrderStatus.PENDING +
+//                " AND " + ROSDbConstants.NewOrder.CL_NAME_CUSTOMER_ID + " = '" + customerId +
+//                "' AND " + ROSDbConstants.NewOrder.CL_NAME_ORDER_DATE + " >= Datetime('" + startDateStr +
+//                "') AND " + ROSDbConstants.NewOrder.CL_NAME_ORDER_DATE + " <= Datetime('" + endDateStr + "');";
+
         final String SQL_SELECT_NEW_ORDERS = "SELECT * FROM " + ROSDbConstants.NewOrder.TABLE_NAME +
                 " WHERE " + ROSDbConstants.NewOrder.CL_NAME_ORDER_STATUS + " = " + Constants.OrderStatus.PENDING +
-                " AND " + ROSDbConstants.NewOrder.CL_NAME_CUSTOMER_ID + " = '" + customerId +
-                "' AND (" + ROSDbConstants.NewOrder.CL_NAME_ORDER_DATE + " BETWEEN '" + startDateStr + "' AND '" + endDateStr + "');";
+                " AND " + ROSDbConstants.NewOrder.CL_NAME_CUSTOMER_ID + " = '" + customerId + "';";
         Cursor c = db.rawQuery(SQL_SELECT_NEW_ORDERS, null);
 
         ArrayList<ROSNewOrder> orderList = new ArrayList<ROSNewOrder>();
 
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
         if (c != null) {
             while (c.moveToNext()){
+                boolean inRange = false;
+                try {
+                    Date orderDate = dateFormat.parse(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_DATE)));
+                    Date stDate = dateFormat.parse(startDateStr);
+                    Date endDate = dateFormat.parse(endDateStr);
+
+                    if (orderDate.after(stDate) && orderDate.before(endDate)) {
+                        inRange = true;
+                    }
+
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+                if (!inRange) {
+                    continue;
+                }
+
                 ROSNewOrder order = new ROSNewOrder();
                 order.setCustCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_CUSTOMER_ID)));
                 order.setSalesOrdNum(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_ID)));
@@ -834,16 +862,43 @@ public class ROSDbHelper extends SQLiteOpenHelper {
     public ArrayList<ROSReturnOrder> getReturnOrdersPending(Context context, String customerId, String startDateStr, String endDateStr) {
         SQLiteDatabase db = getReadableDb(context);
 
+//        final String SQL_SELECT_RETURN_ORDERS = "SELECT * FROM " + ROSDbConstants.ReturnOrder.TABLE_NAME +
+//                " WHERE " + ROSDbConstants.ReturnOrder.CL_NAME_ORDER_STATUS + " = " + Constants.OrderStatus.PENDING +
+//                " AND " + ROSDbConstants.ReturnOrder.CL_NAME_CUSTOMER_ID + " = '" + customerId +
+//                "' AND (" + ROSDbConstants.ReturnOrder.CL_NAME_ORDER_DATE + " BETWEEN '" + startDateStr + "' AND '" + endDateStr + "');";
+
         final String SQL_SELECT_RETURN_ORDERS = "SELECT * FROM " + ROSDbConstants.ReturnOrder.TABLE_NAME +
                 " WHERE " + ROSDbConstants.ReturnOrder.CL_NAME_ORDER_STATUS + " = " + Constants.OrderStatus.PENDING +
-                " AND " + ROSDbConstants.ReturnOrder.CL_NAME_CUSTOMER_ID + " = '" + customerId +
-                "' AND (" + ROSDbConstants.ReturnOrder.CL_NAME_ORDER_DATE + " BETWEEN '" + startDateStr + "' AND '" + endDateStr + "');";
+                " AND " + ROSDbConstants.ReturnOrder.CL_NAME_CUSTOMER_ID + " = '" + customerId + "';";
+
         Cursor c = db.rawQuery(SQL_SELECT_RETURN_ORDERS, null);
 
         ArrayList<ROSReturnOrder> orderList = new ArrayList<ROSReturnOrder>();
 
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
         if (c != null) {
             while (c.moveToNext()){
+
+
+                boolean inRange = false;
+                try {
+                    Date orderDate = dateFormat.parse(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_DATE)));
+                    Date stDate = dateFormat.parse(startDateStr);
+                    Date endDate = dateFormat.parse(endDateStr);
+
+                    if (orderDate.after(stDate) && orderDate.before(endDate)) {
+                        inRange = true;
+                    }
+
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+
+                if (!inRange) {
+                    continue;
+                }
+
                 ROSReturnOrder order = new ROSReturnOrder();
                 order.setCustCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_CUSTOMER_ID)));
                 order.setReturnNumb(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_ID)));

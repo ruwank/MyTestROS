@@ -580,7 +580,7 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
 
             ROSDbHelper dbHelper = new ROSDbHelper(this);
             String startDateStr = fromDateSelected + " 00:00:00";
-            String endDateStr = toDateSelected + " 00:00:00";
+            String endDateStr = toDateSelected + " 23:59:59";
             ArrayList<ROSNewOrder> pendingOrders = dbHelper.getNewOrdersPending(this, selectedCustomer.getCustomerId(), startDateStr, endDateStr);
 
             SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -598,8 +598,12 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
                 }
             }
 
-            pendingOrders.addAll(orders);
-            showSalesOrders(pendingOrders);
+            if(orders != null) {
+                orders.addAll(pendingOrders);
+                showSalesOrders(orders);
+            }else {
+                showSalesOrders(pendingOrders);
+            }
         }
 
         AppUtils.dismissProgressDialog();
@@ -672,7 +676,7 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
 
             ROSDbHelper dbHelper = new ROSDbHelper(this);
             String startDateStr = fromDateSelected + " 00:00:00";
-            String endDateStr = toDateSelected + " 00:00:00";
+            String endDateStr = toDateSelected + " 23:59:59";
             ArrayList<ROSReturnOrder> localOrders = dbHelper.getReturnOrders(this, selectedCustomer.getCustomerId(), startDateStr, endDateStr);
 
             SimpleDateFormat format1 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -714,12 +718,15 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
                 }
             }
 
-            pendingOrders.addAll(orders);
-            showReturnOrders(pendingOrders);
+            if(orders != null) {
+                orders.addAll(pendingOrders);
+                showReturnOrders(orders);
+            }else {
+                showReturnOrders(pendingOrders);
+            }
         }
 
         AppUtils.dismissProgressDialog();
-
 
     }
 

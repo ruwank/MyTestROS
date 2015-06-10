@@ -12,11 +12,13 @@
 
     <item
         android:id="@+id/action_force_sync"
+        android:orderInCategory="101"
         android:title="Force Sync"
         app:showAsAction="never"/>
 
      <item
         android:id="@+id/action_logout"
+         android:orderInCategory="102"
         android:title="@string/action_logout"
         app:showAsAction="never"/>
 
