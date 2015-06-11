@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -112,8 +113,10 @@ public class ViewOrderActivity extends ActionBarActivity {
             ROSReturnOrder order = AppController.getInstance().getSelectedReturnOrder();
             orderNo.setText(order.getReturnNumb());
             dateValue.setText(order.getAddedDate());
+            double discountValueText=order.getOrderValue()-order.getGrossValue();
+
             grossValue.setText(String.format("%.2f", order.getGrossValue()));
-            discountValue.setText(String.format("%.2f", order.getDiscountValue()));
+            discountValue.setText(String.format("%.2f", discountValueText));
             overallDis.setText(String.format("%.2f",order.getOVDiscount()));
             orderValue.setText(String.format("%.2f",order.getOrderValue()));
 
@@ -131,8 +134,10 @@ public class ViewOrderActivity extends ActionBarActivity {
             ROSNewOrder order = AppController.getInstance().getSelectedOrder();
             orderNo.setText(order.getSalesOrdNum());
             dateValue.setText(order.getAddedDate());
+            double discountValueText=order.getOrderValue()-order.getGrossValue();
+
             grossValue.setText(String.format("%.2f", order.getGrossValue()));
-            discountValue.setText(String.format("%.2f", order.getDiscountValue()));
+            discountValue.setText(String.format("%.2f", discountValueText));
             overallDis.setText(String.format("%.2f",order.getOVDiscount()));
             orderValue.setText(String.format("%.2f",order.getOrderValue()));
 
@@ -193,6 +198,7 @@ public class ViewOrderActivity extends ActionBarActivity {
         qtyTextView.setTextColor(getResources().getColor(R.color.color_black));
         qtyTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
 
+        Log.v("item ","item :" +item.getUnitPrice());
         TextView priceTextView = new TextView(this);
         priceTextView.setText(String.format("%.2f",item.getUnitPrice()));
         priceTextView.setGravity(Gravity.CENTER);

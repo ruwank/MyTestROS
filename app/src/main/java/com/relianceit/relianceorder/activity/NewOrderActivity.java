@@ -495,6 +495,7 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
 
         Log.v("productName :",productName);
 
+
         batches.clear();
         if(isLoadFromInvoice){
             //batches= rosInvoice.getBatchNames(productName);
@@ -517,7 +518,7 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
 
     }
     private void loadInvoiceProductNamesForReturns(){
-        batches=null;
+        batches.clear();
         batchNumber.setVisibility(View.INVISIBLE);
         selectReturnBatch.setVisibility(View.INVISIBLE);
         batchSpinner.setVisibility(View.VISIBLE);
@@ -546,17 +547,17 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
 
     }
     private void loadAllProductNamesForReturns(){
-        batches=null;
+        batches.clear();
         ArrayList<ROSProduct> rosProducts=dbHelper.getProductsForReturns(getApplicationContext());
         ArrayList<String> products=new ArrayList<String>(rosProducts.size());
         for (int i = 0; i <rosProducts.size() ; i++) {
             ROSProduct rosProduct1=rosProducts.get(i);
             String productName=rosProduct1.getBrandName() +" - "+rosProduct1.getProductDescription();
+            Log.v("productName ",productName);
+
             products.add(productName);
         }
-        Log.v("rosProducts.size()","rosProducts.size()"+rosProducts.size());
 
-        products= dbHelper.getProductNamesForReturns(getApplicationContext());
 
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, products);
