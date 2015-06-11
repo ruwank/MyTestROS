@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.ImageButton;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -46,6 +47,7 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
     TableLayout orderListTable;
     TextView tblHeaderCol1,tblHeaderCol2,tblHeaderCol3;
     TextView customerName;
+    ImageButton btnFromDate,btnToDate;
     boolean fromDateSelect;
     private int fromYear;
     private int fromMonth;
@@ -78,6 +80,9 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
         fromDate=(TextView)findViewById(R.id.from_date);
         toDate=(TextView)findViewById(R.id.to_date);
 
+        btnFromDate=(ImageButton)findViewById(R.id.btn_from_date);
+        btnToDate=(ImageButton)findViewById(R.id.btn_to_date);
+
         Calendar cal = Calendar.getInstance();
         fromYear=toYear = cal.get(Calendar.YEAR);
         fromMonth=toMonth = cal.get(Calendar.MONTH);
@@ -101,6 +106,23 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
             }
         });
         toDate.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                fromDateSelect=false;
+                datePickerFragment.show(getSupportFragmentManager(), "datePicker");
+            }
+        });
+
+        btnFromDate.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                fromDateSelect=true;
+                datePickerFragment.show(getSupportFragmentManager(), "datePicker");
+            }
+        });
+        btnToDate.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {

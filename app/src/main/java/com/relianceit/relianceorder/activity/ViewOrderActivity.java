@@ -167,14 +167,14 @@ public class ViewOrderActivity extends ActionBarActivity {
         layoutParamsTextView.weight=1.5f;
 
         TextView productTextView = new TextView(this);
-        productTextView.setText(item.getProductUserCode()+" - "+item.getProductDescription());
+        productTextView.setText(item.getBrandName()+" - "+item.getProductDescription());
         productTextView.setGravity(Gravity.CENTER);
         productTextView.setLayoutParams(layoutParamsTextView);
         productTextView.setTextColor(getResources().getColor(R.color.color_black));
         productTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
 
         TextView batchTextView = new TextView(this);
-        batchTextView.setText(item.getProductBatchCode());
+        batchTextView.setText(item.getProductUserCode());
         batchTextView.setGravity(Gravity.CENTER);
         batchTextView.setLayoutParams(layoutParamsTextView);
         batchTextView.setTextColor(getResources().getColor(R.color.color_black));
@@ -250,14 +250,14 @@ public class ViewOrderActivity extends ActionBarActivity {
         layoutParamsTextView.weight=1.5f;
 
         TextView productTextView = new TextView(this);
-        productTextView.setText(item.getProductUserCode()+ " - "+ item.getProductDescription());
+        productTextView.setText(item.getBrandCode()+ " - "+ item.getProductDescription());
         productTextView.setGravity(Gravity.CENTER);
         productTextView.setLayoutParams(layoutParamsTextView);
         productTextView.setTextColor(getResources().getColor(R.color.color_black));
         productTextView.setTextSize(getResources().getDimension(R.dimen.common_text_size));
 
         TextView batchTextView = new TextView(this);
-        batchTextView.setText(item.getProductBatchCode());
+        batchTextView.setText(item.getProductUserCode());
         batchTextView.setGravity(Gravity.CENTER);
         batchTextView.setLayoutParams(layoutParamsTextView);
         batchTextView.setTextColor(getResources().getColor(R.color.color_black));
