@@ -665,10 +665,10 @@ if(isFieldHasValidAmount()) {
             returnOrderItem.setEffPrice(Float.valueOf(total));
             returnOrderItem.setProductCode(rosProduct.getProductCode());
             returnOrderItem.setSuppCode(rosProduct.getSuppCode());
-            //returnOrderItem.setStockLocationCode(rosProduct.ge);
             returnOrderItem.setUnitPrice(Double.parseDouble(orderPrice));
             returnOrderItem.setProdDiscount(orderDiscountValue);
             returnOrderItem.setProductUserCode(rosProduct.getProductUserCode());
+            returnOrderItem.setBrandName(rosProduct.getBrandName());
             returnOrderItemMap.put("" + itemCount, returnOrderItem);
             unitPrice= rosProduct.getUnitPrice();
           //  displayProductName=rosProduct.getBrandName()+" - "+productName;

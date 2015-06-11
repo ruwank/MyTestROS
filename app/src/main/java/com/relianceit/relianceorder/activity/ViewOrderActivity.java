@@ -250,7 +250,7 @@ public class ViewOrderActivity extends ActionBarActivity {
         layoutParamsTextView.weight=1.5f;
 
         TextView productTextView = new TextView(this);
-        productTextView.setText(item.getBrandCode()+ " - "+ item.getProductDescription());
+        productTextView.setText(item.getBrandName()+ " - "+ item.getProductDescription());
         productTextView.setGravity(Gravity.CENTER);
         productTextView.setLayoutParams(layoutParamsTextView);
         productTextView.setTextColor(getResources().getColor(R.color.color_black));
