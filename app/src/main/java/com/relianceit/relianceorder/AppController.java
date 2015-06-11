@@ -6,6 +6,7 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
@@ -52,12 +53,16 @@ public class AppController extends Application {
     }
  
     public <T> void addToRequestQueue(Request<T> req, String tag) {
+
+        req.setRetryPolicy(new DefaultRetryPolicy(Constants.DEFAULT_TIMEOUT_MS, DefaultRetryPolicy.DEFAULT_MAX_RETRIES,DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+
         // set the default tag if tag is empty
         req.setTag(TextUtils.isEmpty(tag) ? TAG : tag);
         getRequestQueue().add(req);
     }
  
     public <T> void addToRequestQueue(Request<T> req) {
+        req.setRetryPolicy(new DefaultRetryPolicy(Constants.DEFAULT_TIMEOUT_MS, DefaultRetryPolicy.DEFAULT_MAX_RETRIES,DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         req.setTag(TAG);
         getRequestQueue().add(req);
     }
@@ -79,7 +84,6 @@ public class AppController extends Application {
         UUID deviceUuid = new UUID(androidId.hashCode(), ((long)tmDevice.hashCode() << 32) | tmSerial.hashCode());
         String deviceId = deviceUuid.toString();
         Log.i(TAG, "Device Id: " + deviceId);
-        deviceId="ffffffff-f20f-bdd9-ffff-fffff2984d97";
         return deviceId;
     }
 
@@ -98,6 +102,7 @@ public class AppController extends Application {
            }
        }
 
+       //user.setAccessToken("A336CC74-7923-43E3-B69B-72E4FC91F7B1");
        user.setDeviceToken(getDeviceId());
    }
 

@@ -156,6 +156,8 @@ public class ViewOrderActivity extends ActionBarActivity {
 
     private void addSaleOrderItem(ROSNewOrderItem item, int index){
 
+        item.print();
+
         TableRow.LayoutParams layoutParamsTableRow = new TableRow.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT);

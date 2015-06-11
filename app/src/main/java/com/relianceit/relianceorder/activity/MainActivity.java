@@ -33,6 +33,7 @@ public class MainActivity extends ActionBarActivity {
         setContentView(R.layout.activity_main);
 
         AppController.getInstance().fillUserUsingSavedData();
+        AppDataManager.saveDataInt(this, Constants.DM_DAILY_SYNC_SHOWN_KEY, 0);
 
         String logged = AppDataManager.getData(this, Constants.DM_LOGGED_KEY);
         if (logged != null && logged.equalsIgnoreCase("yes")) {
