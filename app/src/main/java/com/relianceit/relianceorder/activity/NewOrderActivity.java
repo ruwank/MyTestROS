@@ -670,6 +670,8 @@ if(isFieldHasValidAmount()) {
             returnOrderItem.setProdDiscount(orderDiscountValue);
             returnOrderItem.setProductUserCode(rosProduct.getProductUserCode());
             returnOrderItem.setBrandName(rosProduct.getBrandName());
+            returnOrderItem.setBrandCode(rosProduct.getBrandName());
+            returnOrderItem.setAgenCode(rosProduct.getAgenCode());
             returnOrderItemMap.put("" + itemCount, returnOrderItem);
             unitPrice= rosProduct.getUnitPrice();
           //  displayProductName=rosProduct.getBrandName()+" - "+productName;
@@ -687,6 +689,8 @@ if(isFieldHasValidAmount()) {
             newOrderItem.setUnitPrice(Double.parseDouble(orderPrice));
             newOrderItem.setProdDiscount(orderDiscountValue);
             newOrderItem.setProductUserCode(stock.getProductUserCode());
+            newOrderItem.setBrandName(stock.getBrandName());
+            newOrderItem.setBrandCode(stock.getBrandCode());
 
             newOrderItemMap.put("" + itemCount, newOrderItem);
             unitPrice= stock.getUnitPrice();
@@ -847,8 +851,6 @@ if(isFieldHasValidAmount()) {
             if(rosProduct != null) {
                 batchName = rosProduct.getProductBatchCode();
                 availableQuantity = rosProduct.getQuntityInStock();
-            }else{
-                return false;
             }
 
         }else{
@@ -881,7 +883,7 @@ if(isFieldHasValidAmount()) {
             return false;
         }
 
-            if(availableQuantity <(quantityValue+freeItemCount) && !isLoadFromInvoice){
+            if(section != Constants.Section.ADD_SALE_RETURNS && availableQuantity <(quantityValue+freeItemCount) ){
                 AppUtils.showAlertDialog(this, "Over stock quantity", "Can not add this much of quantity. You have only "+availableQuantity+" quantity");
                 return false;
             }

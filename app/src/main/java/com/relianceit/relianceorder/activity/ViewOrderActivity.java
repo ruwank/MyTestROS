@@ -113,7 +113,7 @@ public class ViewOrderActivity extends ActionBarActivity {
             ROSReturnOrder order = AppController.getInstance().getSelectedReturnOrder();
             orderNo.setText(order.getReturnNumb());
             dateValue.setText(order.getAddedDate());
-            double discountValueText=order.getOrderValue()-order.getGrossValue();
+            double discountValueText=order.getGrossValue()-order.getOrderValue();
 
             grossValue.setText(String.format("%.2f", order.getGrossValue()));
             discountValue.setText(String.format("%.2f", discountValueText));
@@ -134,7 +134,7 @@ public class ViewOrderActivity extends ActionBarActivity {
             ROSNewOrder order = AppController.getInstance().getSelectedOrder();
             orderNo.setText(order.getSalesOrdNum());
             dateValue.setText(order.getAddedDate());
-            double discountValueText=order.getOrderValue()-order.getGrossValue();
+            double discountValueText=order.getGrossValue()-order.getOrderValue();
 
             grossValue.setText(String.format("%.2f", order.getGrossValue()));
             discountValue.setText(String.format("%.2f", discountValueText));
