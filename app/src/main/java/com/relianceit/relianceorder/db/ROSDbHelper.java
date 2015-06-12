@@ -1069,6 +1069,7 @@ public class ROSDbHelper extends SQLiteOpenHelper {
                 orderItem.setStockLocationCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_LOCATION_CODE)));
                 orderItem.setAgenCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_AGEN_CODE)));
                 orderItem.setBrandCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_BRAND_CODE)));
+                orderItem.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_BRAND_NAME)));
                 orderItem.setProductUserCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_PRODUCT_USER_CODE)));
 
                 orderItemList.add(orderItem);
@@ -1105,6 +1106,7 @@ public class ROSDbHelper extends SQLiteOpenHelper {
             values.put(ROSDbConstants.ReturnOrderItem.CL_NAME_LOCATION_CODE, orderItem.getStockLocationCode());
             values.put(ROSDbConstants.ReturnOrderItem.CL_NAME_AGEN_CODE, orderItem.getAgenCode());
             values.put(ROSDbConstants.ReturnOrderItem.CL_NAME_BRAND_CODE, orderItem.getBrandCode());
+            values.put(ROSDbConstants.ReturnOrderItem.CL_NAME_BRAND_NAME, orderItem.getBrandName());
             values.put(ROSDbConstants.ReturnOrderItem.CL_NAME_PRODUCT_USER_CODE, orderItem.getProductUserCode());
 
             long itemId = db.insert(ROSDbConstants.ReturnOrderItem.TABLE_NAME, null, values);
