@@ -94,8 +94,12 @@ public class HomeActivity extends RelianceBaseActivity {
 
         if (isPendingDataAvailable()) {
             //don't remove this if statement
-        }else if (shouldShowDailySync()) {
-            downloadDailyData();
+        }else {
+            int alreadyShown = AppDataManager.getDataInt(this, Constants.DM_DAILY_SYNC_SHOWN_KEY);
+            if (alreadyShown == 0 && shouldShowDailySync()) {
+                AppDataManager.saveDataInt(this, Constants.DM_DAILY_SYNC_SHOWN_KEY, 1);
+                downloadDailyData();
+            }
         }
     }
 
@@ -331,7 +335,7 @@ public class HomeActivity extends RelianceBaseActivity {
             logout();
         }else {
             setPendingSyncButtonStatus(true);
-            AppUtils.showAlertDialog(this, "Sync Failed!", "Data syncing failed due to Server error. Please try again.");
+            AppUtils.showAlertDialog(this, "Sync Failed!", "Daily syncing failed due to Server error. Please try again to update your daily stock.");
         }
     }
 

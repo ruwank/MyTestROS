@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -19,6 +20,7 @@ import com.relianceit.relianceorder.models.ROSReturnOrder;
 import com.relianceit.relianceorder.models.ROSReturnOrderItem;
 import com.relianceit.relianceorder.models.ROSUser;
 import com.relianceit.relianceorder.util.AppURLs;
+import com.relianceit.relianceorder.util.Constants;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -246,6 +248,7 @@ public class ReturnOrderServiceHandler {
             }
         };
 
+        listRequest.setRetryPolicy(new DefaultRetryPolicy(Constants.DEFAULT_TIMEOUT_MS, DefaultRetryPolicy.DEFAULT_MAX_RETRIES,DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
         AppController.getInstance().addToRequestQueue(listRequest, requestTag);
     }
 

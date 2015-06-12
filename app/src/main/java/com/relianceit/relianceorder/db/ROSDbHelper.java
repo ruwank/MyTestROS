@@ -1166,7 +1166,7 @@ public class ROSDbHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDb(context);
 
         final String SQL_SELECT_STOCK = "SELECT * FROM " + ROSDbConstants.Stock.TABLE_NAME +
-                " WHERE "+ ROSDbConstants.Stock.CL_NAME_AVAILABLE_QTY + " > 0 AND " + ROSDbConstants.Stock.CL_NAME_STATUS +" = 0;";
+                " WHERE "+ ROSDbConstants.Stock.CL_NAME_AVAILABLE_QTY + " > 0 AND " + ROSDbConstants.Stock.CL_NAME_STATUS +" = 0 GROUP BY " + ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME  + ";";
         Cursor c = db.rawQuery(SQL_SELECT_STOCK, null);
 
         ArrayList<ROSStock> stockList = new ArrayList<ROSStock>();
@@ -1502,7 +1502,7 @@ public class ROSDbHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = getReadableDb(context);
 
-        final String SQL_SELECT_PRODUCT = "SELECT * FROM " + ROSDbConstants.Product.TABLE_NAME + ";";
+        final String SQL_SELECT_PRODUCT = "SELECT * FROM " + ROSDbConstants.Product.TABLE_NAME + " GROUP BY " + ROSDbConstants.Product.CL_NAME_PRODUCT_NAME + ";";
         Cursor c = db.rawQuery(SQL_SELECT_PRODUCT, null);
 
         ArrayList<ROSProduct> productList = new ArrayList<ROSProduct>();

@@ -21,6 +21,9 @@ public class Constants {
     public static final String DM_DAILY_SYNC_TIME_KEY = "com.relianceit.relianceorder.daily_sync_time_key";
     public static final String DM_DAILY_SYNC_PRODUCT_KEY = "com.relianceit.relianceorder.daily_sync_product_time_key";
     public static final String DM_OFFLINE_LOGOUT_KEY = "com.relianceit.relianceorder.offline_logout_key";
+    public static final String DM_DAILY_SYNC_SHOWN_KEY = "com.relianceit.relianceorder.daily_sync_shown_key";
+
+    public static final int DEFAULT_TIMEOUT_MS = 60000;
 
     public static final class LocalDataChange {
         public static final String ACTION_ORDER_ADDED = "action_order_added";

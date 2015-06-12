@@ -48,6 +48,7 @@ public class ROSNewOrderItem {
     public void print() {
         Log.i(TAG, ProductDescription + " " +
                 ProductBatchCode + " " +
+                BrandName + " " +
                 QtyOrdered + " " +
                 ProdDiscount + " " +
                 QtyBonus + " " +
