@@ -46,7 +46,7 @@ public class ROSReturnOrderItem {
         this.BrandCode = null;
         this.AgenCode = null;
         this.ProductUserCode = null;
-        this.BrandName = null;
+        this.BrandName = "";
     }
 
     public void print() {
