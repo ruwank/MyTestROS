@@ -1064,7 +1064,7 @@ if(isFieldHasValidAmount()) {
         String grossValueText = grossValueLabel.getText().toString();
         String discountPre = overallDisPreText.getText().toString();
 
-        if(section == Constants.Section.ADD_SALE_RETURNS)
+        if(section == Constants.Section.ADD_SALE_RETURNS) {
             if (orderValueText != null && orderValueText.length() > 0 && returnOrderItemMap.size() > 0) {
                 ArrayList<ROSReturnOrderItem> returnOrderItemArrayList = new ArrayList<ROSReturnOrderItem>(returnOrderItemMap.values());
                 ROSReturnOrder returnOrder = new ROSReturnOrder();
@@ -1113,7 +1113,7 @@ if(isFieldHasValidAmount()) {
                 }
 
             }
-        else {
+        }else {
             if (orderValueText != null && orderValueText.length() > 0 && newOrderItemMap.size()>0) {
                 ArrayList<ROSNewOrderItem> newOrderItemArrayList = new ArrayList<ROSNewOrderItem>(newOrderItemMap.values());
                 ROSNewOrder rosNewOrder = new ROSNewOrder();
@@ -1173,10 +1173,8 @@ if(isFieldHasValidAmount()) {
                     AppUtils.showAlertDialog(this, "New Order Added Error!", "Try again later.");
 
                 }
-
             }
         }
-
     }
 
 	@Override
