@@ -378,20 +378,21 @@ public class HomeActivity extends RelianceBaseActivity {
         long timeMS = AppDataManager.getDataLong(this, Constants.DM_DAILY_SYNC_TIME_KEY);
         if (timeMS == 0) {
             return true;
-        }
-        Date lastSyncDate = new Date(timeMS);
-        Date now = new Date();
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(lastSyncDate);
-        int lDate = calendar.get(Calendar.DATE);
-        calendar.setTime(now);
-        int nDate = calendar.get(Calendar.DATE);
-
-        if (nDate != lDate) {
-            return true;
         }else {
-            return false;
+            Date lastSyncDate = new Date(timeMS);
+            Date now = new Date();
+
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(lastSyncDate);
+            int lDate = calendar.get(Calendar.DATE);
+            calendar.setTime(now);
+            int nDate = calendar.get(Calendar.DATE);
+
+            if (nDate != lDate) {
+                return true;
+            }else {
+                return false;
+            }
         }
     }
 
