@@ -609,7 +609,12 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
         String batchName= batchNumber.getText().toString();
         ROSProduct product=null;
 
-        product=dbHelper.getProductForReturns(getApplicationContext(),productName,batchName);
+        try {
+            product=dbHelper.getProductForReturns(getApplicationContext(),productName,batchName);
+
+        }catch (Exception e){
+
+        }
 
         if(product !=null){
             rosProduct=product;
@@ -670,6 +675,10 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
 if(isFieldHasValidAmount()) {
     String displayProductName = productSpinner.getSelectedItem().toString();
     String batchName = batchSpinner.getSelectedItem().toString();
+
+    if (section == Constants.Section.ADD_SALE_RETURNS && !isLoadFromInvoice) {
+        batchName=batchNumber.getText().toString();
+    }
     String quantity = quantityText.getText().toString();
     String orderPrice = orderPriceText.getText().toString();
     String orderDiscount = orderDiscountText.getText().toString();
