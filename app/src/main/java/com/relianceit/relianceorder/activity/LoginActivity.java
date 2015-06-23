@@ -1,6 +1,5 @@
 package com.relianceit.relianceorder.activity;
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -20,12 +19,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.relianceit.relianceorder.AppController;
 import com.relianceit.relianceorder.R;
-import com.relianceit.relianceorder.db.ROSDbHelper;
-import com.relianceit.relianceorder.models.ROSCustomer;
-import com.relianceit.relianceorder.models.ROSStock;
 import com.relianceit.relianceorder.models.ROSUser;
-import com.relianceit.relianceorder.services.GeneralServiceHandler;
-import com.relianceit.relianceorder.services.NewOrderServiceHandler;
 import com.relianceit.relianceorder.util.AppDataManager;
 import com.relianceit.relianceorder.util.AppURLs;
 import com.relianceit.relianceorder.util.AppUtils;
@@ -36,7 +30,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,8 +37,8 @@ public class LoginActivity extends ActionBarActivity {
 
     public static final String TAG = LoginActivity.class.getSimpleName();
 
-    private String username = "Reliance";
-    private String password = "10";
+    private String username = "";
+    private String password = "";
 
     private EditText userNameET = null;
     private EditText passwordET = null;
