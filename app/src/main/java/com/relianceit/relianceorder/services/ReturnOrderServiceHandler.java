@@ -94,7 +94,7 @@ public class ReturnOrderServiceHandler {
             return;
         }
 
-        JsonObjectRequest syncRequest = new JsonObjectRequest(Request.Method.POST, AppURLs.RETURN_ORDER_SYNC_ENDPOINT, postBody,
+        JsonObjectRequest syncRequest = new JsonObjectRequest(Request.Method.POST, AppURLs.getRETURN_ORDER_SYNC_ENDPOINT(context), postBody,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jsonObject) {
@@ -192,7 +192,7 @@ public class ReturnOrderServiceHandler {
         final String params = "Token " + user.getAccessToken() + ":" + user.getDeviceToken();
         Log.i(TAG, "Return Order Authorization: " + params);
 
-        String endPoint = AppURLs.RETURN_LIST_GET_ENDPOINT + customerCode;
+        String endPoint = AppURLs.getRETURN_LIST_GET_ENDPOINT(context) + customerCode;
         if (fromDate != null && fromDate.length() > 0) {
             try {
                 fromDate = URLEncoder.encode(fromDate, "utf-8");
@@ -288,7 +288,7 @@ public class ReturnOrderServiceHandler {
         final String params = "Token " + user.getAccessToken() + ":" + user.getDeviceToken();
         Log.i(TAG, "Get Return Order Authorization: " + params);
 
-        String endPoint = AppURLs.RETURN_GET_ENDPOINT + customerCode + "/" + orderId;
+        String endPoint = AppURLs.getRETURN_GET_ENDPOINT(context) + customerCode + "/" + orderId;
 
         Log.i(TAG, "Get Return Order end point: " + endPoint);
 
@@ -360,7 +360,7 @@ public class ReturnOrderServiceHandler {
         final String params = "Token " + user.getAccessToken() + ":" + user.getDeviceToken();
         Log.i(TAG, "Get Invoice Authorization: " + params);
 
-        String endPoint = AppURLs.INVOICE_GET_ENDPOINT + customerCode + "/" + invoiceNo;
+        String endPoint = AppURLs.getINVOICE_GET_ENDPOINT(context) + customerCode + "/" + invoiceNo;
 
         Log.i(TAG, "Get Invoice end point: " + endPoint);
 

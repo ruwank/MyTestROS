@@ -7,7 +7,7 @@
         android:id="@+id/action_settings"
         android:orderInCategory="100"
                   android:icon="@mipmap/ic_action_refresh"
-        
+
         android:title="@string/action_settings"
         app:showAsAction="ifRoom"/>
 

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">REL ORDER</string>
+    <string name="app_name">Ecnailer</string>
     <string name="action_settings">Settings</string>
-    <string name="img_content_desc" translatable="false">REL ORDER</string>
-    <string name="btn_content_desc" translatable="false">REL ORDER</string>
+    <string name="img_content_desc" translatable="false">Ecnailer</string>
+    <string name="btn_content_desc" translatable="false">Ecnailer</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 

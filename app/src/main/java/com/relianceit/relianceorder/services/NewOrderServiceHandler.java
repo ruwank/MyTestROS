@@ -94,7 +94,7 @@ public class NewOrderServiceHandler {
             return;
         }
 
-        JsonObjectRequest syncRequest = new JsonObjectRequest(Request.Method.POST, AppURLs.NEW_ORDER_SYNC_ENDPOINT, postBody,
+        JsonObjectRequest syncRequest = new JsonObjectRequest(Request.Method.POST, AppURLs.getNEW_ORDER_SYNC_ENDPOINT(context), postBody,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jsonObject) {
@@ -195,7 +195,7 @@ public class NewOrderServiceHandler {
         final String params = "Token " + user.getAccessToken() + ":" + user.getDeviceToken();
         Log.i(TAG, "Sales Order Authorization: " + params);
 
-        String endPoint = AppURLs.SALES_LIST_GET_ENDPOINT + customerCode;
+        String endPoint = AppURLs.getSALES_LIST_GET_ENDPOINT(context) + customerCode;
         if (fromDate != null && fromDate.length() > 0) {
             try {
                 fromDate = URLEncoder.encode(fromDate, "utf-8");
@@ -291,7 +291,7 @@ public class NewOrderServiceHandler {
         final String params = "Token " + user.getAccessToken() + ":" + user.getDeviceToken();
         Log.i(TAG, "Get Sales Order Authorization: " + params);
 
-        String endPoint = AppURLs.SALE_GET_ENDPOINT + customerCode + "/" + orderId;
+        String endPoint = AppURLs.getSALE_GET_ENDPOINT(context) + customerCode + "/" + orderId;
 
         Log.i(TAG, "Get Sales Order end point: " + endPoint);
 
