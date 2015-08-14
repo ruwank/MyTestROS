@@ -160,7 +160,7 @@ public class GeneralServiceHandler {
         final String params = "Token " + user.getAccessToken() + ":" + user.getDeviceToken();
         Log.i(TAG, "Customer Authorization: " + params);
 
-        JsonArrayRequest customerRequest = new JsonArrayRequest(AppURLs.CUSTOMER_LIST_ENDPOINT, new Response.Listener<JSONArray>() {
+        JsonArrayRequest customerRequest = new JsonArrayRequest(AppURLs.getCUSTOMER_LIST_ENDPOINT(context), new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray jsonArray) {
                 Log.i(TAG, "Customer list success " + jsonArray.toString());
@@ -203,7 +203,7 @@ public class GeneralServiceHandler {
         final String params = "Token " + user.getAccessToken() + ":" + user.getDeviceToken();
         Log.i(TAG, "Stock Authorization: " + params);
 
-        JsonArrayRequest stockRequest = new JsonArrayRequest(AppURLs.STOCK_LIST_ENDPOINT, new Response.Listener<JSONArray>() {
+        JsonArrayRequest stockRequest = new JsonArrayRequest(AppURLs.getSTOCK_LIST_ENDPOINT(context), new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray jsonArray) {
                 Log.i(TAG, "Stock list success " + jsonArray.toString());
@@ -249,7 +249,7 @@ public class GeneralServiceHandler {
         //Authorization: Token <auth token>:<deviceId>
         final String params = "Token " + user.getAccessToken() + ":" + user.getDeviceToken();
 
-        JsonArrayRequest productRequest = new JsonArrayRequest(AppURLs.PRODUCT_LIST_ENDPOINT, new Response.Listener<JSONArray>() {
+        JsonArrayRequest productRequest = new JsonArrayRequest(AppURLs.getPRODUCT_LIST_ENDPOINT(context), new Response.Listener<JSONArray>() {
             @Override
             public void onResponse(JSONArray jsonArray) {
                 Log.i(TAG, "Products list success " + jsonArray.toString());
@@ -319,7 +319,7 @@ public class GeneralServiceHandler {
             return;
         }
 
-        JsonObjectRequest syncRequest = new JsonObjectRequest(Request.Method.POST, AppURLs.VISIT_SEND_ENDPOINT, postBody,
+        JsonObjectRequest syncRequest = new JsonObjectRequest(Request.Method.POST, AppURLs.getVISIT_SEND_ENDPOINT(context), postBody,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jsonObject) {

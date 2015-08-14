@@ -1,5 +1,7 @@
 package com.relianceit.relianceorder.activity;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -7,9 +9,12 @@ import android.support.v7.app.ActionBarActivity;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
@@ -42,6 +47,8 @@ public class LoginActivity extends ActionBarActivity {
 
     private EditText userNameET = null;
     private EditText passwordET = null;
+
+    private AlertDialog settingAlertDialog = null;
 
     Button loginBtn;
     @Override
@@ -119,7 +126,7 @@ public class LoginActivity extends ActionBarActivity {
         final String params = "Basic " + username + ":" + password + ":" + user.getDeviceToken();
         Log.i(TAG, "Login Authorization: " + params);
 
-        JsonObjectRequest loginRequest = new JsonObjectRequest(Request.Method.POST, AppURLs.LOGIN_ENDPOINT, null,
+        JsonObjectRequest loginRequest = new JsonObjectRequest(Request.Method.POST, AppURLs.getLOGIN_ENDPOINT(getApplicationContext()), null,
                 new Response.Listener<JSONObject>() {
                     @Override
                     public void onResponse(JSONObject jsonObject) {
@@ -204,5 +211,63 @@ public class LoginActivity extends ActionBarActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_login, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+            settingMenuTapped();
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void settingMenuTapped() {
+
+        final EditText urlET = new EditText(LoginActivity.this);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.MATCH_PARENT);
+        urlET.setTextColor(getResources().getColor(R.color.app_base_color));
+        urlET.setLayoutParams(lp);
+
+        urlET.setText(AppURLs.getBASE_URL(getApplicationContext()));
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Enter base URL here.(Eg: http://reliancereldiz.com.lk)");
+        builder.setNegativeButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                saveBaseUrl(urlET.getText().toString());
+                settingAlertDialog.dismiss();
+            }
+        });
+        builder.setPositiveButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                settingAlertDialog.dismiss();
+            }
+        });
+        settingAlertDialog = builder.create();
+        settingAlertDialog.setView(urlET);
+        settingAlertDialog.setCanceledOnTouchOutside(false);
+        settingAlertDialog.setCancelable(false);
+        settingAlertDialog.show();
+    }
+
+    private void saveBaseUrl(String url) {
+        String baseUrl = url.trim();
+        if (baseUrl.length() > 8) {
+            AppDataManager.saveData(getApplicationContext(), Constants.BASE_URL_KEY, baseUrl);
+        }
     }
 }

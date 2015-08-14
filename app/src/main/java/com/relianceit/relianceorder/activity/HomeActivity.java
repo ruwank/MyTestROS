@@ -289,7 +289,7 @@ public class HomeActivity extends RelianceBaseActivity {
         final String params = "Token " + user.getAccessToken() + ":" + user.getDeviceToken();
         Log.i(TAG, "Logout Authorization: " + params);
 
-        JsonObjectRequest lRequest = new JsonObjectRequest(Request.Method.GET, AppURLs.LOGOUT_ENDPOINT, null, new Response.Listener<JSONObject>() {
+        JsonObjectRequest lRequest = new JsonObjectRequest(Request.Method.GET, AppURLs.getLOGOUT_ENDPOINT(getApplicationContext()), null, new Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject jsonObject) {
                 Log.i(TAG, "Logout success " + jsonObject.toString());
