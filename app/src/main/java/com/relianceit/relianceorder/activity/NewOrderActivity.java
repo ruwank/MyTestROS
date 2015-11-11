@@ -457,20 +457,21 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
     private void loadProductBatchForSale(){
         String productSpinnerText= productSpinner.getSelectedItem().toString();
         String[] separated = productSpinnerText.split("-");
-        String productName=separated[separated.length-1].trim();
-        batches.clear();
-        rosStockList= dbHelper.getBatchesForSale(getApplicationContext(),productName);
-        for (int i = 0; i <rosStockList.size() ; i++) {
-            ROSStock stock1=rosStockList.get(i);
-            batches.add(stock1.getProductUserCode());
+        if (separated.length >= 2) {
+            String brandName = separated[0].trim();
+            String productName = separated[1].trim();
+            batches.clear();
+            rosStockList= dbHelper.getBatchesForSale(getApplicationContext(), productName, brandName);
+            for (int i = 0; i <rosStockList.size() ; i++) {
+                ROSStock stock1=rosStockList.get(i);
+                batches.add(stock1.getProductUserCode());
+            }
+
+            ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
+                    android.R.layout.simple_spinner_item, batches);
+            dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            batchSpinner.setAdapter(dataAdapter);
         }
-
-
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_spinner_item, batches);
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        batchSpinner.setAdapter(dataAdapter);
-
     }
     private void loadStockForSale(int position){
        // String productSpinnerText= productSpinner.getSelectedItem().toString();
