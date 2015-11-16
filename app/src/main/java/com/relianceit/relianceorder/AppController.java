@@ -10,6 +10,7 @@ import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+import com.crashlytics.android.Crashlytics;
 import com.relianceit.relianceorder.models.ROSCustomer;
 import com.relianceit.relianceorder.models.ROSNewOrder;
 import com.relianceit.relianceorder.models.ROSReturnOrder;
@@ -20,6 +21,7 @@ import com.relianceit.relianceorder.util.Constants;
 import java.io.UnsupportedEncodingException;
 import java.util.UUID;
 
+import io.fabric.sdk.android.Fabric;
 public class AppController extends Application {
 
 	public static final String TAG = AppController.class.getSimpleName();
@@ -35,11 +37,13 @@ public class AppController extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Fabric.with(this, new Crashlytics());
         mInstance = this;
 
         fillUserUsingSavedData();
     }
- 
+
+
     public static synchronized AppController getInstance() {
         return mInstance;
     }

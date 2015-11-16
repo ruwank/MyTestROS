@@ -245,7 +245,7 @@
                 android:textColor="@android:color/black"
                 android:background="@drawable/border"
                 android:textSize="@dimen/common_text_size"
-                android:inputType="number"
+                android:inputType="numberDecimal"
                 android:singleLine="true"
                 android:maxLines="1" />
 
@@ -349,7 +349,7 @@
                 android:textSize="@dimen/common_text_size"
                 android:lines="1"
                 android:singleLine="true"
-                android:inputType="number" />
+                android:inputType="numberDecimal" />
             <TextView android:text="@string/tbl_label_discount_value"
                 android:layout_weight="1"
                 android:layout_margin="3px"
