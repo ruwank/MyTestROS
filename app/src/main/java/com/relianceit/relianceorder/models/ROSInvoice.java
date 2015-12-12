@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class ROSInvoice extends ROSNewOrder{
 
     public ArrayList<String> getProductNames() {
-        ArrayList<String> names = new ArrayList<>();
+        ArrayList<String> names = new ArrayList<String>();
 
         if (this.Products != null && this.Products.size() > 0) {
             for (int i = 0; i < this.Products.size(); i++) {
@@ -24,9 +24,9 @@ public class ROSInvoice extends ROSNewOrder{
     }
 
     public ArrayList<ROSProduct> getProductsForReturns() {
-        ArrayList<ROSProduct> products = new ArrayList<>();
+        ArrayList<ROSProduct> products = new ArrayList<ROSProduct>();
 
-        ArrayList<String> names = new ArrayList<>();
+        ArrayList<String> names = new ArrayList<String>();
 
         if (this.Products != null && this.Products.size() > 0) {
             for (int i = 0; i < this.Products.size(); i++) {
@@ -54,7 +54,7 @@ public class ROSInvoice extends ROSNewOrder{
     }
 
     public ArrayList<String> getBatchNames(String productName) {
-        ArrayList<String> batches = new ArrayList<>();
+        ArrayList<String> batches = new ArrayList<String>();
 
         if (this.Products != null && this.Products.size() > 0) {
             for (int i = 0; i < this.Products.size(); i++) {
@@ -74,8 +74,8 @@ public class ROSInvoice extends ROSNewOrder{
 
     public ArrayList<ROSProduct> getBatchesForReturns(String productName) {
 
-        ArrayList<ROSProduct> products = new ArrayList<>();
-        ArrayList<String> batches = new ArrayList<>();
+        ArrayList<ROSProduct> products = new ArrayList<ROSProduct>();
+        ArrayList<String> batches = new ArrayList<String>();
 
         if (this.Products != null && this.Products.size() > 0) {
             for (int i = 0; i < this.Products.size(); i++) {
