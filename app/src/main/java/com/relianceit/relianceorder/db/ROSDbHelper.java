@@ -250,27 +250,33 @@ public class ROSDbHelper extends SQLiteOpenHelper {
 
         ArrayList<ROSCustomer> cusList = new ArrayList<ROSCustomer>();
 
-        if (c != null) {
-            while (c.moveToNext()){
-                ROSCustomer cus = new ROSCustomer();
-                cus.setAddress1(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_ADDRESS1)));
-                cus.setAddress2(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_ADDRESS2)));
-                cus.setAddress3(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_ADDRESS2)));
-                cus.setCustomerId(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_CUSTOMER_ID)));
-                cus.setEmail(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_EMAIL)));
-                cus.setFirstName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_FIRST_NAME)));
-                cus.setLastName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_LAST_NAME)));
-                cus.setShopName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_SHOP_NAME)));
-                cus.setTelephone(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_TELEPHONE)));
-                cus.setTown(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_TOWN)));
-                cus.setTownId(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_TOWN_ID)));
-                cus.setOutstanding(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_OUTSTANDING)));
-                cus.setCreditLimit(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_CREDIT_LIMIT)));
+        try {
+            if (c != null) {
+                while (c.moveToNext()){
+                    ROSCustomer cus = new ROSCustomer();
+                    cus.setAddress1(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_ADDRESS1)));
+                    cus.setAddress2(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_ADDRESS2)));
+                    cus.setAddress3(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_ADDRESS2)));
+                    cus.setCustomerId(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_CUSTOMER_ID)));
+                    cus.setEmail(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_EMAIL)));
+                    cus.setFirstName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_FIRST_NAME)));
+                    cus.setLastName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_LAST_NAME)));
+                    cus.setShopName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_SHOP_NAME)));
+                    cus.setTelephone(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_TELEPHONE)));
+                    cus.setTown(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_TOWN)));
+                    cus.setTownId(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_TOWN_ID)));
+                    cus.setOutstanding(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_OUTSTANDING)));
+                    cus.setCreditLimit(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_CREDIT_LIMIT)));
 
-                cusList.add(cus);
+                    cusList.add(cus);
+                }
             }
-
-            c.close();
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            if (c != null && !c.isClosed()) {
+                c.close();
+            }
             db.close();
         }
 
@@ -298,31 +304,7 @@ public class ROSDbHelper extends SQLiteOpenHelper {
     public void insertCustomer(Context context, ROSCustomer customer) {
         SQLiteDatabase db = getWritableDb(context);
 
-        ContentValues values = new ContentValues();
-        values.put(ROSDbConstants.Customer.CL_NAME_CUSTOMER_ID, customer.getCustomerId());
-        values.put(ROSDbConstants.Customer.CL_NAME_FIRST_NAME, customer.getFirstName());
-        values.put(ROSDbConstants.Customer.CL_NAME_LAST_NAME, customer.getLastName());
-        values.put(ROSDbConstants.Customer.CL_NAME_EMAIL, customer.getEmail());
-        values.put(ROSDbConstants.Customer.CL_NAME_TELEPHONE, customer.getTelephone());
-        values.put(ROSDbConstants.Customer.CL_NAME_SHOP_NAME, customer.getShopName());
-        values.put(ROSDbConstants.Customer.CL_NAME_TOWN, customer.getTown());
-        values.put(ROSDbConstants.Customer.CL_NAME_TOWN_ID, customer.getTownId());
-        values.put(ROSDbConstants.Customer.CL_NAME_ADDRESS1, customer.getAddress1());
-        values.put(ROSDbConstants.Customer.CL_NAME_ADDRESS2, customer.getAddress2());
-        values.put(ROSDbConstants.Customer.CL_NAME_ADDRESS3, customer.getAddress3());
-        values.put(ROSDbConstants.Customer.CL_NAME_OUTSTANDING, customer.getOutstanding());
-        values.put(ROSDbConstants.Customer.CL_NAME_CREDIT_LIMIT, customer.getCreditLimit());
-
-        db.insert(ROSDbConstants.Customer.TABLE_NAME, null, values);
-        db.close();
-    }
-
-    public void insertCustomers(Context context, ArrayList<ROSCustomer>customers) {
-        SQLiteDatabase db = getWritableDb(context);
-
-        for (int i = 0; i < customers.size(); i++) {
-            ROSCustomer customer = customers.get(i);
-
+        try {
             ContentValues values = new ContentValues();
             values.put(ROSDbConstants.Customer.CL_NAME_CUSTOMER_ID, customer.getCustomerId());
             values.put(ROSDbConstants.Customer.CL_NAME_FIRST_NAME, customer.getFirstName());
@@ -339,9 +321,42 @@ public class ROSDbHelper extends SQLiteOpenHelper {
             values.put(ROSDbConstants.Customer.CL_NAME_CREDIT_LIMIT, customer.getCreditLimit());
 
             db.insert(ROSDbConstants.Customer.TABLE_NAME, null, values);
-        }
+        }catch (Exception ex) {
 
-        db.close();
+        }finally {
+            db.close();
+        }
+    }
+
+    public void insertCustomers(Context context, ArrayList<ROSCustomer>customers) {
+        SQLiteDatabase db = getWritableDb(context);
+
+        try {
+            for (int i = 0; i < customers.size(); i++) {
+                ROSCustomer customer = customers.get(i);
+
+                ContentValues values = new ContentValues();
+                values.put(ROSDbConstants.Customer.CL_NAME_CUSTOMER_ID, customer.getCustomerId());
+                values.put(ROSDbConstants.Customer.CL_NAME_FIRST_NAME, customer.getFirstName());
+                values.put(ROSDbConstants.Customer.CL_NAME_LAST_NAME, customer.getLastName());
+                values.put(ROSDbConstants.Customer.CL_NAME_EMAIL, customer.getEmail());
+                values.put(ROSDbConstants.Customer.CL_NAME_TELEPHONE, customer.getTelephone());
+                values.put(ROSDbConstants.Customer.CL_NAME_SHOP_NAME, customer.getShopName());
+                values.put(ROSDbConstants.Customer.CL_NAME_TOWN, customer.getTown());
+                values.put(ROSDbConstants.Customer.CL_NAME_TOWN_ID, customer.getTownId());
+                values.put(ROSDbConstants.Customer.CL_NAME_ADDRESS1, customer.getAddress1());
+                values.put(ROSDbConstants.Customer.CL_NAME_ADDRESS2, customer.getAddress2());
+                values.put(ROSDbConstants.Customer.CL_NAME_ADDRESS3, customer.getAddress3());
+                values.put(ROSDbConstants.Customer.CL_NAME_OUTSTANDING, customer.getOutstanding());
+                values.put(ROSDbConstants.Customer.CL_NAME_CREDIT_LIMIT, customer.getCreditLimit());
+
+                db.insert(ROSDbConstants.Customer.TABLE_NAME, null, values);
+            }
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            db.close();
+        }
     }
 
     /*
@@ -356,28 +371,33 @@ public class ROSDbHelper extends SQLiteOpenHelper {
 
         ArrayList<ROSNewOrder> orderList = new ArrayList<ROSNewOrder>();
 
-        if (c != null) {
-            while (c.moveToNext()){
-                ROSNewOrder order = new ROSNewOrder();
-                order.setCustCode(customerId);
-                order.setSalesOrdNum(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_ID)));
-                order.setAddedDate(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_DATE)));
-                order.setOVDiscount(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_DISCOUNT)));
-                order.setDiscountValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_DISCOUNT_VALUE)));
-                order.setGrossValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_GROSS_VALUE)));
-                order.setOrderValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_VALUE)));
-                order.setLatitude(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_LATITUDE)));
-                order.setLongitude(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_LONGITUDE)));
-                order.setOrderStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_STATUS)));
-                order.setAccountYear(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ACCOUNT_YEAR)));
-                order.setAccountMonth(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ACCOUNT_MONTH)));
-                orderList.add(order);
+        try {
+            if (c != null) {
+                while (c.moveToNext()){
+                    ROSNewOrder order = new ROSNewOrder();
+                    order.setCustCode(customerId);
+                    order.setSalesOrdNum(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_ID)));
+                    order.setAddedDate(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_DATE)));
+                    order.setOVDiscount(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_DISCOUNT)));
+                    order.setDiscountValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_DISCOUNT_VALUE)));
+                    order.setGrossValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_GROSS_VALUE)));
+                    order.setOrderValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_VALUE)));
+                    order.setLatitude(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_LATITUDE)));
+                    order.setLongitude(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_LONGITUDE)));
+                    order.setOrderStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_STATUS)));
+                    order.setAccountYear(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ACCOUNT_YEAR)));
+                    order.setAccountMonth(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ACCOUNT_MONTH)));
+                    orderList.add(order);
+                }
             }
-
-            c.close();
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            if (c != null && !c.isClosed()) {
+                c.close();
+            }
+            db.close();
         }
-
-        db.close();
 
         return  orderList;
     }
@@ -392,28 +412,33 @@ public class ROSDbHelper extends SQLiteOpenHelper {
 
         ArrayList<ROSNewOrder> orderList = new ArrayList<ROSNewOrder>();
 
-        if (c != null) {
-            while (c.moveToNext()){
-                ROSNewOrder order = new ROSNewOrder();
-                order.setCustCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_CUSTOMER_ID)));
-                order.setSalesOrdNum(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_ID)));
-                order.setAddedDate(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_DATE)));
-                order.setOVDiscount(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_DISCOUNT)));
-                order.setDiscountValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_DISCOUNT_VALUE)));
-                order.setGrossValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_GROSS_VALUE)));
-                order.setOrderValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_VALUE)));
-                order.setLatitude(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_LATITUDE)));
-                order.setLongitude(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_LONGITUDE)));
-                order.setOrderStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_STATUS)));
-                order.setAccountYear(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ACCOUNT_YEAR)));
-                order.setAccountMonth(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ACCOUNT_MONTH)));
-                orderList.add(order);
+        try {
+            if (c != null) {
+                while (c.moveToNext()){
+                    ROSNewOrder order = new ROSNewOrder();
+                    order.setCustCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_CUSTOMER_ID)));
+                    order.setSalesOrdNum(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_ID)));
+                    order.setAddedDate(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_DATE)));
+                    order.setOVDiscount(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_DISCOUNT)));
+                    order.setDiscountValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_DISCOUNT_VALUE)));
+                    order.setGrossValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_GROSS_VALUE)));
+                    order.setOrderValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_VALUE)));
+                    order.setLatitude(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_LATITUDE)));
+                    order.setLongitude(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_LONGITUDE)));
+                    order.setOrderStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_STATUS)));
+                    order.setAccountYear(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ACCOUNT_YEAR)));
+                    order.setAccountMonth(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ACCOUNT_MONTH)));
+                    orderList.add(order);
+                }
             }
-
-            c.close();
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            if (c != null && !c.isClosed()) {
+                c.close();
+            }
+            db.close();
         }
-
-        db.close();
 
         return  orderList;
     }
@@ -427,28 +452,33 @@ public class ROSDbHelper extends SQLiteOpenHelper {
 
         ArrayList<ROSNewOrder> orderList = new ArrayList<ROSNewOrder>();
 
-        if (c != null) {
-            while (c.moveToNext()){
-                ROSNewOrder order = new ROSNewOrder();
-                order.setCustCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_CUSTOMER_ID)));
-                order.setSalesOrdNum(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_ID)));
-                order.setAddedDate(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_DATE)));
-                order.setOVDiscount(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_DISCOUNT)));
-                order.setDiscountValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_DISCOUNT_VALUE)));
-                order.setGrossValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_GROSS_VALUE)));
-                order.setOrderValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_VALUE)));
-                order.setLatitude(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_LATITUDE)));
-                order.setLongitude(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_LONGITUDE)));
-                order.setOrderStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_STATUS)));
-                order.setAccountYear(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ACCOUNT_YEAR)));
-                order.setAccountMonth(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ACCOUNT_MONTH)));
-                orderList.add(order);
+        try {
+            if (c != null) {
+                while (c.moveToNext()){
+                    ROSNewOrder order = new ROSNewOrder();
+                    order.setCustCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_CUSTOMER_ID)));
+                    order.setSalesOrdNum(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_ID)));
+                    order.setAddedDate(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_DATE)));
+                    order.setOVDiscount(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_DISCOUNT)));
+                    order.setDiscountValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_DISCOUNT_VALUE)));
+                    order.setGrossValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_GROSS_VALUE)));
+                    order.setOrderValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_VALUE)));
+                    order.setLatitude(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_LATITUDE)));
+                    order.setLongitude(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_LONGITUDE)));
+                    order.setOrderStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_STATUS)));
+                    order.setAccountYear(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ACCOUNT_YEAR)));
+                    order.setAccountMonth(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ACCOUNT_MONTH)));
+                    orderList.add(order);
+                }
             }
-
-            c.close();
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            if (c != null && !c.isClosed()) {
+                c.close();
+            }
+            db.close();
         }
-
-        db.close();
 
         for (int i = 0; i < orderList.size(); i++) {
             ROSNewOrder order = orderList.get(i);
@@ -461,12 +491,6 @@ public class ROSDbHelper extends SQLiteOpenHelper {
     public ArrayList<ROSNewOrder> getNewOrdersPending(Context context, String customerId, String startDateStr, String endDateStr) {
         SQLiteDatabase db = getReadableDb(context);
 
-//        final String SQL_SELECT_NEW_ORDERS = "SELECT * FROM " + ROSDbConstants.NewOrder.TABLE_NAME +
-//                " WHERE " + ROSDbConstants.NewOrder.CL_NAME_ORDER_STATUS + " = " + Constants.OrderStatus.PENDING +
-//                " AND " + ROSDbConstants.NewOrder.CL_NAME_CUSTOMER_ID + " = '" + customerId +
-//                "' AND " + ROSDbConstants.NewOrder.CL_NAME_ORDER_DATE + " >= Datetime('" + startDateStr +
-//                "') AND " + ROSDbConstants.NewOrder.CL_NAME_ORDER_DATE + " <= Datetime('" + endDateStr + "');";
-
         final String SQL_SELECT_NEW_ORDERS = "SELECT * FROM " + ROSDbConstants.NewOrder.TABLE_NAME +
                 " WHERE " + ROSDbConstants.NewOrder.CL_NAME_ORDER_STATUS + " = " + Constants.OrderStatus.PENDING +
                 " AND " + ROSDbConstants.NewOrder.CL_NAME_CUSTOMER_ID + " = '" + customerId + "';";
@@ -476,46 +500,51 @@ public class ROSDbHelper extends SQLiteOpenHelper {
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-        if (c != null) {
-            while (c.moveToNext()){
-                boolean inRange = false;
-                try {
-                    Date orderDate = dateFormat.parse(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_DATE)));
-                    Date stDate = dateFormat.parse(startDateStr);
-                    Date endDate = dateFormat.parse(endDateStr);
+        try {
+            if (c != null) {
+                while (c.moveToNext()){
+                    boolean inRange = false;
+                    try {
+                        Date orderDate = dateFormat.parse(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_DATE)));
+                        Date stDate = dateFormat.parse(startDateStr);
+                        Date endDate = dateFormat.parse(endDateStr);
 
-                    if (orderDate.after(stDate) && orderDate.before(endDate)) {
-                        inRange = true;
+                        if (orderDate.after(stDate) && orderDate.before(endDate)) {
+                            inRange = true;
+                        }
+
+                    } catch (ParseException e) {
+                        e.printStackTrace();
                     }
 
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
+                    if (!inRange) {
+                        continue;
+                    }
 
-                if (!inRange) {
-                    continue;
+                    ROSNewOrder order = new ROSNewOrder();
+                    order.setCustCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_CUSTOMER_ID)));
+                    order.setSalesOrdNum(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_ID)));
+                    order.setAddedDate(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_DATE)));
+                    order.setOVDiscount(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_DISCOUNT)));
+                    order.setDiscountValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_DISCOUNT_VALUE)));
+                    order.setGrossValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_GROSS_VALUE)));
+                    order.setOrderValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_VALUE)));
+                    order.setLatitude(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_LATITUDE)));
+                    order.setLongitude(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_LONGITUDE)));
+                    order.setOrderStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_STATUS)));
+                    order.setAccountYear(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ACCOUNT_YEAR)));
+                    order.setAccountMonth(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ACCOUNT_MONTH)));
+                    orderList.add(order);
                 }
-
-                ROSNewOrder order = new ROSNewOrder();
-                order.setCustCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_CUSTOMER_ID)));
-                order.setSalesOrdNum(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_ID)));
-                order.setAddedDate(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_DATE)));
-                order.setOVDiscount(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_DISCOUNT)));
-                order.setDiscountValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_DISCOUNT_VALUE)));
-                order.setGrossValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_GROSS_VALUE)));
-                order.setOrderValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_VALUE)));
-                order.setLatitude(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_LATITUDE)));
-                order.setLongitude(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_LONGITUDE)));
-                order.setOrderStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_STATUS)));
-                order.setAccountYear(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ACCOUNT_YEAR)));
-                order.setAccountMonth(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ACCOUNT_MONTH)));
-                orderList.add(order);
             }
-
-            c.close();
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            if (c != null && !c.isClosed()) {
+                c.close();
+            }
+            db.close();
         }
-
-        db.close();
 
         for (int i = 0; i < orderList.size(); i++) {
             ROSNewOrder order = orderList.get(i);
@@ -553,24 +582,29 @@ public class ROSDbHelper extends SQLiteOpenHelper {
 
         ROSNewOrder order = null;
 
-        if (c != null) {
-
-            c.moveToFirst();
-            order = new ROSNewOrder();
-            order.setCustCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_CUSTOMER_ID)));
-            order.setSalesOrdNum(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_ID)));
-            order.setAddedDate(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_DATE)));
-            order.setOVDiscount(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_DISCOUNT)));
-            order.setDiscountValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_DISCOUNT_VALUE)));
-            order.setGrossValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_GROSS_VALUE)));
-            order.setOrderValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_VALUE)));
-            order.setLatitude(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_LATITUDE)));
-            order.setLongitude(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_LONGITUDE)));
-            order.setOrderStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_STATUS)));
-            order.setAccountYear(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ACCOUNT_YEAR)));
-            order.setAccountMonth(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ACCOUNT_MONTH)));
-
-            c.close();
+        try {
+            if (c != null) {
+                c.moveToFirst();
+                order = new ROSNewOrder();
+                order.setCustCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_CUSTOMER_ID)));
+                order.setSalesOrdNum(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_ID)));
+                order.setAddedDate(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_DATE)));
+                order.setOVDiscount(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_DISCOUNT)));
+                order.setDiscountValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_DISCOUNT_VALUE)));
+                order.setGrossValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_GROSS_VALUE)));
+                order.setOrderValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_VALUE)));
+                order.setLatitude(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_LATITUDE)));
+                order.setLongitude(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_LONGITUDE)));
+                order.setOrderStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ORDER_STATUS)));
+                order.setAccountYear(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ACCOUNT_YEAR)));
+                order.setAccountMonth(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrder.CL_NAME_ACCOUNT_MONTH)));
+            }
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            if (c != null && !c.isClosed()) {
+                c.close();
+            }
             db.close();
         }
 
@@ -594,21 +628,29 @@ public class ROSDbHelper extends SQLiteOpenHelper {
     public String insertNewOrder(Context context, ROSNewOrder order) {
         SQLiteDatabase db = getWritableDb(context);
 
-        ContentValues values = new ContentValues();
-        values.put(ROSDbConstants.NewOrder.CL_NAME_CUSTOMER_ID, order.getCustCode());
-        values.put(ROSDbConstants.NewOrder.CL_NAME_ORDER_DATE, order.getAddedDate());
-        values.put(ROSDbConstants.NewOrder.CL_NAME_DISCOUNT, order.getOVDiscount());
-        values.put(ROSDbConstants.NewOrder.CL_NAME_DISCOUNT_VALUE, order.getDiscountValue());
-        values.put(ROSDbConstants.NewOrder.CL_NAME_GROSS_VALUE, order.getGrossValue());
-        values.put(ROSDbConstants.NewOrder.CL_NAME_ORDER_VALUE, order.getOrderValue());
-        values.put(ROSDbConstants.NewOrder.CL_NAME_LATITUDE, order.getLatitude());
-        values.put(ROSDbConstants.NewOrder.CL_NAME_LONGITUDE, order.getLongitude());
-        values.put(ROSDbConstants.NewOrder.CL_NAME_ORDER_STATUS, Constants.OrderStatus.PENDING);
-        values.put(ROSDbConstants.NewOrder.CL_NAME_ACCOUNT_YEAR, order.getAccountYear());
-        values.put(ROSDbConstants.NewOrder.CL_NAME_ACCOUNT_MONTH, order.getAccountMonth());
+        long orderId = -1;
 
-        long orderId = db.insert(ROSDbConstants.NewOrder.TABLE_NAME, null, values);
-        db.close();
+        try {
+            ContentValues values = new ContentValues();
+            values.put(ROSDbConstants.NewOrder.CL_NAME_CUSTOMER_ID, order.getCustCode());
+            values.put(ROSDbConstants.NewOrder.CL_NAME_ORDER_DATE, order.getAddedDate());
+            values.put(ROSDbConstants.NewOrder.CL_NAME_DISCOUNT, order.getOVDiscount());
+            values.put(ROSDbConstants.NewOrder.CL_NAME_DISCOUNT_VALUE, order.getDiscountValue());
+            values.put(ROSDbConstants.NewOrder.CL_NAME_GROSS_VALUE, order.getGrossValue());
+            values.put(ROSDbConstants.NewOrder.CL_NAME_ORDER_VALUE, order.getOrderValue());
+            values.put(ROSDbConstants.NewOrder.CL_NAME_LATITUDE, order.getLatitude());
+            values.put(ROSDbConstants.NewOrder.CL_NAME_LONGITUDE, order.getLongitude());
+            values.put(ROSDbConstants.NewOrder.CL_NAME_ORDER_STATUS, Constants.OrderStatus.PENDING);
+            values.put(ROSDbConstants.NewOrder.CL_NAME_ACCOUNT_YEAR, order.getAccountYear());
+            values.put(ROSDbConstants.NewOrder.CL_NAME_ACCOUNT_MONTH, order.getAccountMonth());
+
+            orderId = db.insert(ROSDbConstants.NewOrder.TABLE_NAME, null, values);
+
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            db.close();
+        }
 
         if (orderId == -1) {
             return null;
@@ -666,29 +708,36 @@ public class ROSDbHelper extends SQLiteOpenHelper {
         Cursor c = db.rawQuery(SQL_SELECT_NEW_ORDER_ITEMS, null);
 
         ArrayList<ROSNewOrderItem> orderItemList = new ArrayList<ROSNewOrderItem>();
-        if (c != null) {
-            while (c.moveToNext()){
-                ROSNewOrderItem orderItem = new ROSNewOrderItem();
 
-                orderItem.setItemId(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_ITEM_ID)));
-                orderItem.setOrderId(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_ORDER_ID)));
-                orderItem.setProductCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_PRODUCT_ID)));
-                orderItem.setProductDescription(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_PRODUCT_NAME)));
-                orderItem.setProductBatchCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_BATCH_NAME)));
-                orderItem.setUnitPrice(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_PRICE)));
-                orderItem.setProdDiscount(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_DISCOUNT)));
-                orderItem.setEffPrice(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_ITEM_VALUE)));
-                orderItem.setQtyOrdered(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_QUANTITY)));
-                orderItem.setQtyBonus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_FREE_ISSUES)));
-                orderItem.setSuppCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_SUPP_CODE)));
-                orderItem.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_BRAND_NAME)));
-                orderItem.setBrandCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_BRAND_CODE)));
-                orderItem.setStockLocationCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_LOCATION_CODE)));
-                orderItem.setProductUserCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_PRODUCT_USER_CODE)));
-                orderItemList.add(orderItem);
+        try {
+            if (c != null) {
+                while (c.moveToNext()){
+                    ROSNewOrderItem orderItem = new ROSNewOrderItem();
+
+                    orderItem.setItemId(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_ITEM_ID)));
+                    orderItem.setOrderId(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_ORDER_ID)));
+                    orderItem.setProductCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_PRODUCT_ID)));
+                    orderItem.setProductDescription(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_PRODUCT_NAME)));
+                    orderItem.setProductBatchCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_BATCH_NAME)));
+                    orderItem.setUnitPrice(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_PRICE)));
+                    orderItem.setProdDiscount(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_DISCOUNT)));
+                    orderItem.setEffPrice(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_ITEM_VALUE)));
+                    orderItem.setQtyOrdered(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_QUANTITY)));
+                    orderItem.setQtyBonus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_FREE_ISSUES)));
+                    orderItem.setSuppCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_SUPP_CODE)));
+                    orderItem.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_BRAND_NAME)));
+                    orderItem.setBrandCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_BRAND_CODE)));
+                    orderItem.setStockLocationCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_LOCATION_CODE)));
+                    orderItem.setProductUserCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.NewOrderItem.CL_NAME_PRODUCT_USER_CODE)));
+                    orderItemList.add(orderItem);
+                }
             }
-
-            c.close();
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            if (c != null && !c.isClosed()) {
+                c.close();
+            }
             db.close();
         }
 
@@ -700,34 +749,39 @@ public class ROSDbHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDb(context);
         boolean success = true;
 
-        for (int i = 0; i < items.size(); i++) {
+        try {
+            for (int i = 0; i < items.size(); i++) {
 
-            ROSNewOrderItem orderItem = items.get(i);
+                ROSNewOrderItem orderItem = items.get(i);
 
-            ContentValues values = new ContentValues();
+                ContentValues values = new ContentValues();
 
-            values.put(ROSDbConstants.NewOrderItem.CL_NAME_ORDER_ID, orderId);
-            values.put(ROSDbConstants.NewOrderItem.CL_NAME_PRODUCT_ID, orderItem.getProductCode());
-            values.put(ROSDbConstants.NewOrderItem.CL_NAME_PRODUCT_NAME, orderItem.getProductDescription());
-            values.put(ROSDbConstants.NewOrderItem.CL_NAME_BATCH_NAME, orderItem.getProductBatchCode());
-            values.put(ROSDbConstants.NewOrderItem.CL_NAME_PRICE, orderItem.getUnitPrice());
-            values.put(ROSDbConstants.NewOrderItem.CL_NAME_DISCOUNT, orderItem.getProdDiscount());
-            values.put(ROSDbConstants.NewOrderItem.CL_NAME_ITEM_VALUE, orderItem.getEffPrice());
-            values.put(ROSDbConstants.NewOrderItem.CL_NAME_QUANTITY, orderItem.getQtyOrdered());
-            values.put(ROSDbConstants.NewOrderItem.CL_NAME_FREE_ISSUES, orderItem.getQtyBonus());
-            values.put(ROSDbConstants.NewOrderItem.CL_NAME_SUPP_CODE, orderItem.getSuppCode());
-            values.put(ROSDbConstants.NewOrderItem.CL_NAME_BRAND_NAME, orderItem.getBrandName());
-            values.put(ROSDbConstants.NewOrderItem.CL_NAME_BRAND_CODE, orderItem.getBrandCode());
-            values.put(ROSDbConstants.NewOrderItem.CL_NAME_LOCATION_CODE, orderItem.getStockLocationCode());
-            values.put(ROSDbConstants.NewOrderItem.CL_NAME_PRODUCT_USER_CODE, orderItem.getProductUserCode());
+                values.put(ROSDbConstants.NewOrderItem.CL_NAME_ORDER_ID, orderId);
+                values.put(ROSDbConstants.NewOrderItem.CL_NAME_PRODUCT_ID, orderItem.getProductCode());
+                values.put(ROSDbConstants.NewOrderItem.CL_NAME_PRODUCT_NAME, orderItem.getProductDescription());
+                values.put(ROSDbConstants.NewOrderItem.CL_NAME_BATCH_NAME, orderItem.getProductBatchCode());
+                values.put(ROSDbConstants.NewOrderItem.CL_NAME_PRICE, orderItem.getUnitPrice());
+                values.put(ROSDbConstants.NewOrderItem.CL_NAME_DISCOUNT, orderItem.getProdDiscount());
+                values.put(ROSDbConstants.NewOrderItem.CL_NAME_ITEM_VALUE, orderItem.getEffPrice());
+                values.put(ROSDbConstants.NewOrderItem.CL_NAME_QUANTITY, orderItem.getQtyOrdered());
+                values.put(ROSDbConstants.NewOrderItem.CL_NAME_FREE_ISSUES, orderItem.getQtyBonus());
+                values.put(ROSDbConstants.NewOrderItem.CL_NAME_SUPP_CODE, orderItem.getSuppCode());
+                values.put(ROSDbConstants.NewOrderItem.CL_NAME_BRAND_NAME, orderItem.getBrandName());
+                values.put(ROSDbConstants.NewOrderItem.CL_NAME_BRAND_CODE, orderItem.getBrandCode());
+                values.put(ROSDbConstants.NewOrderItem.CL_NAME_LOCATION_CODE, orderItem.getStockLocationCode());
+                values.put(ROSDbConstants.NewOrderItem.CL_NAME_PRODUCT_USER_CODE, orderItem.getProductUserCode());
 
-            long itemId = db.insert(ROSDbConstants.NewOrderItem.TABLE_NAME, null, values);
-            if (itemId == -1) {
-                success = false;
-                break;
+                long itemId = db.insert(ROSDbConstants.NewOrderItem.TABLE_NAME, null, values);
+                if (itemId == -1) {
+                    success = false;
+                    break;
+                }
             }
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            db.close();
         }
-        db.close();
 
         if (!success) {
             deleteNewOrderItems(context, orderId);
@@ -765,26 +819,32 @@ public class ROSDbHelper extends SQLiteOpenHelper {
 
         ArrayList<ROSReturnOrder> orderList = new ArrayList<ROSReturnOrder>();
 
-        if (c != null) {
-            while (c.moveToNext()){
-                ROSReturnOrder order = new ROSReturnOrder();
+        try {
+            if (c != null) {
+                while (c.moveToNext()){
+                    ROSReturnOrder order = new ROSReturnOrder();
 
-                order.setCustCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_CUSTOMER_ID)));
-                order.setReturnNumb(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_ID)));
-                order.setAddedDate(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_DATE)));
-                order.setInvoiceNumb(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_INVOICE_NO)));
-                order.setOVDiscount(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_DISCOUNT)));
-                order.setDiscountValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_DISCOUNT_VALUE)));
-                order.setGrossValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_GROSS_VALUE)));
-                order.setOrderValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_VALUE)));
-                order.setOrderStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_STATUS)));
+                    order.setCustCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_CUSTOMER_ID)));
+                    order.setReturnNumb(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_ID)));
+                    order.setAddedDate(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_DATE)));
+                    order.setInvoiceNumb(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_INVOICE_NO)));
+                    order.setOVDiscount(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_DISCOUNT)));
+                    order.setDiscountValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_DISCOUNT_VALUE)));
+                    order.setGrossValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_GROSS_VALUE)));
+                    order.setOrderValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_VALUE)));
+                    order.setOrderStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_STATUS)));
 
-                orderList.add(order);
+                    orderList.add(order);
+                }
             }
-
-            c.close();
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            if (c != null && !c.isClosed()) {
+                c.close();
+            }
+            db.close();
         }
-        db.close();
 
         return  orderList;
     }
@@ -799,26 +859,32 @@ public class ROSDbHelper extends SQLiteOpenHelper {
 
         ArrayList<ROSReturnOrder> orderList = new ArrayList<ROSReturnOrder>();
 
-        if (c != null) {
-            while (c.moveToNext()){
-                ROSReturnOrder order = new ROSReturnOrder();
+        try {
+            if (c != null) {
+                while (c.moveToNext()){
+                    ROSReturnOrder order = new ROSReturnOrder();
 
-                order.setCustCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_CUSTOMER_ID)));
-                order.setReturnNumb(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_ID)));
-                order.setAddedDate(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_DATE)));
-                order.setInvoiceNumb(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_INVOICE_NO)));
-                order.setOVDiscount(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_DISCOUNT)));
-                order.setDiscountValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_DISCOUNT_VALUE)));
-                order.setGrossValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_GROSS_VALUE)));
-                order.setOrderValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_VALUE)));
-                order.setOrderStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_STATUS)));
+                    order.setCustCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_CUSTOMER_ID)));
+                    order.setReturnNumb(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_ID)));
+                    order.setAddedDate(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_DATE)));
+                    order.setInvoiceNumb(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_INVOICE_NO)));
+                    order.setOVDiscount(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_DISCOUNT)));
+                    order.setDiscountValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_DISCOUNT_VALUE)));
+                    order.setGrossValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_GROSS_VALUE)));
+                    order.setOrderValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_VALUE)));
+                    order.setOrderStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_STATUS)));
 
-                orderList.add(order);
+                    orderList.add(order);
+                }
             }
-
-            c.close();
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            if (c != null && !c.isClosed()) {
+                c.close();
+            }
+            db.close();
         }
-        db.close();
 
         return  orderList;
     }
@@ -832,25 +898,31 @@ public class ROSDbHelper extends SQLiteOpenHelper {
 
         ArrayList<ROSReturnOrder> orderList = new ArrayList<ROSReturnOrder>();
 
-        if (c != null) {
-            while (c.moveToNext()){
-                ROSReturnOrder order = new ROSReturnOrder();
-                order.setCustCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_CUSTOMER_ID)));
-                order.setReturnNumb(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_ID)));
-                order.setAddedDate(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_DATE)));
-                order.setInvoiceNumb(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_INVOICE_NO)));
-                order.setOVDiscount(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_DISCOUNT)));
-                order.setDiscountValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_DISCOUNT_VALUE)));
-                order.setGrossValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_GROSS_VALUE)));
-                order.setOrderValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_VALUE)));
-                order.setOrderStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_STATUS)));
-                orderList.add(order);
+        try {
+
+            if (c != null) {
+                while (c.moveToNext()){
+                    ROSReturnOrder order = new ROSReturnOrder();
+                    order.setCustCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_CUSTOMER_ID)));
+                    order.setReturnNumb(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_ID)));
+                    order.setAddedDate(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_DATE)));
+                    order.setInvoiceNumb(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_INVOICE_NO)));
+                    order.setOVDiscount(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_DISCOUNT)));
+                    order.setDiscountValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_DISCOUNT_VALUE)));
+                    order.setGrossValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_GROSS_VALUE)));
+                    order.setOrderValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_VALUE)));
+                    order.setOrderStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_STATUS)));
+                    orderList.add(order);
+                }
             }
-
-            c.close();
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            if (c != null && !c.isClosed()) {
+                c.close();
+            }
+            db.close();
         }
-
-        db.close();
 
         for (int i = 0; i < orderList.size(); i++) {
             ROSReturnOrder order = orderList.get(i);
@@ -863,11 +935,6 @@ public class ROSDbHelper extends SQLiteOpenHelper {
     public ArrayList<ROSReturnOrder> getReturnOrdersPending(Context context, String customerId, String startDateStr, String endDateStr) {
         SQLiteDatabase db = getReadableDb(context);
 
-//        final String SQL_SELECT_RETURN_ORDERS = "SELECT * FROM " + ROSDbConstants.ReturnOrder.TABLE_NAME +
-//                " WHERE " + ROSDbConstants.ReturnOrder.CL_NAME_ORDER_STATUS + " = " + Constants.OrderStatus.PENDING +
-//                " AND " + ROSDbConstants.ReturnOrder.CL_NAME_CUSTOMER_ID + " = '" + customerId +
-//                "' AND (" + ROSDbConstants.ReturnOrder.CL_NAME_ORDER_DATE + " BETWEEN '" + startDateStr + "' AND '" + endDateStr + "');";
-
         final String SQL_SELECT_RETURN_ORDERS = "SELECT * FROM " + ROSDbConstants.ReturnOrder.TABLE_NAME +
                 " WHERE " + ROSDbConstants.ReturnOrder.CL_NAME_ORDER_STATUS + " = " + Constants.OrderStatus.PENDING +
                 " AND " + ROSDbConstants.ReturnOrder.CL_NAME_CUSTOMER_ID + " = '" + customerId + "';";
@@ -878,45 +945,49 @@ public class ROSDbHelper extends SQLiteOpenHelper {
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-        if (c != null) {
-            while (c.moveToNext()){
+        try {
+            if (c != null) {
+                while (c.moveToNext()){
 
+                    boolean inRange = false;
+                    try {
+                        Date orderDate = dateFormat.parse(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_DATE)));
+                        Date stDate = dateFormat.parse(startDateStr);
+                        Date endDate = dateFormat.parse(endDateStr);
 
-                boolean inRange = false;
-                try {
-                    Date orderDate = dateFormat.parse(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_DATE)));
-                    Date stDate = dateFormat.parse(startDateStr);
-                    Date endDate = dateFormat.parse(endDateStr);
+                        if (orderDate.after(stDate) && orderDate.before(endDate)) {
+                            inRange = true;
+                        }
 
-                    if (orderDate.after(stDate) && orderDate.before(endDate)) {
-                        inRange = true;
+                    } catch (ParseException e) {
+                        e.printStackTrace();
                     }
 
-                } catch (ParseException e) {
-                    e.printStackTrace();
-                }
+                    if (!inRange) {
+                        continue;
+                    }
 
-                if (!inRange) {
-                    continue;
+                    ROSReturnOrder order = new ROSReturnOrder();
+                    order.setCustCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_CUSTOMER_ID)));
+                    order.setReturnNumb(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_ID)));
+                    order.setAddedDate(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_DATE)));
+                    order.setInvoiceNumb(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_INVOICE_NO)));
+                    order.setOVDiscount(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_DISCOUNT)));
+                    order.setDiscountValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_DISCOUNT_VALUE)));
+                    order.setGrossValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_GROSS_VALUE)));
+                    order.setOrderValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_VALUE)));
+                    order.setOrderStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_STATUS)));
+                    orderList.add(order);
                 }
-
-                ROSReturnOrder order = new ROSReturnOrder();
-                order.setCustCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_CUSTOMER_ID)));
-                order.setReturnNumb(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_ID)));
-                order.setAddedDate(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_DATE)));
-                order.setInvoiceNumb(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_INVOICE_NO)));
-                order.setOVDiscount(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_DISCOUNT)));
-                order.setDiscountValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_DISCOUNT_VALUE)));
-                order.setGrossValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_GROSS_VALUE)));
-                order.setOrderValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_VALUE)));
-                order.setOrderStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_STATUS)));
-                orderList.add(order);
             }
-
-            c.close();
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            if (c != null && !c.isClosed()) {
+                c.close();
+            }
+            db.close();
         }
-
-        db.close();
 
         for (int i = 0; i < orderList.size(); i++) {
             ROSReturnOrder order = orderList.get(i);
@@ -954,21 +1025,26 @@ public class ROSDbHelper extends SQLiteOpenHelper {
 
         ROSReturnOrder order = null;
 
-        if (c != null) {
-
-            c.moveToFirst();
-            order = new ROSReturnOrder();
-            order.setCustCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_CUSTOMER_ID)));
-            order.setReturnNumb(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_ID)));
-            order.setAddedDate(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_DATE)));
-            order.setInvoiceNumb(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_INVOICE_NO)));
-            order.setOVDiscount(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_DISCOUNT)));
-            order.setDiscountValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_DISCOUNT_VALUE)));
-            order.setGrossValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_GROSS_VALUE)));
-            order.setOrderValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_VALUE)));
-            order.setOrderStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_STATUS)));
-
-            c.close();
+        try {
+            if (c != null) {
+                c.moveToFirst();
+                order = new ROSReturnOrder();
+                order.setCustCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_CUSTOMER_ID)));
+                order.setReturnNumb(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_ID)));
+                order.setAddedDate(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_DATE)));
+                order.setInvoiceNumb(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_INVOICE_NO)));
+                order.setOVDiscount(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_DISCOUNT)));
+                order.setDiscountValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_DISCOUNT_VALUE)));
+                order.setGrossValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_GROSS_VALUE)));
+                order.setOrderValue(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_VALUE)));
+                order.setOrderStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_STATUS)));
+            }
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            if (c != null && !c.isClosed()) {
+                c.close();
+            }
             db.close();
         }
 
@@ -992,18 +1068,26 @@ public class ROSDbHelper extends SQLiteOpenHelper {
     public String insertReturnOrder(Context context, ROSReturnOrder order) {
         SQLiteDatabase db = getWritableDb(context);
 
-        ContentValues values = new ContentValues();
-        values.put(ROSDbConstants.ReturnOrder.CL_NAME_CUSTOMER_ID, order.getCustCode());
-        values.put(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_DATE, order.getAddedDate());
-        values.put(ROSDbConstants.ReturnOrder.CL_NAME_DISCOUNT, order.getOVDiscount());
-        values.put(ROSDbConstants.ReturnOrder.CL_NAME_DISCOUNT_VALUE, order.getDiscountValue());
-        values.put(ROSDbConstants.ReturnOrder.CL_NAME_GROSS_VALUE, order.getGrossValue());
-        values.put(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_VALUE, order.getOrderValue());
-        values.put(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_STATUS, Constants.OrderStatus.PENDING);
-        values.put(ROSDbConstants.ReturnOrder.CL_NAME_INVOICE_NO, order.getInvoiceNumb());
+        long orderId = -1;
 
-        long orderId = db.insert(ROSDbConstants.ReturnOrder.TABLE_NAME, null, values);
-        db.close();
+        try {
+            ContentValues values = new ContentValues();
+            values.put(ROSDbConstants.ReturnOrder.CL_NAME_CUSTOMER_ID, order.getCustCode());
+            values.put(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_DATE, order.getAddedDate());
+            values.put(ROSDbConstants.ReturnOrder.CL_NAME_DISCOUNT, order.getOVDiscount());
+            values.put(ROSDbConstants.ReturnOrder.CL_NAME_DISCOUNT_VALUE, order.getDiscountValue());
+            values.put(ROSDbConstants.ReturnOrder.CL_NAME_GROSS_VALUE, order.getGrossValue());
+            values.put(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_VALUE, order.getOrderValue());
+            values.put(ROSDbConstants.ReturnOrder.CL_NAME_ORDER_STATUS, Constants.OrderStatus.PENDING);
+            values.put(ROSDbConstants.ReturnOrder.CL_NAME_INVOICE_NO, order.getInvoiceNumb());
+
+            orderId = db.insert(ROSDbConstants.ReturnOrder.TABLE_NAME, null, values);
+
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            db.close();
+        }
 
         if (orderId == -1) {
             return null;
@@ -1051,31 +1135,38 @@ public class ROSDbHelper extends SQLiteOpenHelper {
         Cursor c = db.rawQuery(SQL_SELECT_RETURN_ORDER_ITEMS, null);
 
         ArrayList<ROSReturnOrderItem> orderItemList = new ArrayList<ROSReturnOrderItem>();
-        if (c != null) {
-            while (c.moveToNext()){
-                ROSReturnOrderItem orderItem = new ROSReturnOrderItem();
 
-                orderItem.setItemId(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_ITEM_ID)));
-                orderItem.setOrderId(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_ORDER_ID)));
-                orderItem.setProductCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_PRODUCT_ID)));
-                orderItem.setProductDescription(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_PRODUCT_NAME)));
-                orderItem.setProductBatchCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_BATCH_NAME)));
-                orderItem.setUnitPrice(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_PRICE)));
-                orderItem.setProdDiscount(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_DISCOUNT)));
-                orderItem.setEffPrice(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_ITEM_VALUE)));
-                orderItem.setQtyOrdered(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_QUANTITY)));
-                orderItem.setQtyBonus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_FREE_ISSUES)));
-                orderItem.setSuppCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_SUPP_CODE)));
-                orderItem.setStockLocationCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_LOCATION_CODE)));
-                orderItem.setAgenCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_AGEN_CODE)));
-                orderItem.setBrandCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_BRAND_CODE)));
-                orderItem.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_BRAND_NAME)));
-                orderItem.setProductUserCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_PRODUCT_USER_CODE)));
+        try {
+            if (c != null) {
+                while (c.moveToNext()){
+                    ROSReturnOrderItem orderItem = new ROSReturnOrderItem();
 
-                orderItemList.add(orderItem);
+                    orderItem.setItemId(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_ITEM_ID)));
+                    orderItem.setOrderId(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_ORDER_ID)));
+                    orderItem.setProductCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_PRODUCT_ID)));
+                    orderItem.setProductDescription(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_PRODUCT_NAME)));
+                    orderItem.setProductBatchCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_BATCH_NAME)));
+                    orderItem.setUnitPrice(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_PRICE)));
+                    orderItem.setProdDiscount(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_DISCOUNT)));
+                    orderItem.setEffPrice(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_ITEM_VALUE)));
+                    orderItem.setQtyOrdered(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_QUANTITY)));
+                    orderItem.setQtyBonus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_FREE_ISSUES)));
+                    orderItem.setSuppCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_SUPP_CODE)));
+                    orderItem.setStockLocationCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_LOCATION_CODE)));
+                    orderItem.setAgenCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_AGEN_CODE)));
+                    orderItem.setBrandCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_BRAND_CODE)));
+                    orderItem.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_BRAND_NAME)));
+                    orderItem.setProductUserCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.ReturnOrderItem.CL_NAME_PRODUCT_USER_CODE)));
+
+                    orderItemList.add(orderItem);
+                }
             }
-
-            c.close();
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            if (c != null && !c.isClosed()) {
+                c.close();
+            }
             db.close();
         }
 
@@ -1087,35 +1178,40 @@ public class ROSDbHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDb(context);
         boolean success = true;
 
-        for (int i = 0; i < items.size(); i++) {
+        try {
+            for (int i = 0; i < items.size(); i++) {
 
-            ROSReturnOrderItem orderItem = items.get(i);
+                ROSReturnOrderItem orderItem = items.get(i);
 
-            ContentValues values = new ContentValues();
+                ContentValues values = new ContentValues();
 
-            values.put(ROSDbConstants.ReturnOrderItem.CL_NAME_ORDER_ID, orderId);
-            values.put(ROSDbConstants.ReturnOrderItem.CL_NAME_PRODUCT_ID, orderItem.getProductCode());
-            values.put(ROSDbConstants.ReturnOrderItem.CL_NAME_PRODUCT_NAME, orderItem.getProductDescription());
-            values.put(ROSDbConstants.ReturnOrderItem.CL_NAME_BATCH_NAME, orderItem.getProductBatchCode());
-            values.put(ROSDbConstants.ReturnOrderItem.CL_NAME_PRICE, orderItem.getUnitPrice());
-            values.put(ROSDbConstants.ReturnOrderItem.CL_NAME_DISCOUNT, orderItem.getProdDiscount());
-            values.put(ROSDbConstants.ReturnOrderItem.CL_NAME_ITEM_VALUE, orderItem.getEffPrice());
-            values.put(ROSDbConstants.ReturnOrderItem.CL_NAME_QUANTITY, orderItem.getQtyOrdered());
-            values.put(ROSDbConstants.ReturnOrderItem.CL_NAME_FREE_ISSUES, orderItem.getQtyBonus());
-            values.put(ROSDbConstants.ReturnOrderItem.CL_NAME_SUPP_CODE, orderItem.getSuppCode());
-            values.put(ROSDbConstants.ReturnOrderItem.CL_NAME_LOCATION_CODE, orderItem.getStockLocationCode());
-            values.put(ROSDbConstants.ReturnOrderItem.CL_NAME_AGEN_CODE, orderItem.getAgenCode());
-            values.put(ROSDbConstants.ReturnOrderItem.CL_NAME_BRAND_CODE, orderItem.getBrandCode());
-            values.put(ROSDbConstants.ReturnOrderItem.CL_NAME_BRAND_NAME, orderItem.getBrandName());
-            values.put(ROSDbConstants.ReturnOrderItem.CL_NAME_PRODUCT_USER_CODE, orderItem.getProductUserCode());
+                values.put(ROSDbConstants.ReturnOrderItem.CL_NAME_ORDER_ID, orderId);
+                values.put(ROSDbConstants.ReturnOrderItem.CL_NAME_PRODUCT_ID, orderItem.getProductCode());
+                values.put(ROSDbConstants.ReturnOrderItem.CL_NAME_PRODUCT_NAME, orderItem.getProductDescription());
+                values.put(ROSDbConstants.ReturnOrderItem.CL_NAME_BATCH_NAME, orderItem.getProductBatchCode());
+                values.put(ROSDbConstants.ReturnOrderItem.CL_NAME_PRICE, orderItem.getUnitPrice());
+                values.put(ROSDbConstants.ReturnOrderItem.CL_NAME_DISCOUNT, orderItem.getProdDiscount());
+                values.put(ROSDbConstants.ReturnOrderItem.CL_NAME_ITEM_VALUE, orderItem.getEffPrice());
+                values.put(ROSDbConstants.ReturnOrderItem.CL_NAME_QUANTITY, orderItem.getQtyOrdered());
+                values.put(ROSDbConstants.ReturnOrderItem.CL_NAME_FREE_ISSUES, orderItem.getQtyBonus());
+                values.put(ROSDbConstants.ReturnOrderItem.CL_NAME_SUPP_CODE, orderItem.getSuppCode());
+                values.put(ROSDbConstants.ReturnOrderItem.CL_NAME_LOCATION_CODE, orderItem.getStockLocationCode());
+                values.put(ROSDbConstants.ReturnOrderItem.CL_NAME_AGEN_CODE, orderItem.getAgenCode());
+                values.put(ROSDbConstants.ReturnOrderItem.CL_NAME_BRAND_CODE, orderItem.getBrandCode());
+                values.put(ROSDbConstants.ReturnOrderItem.CL_NAME_BRAND_NAME, orderItem.getBrandName());
+                values.put(ROSDbConstants.ReturnOrderItem.CL_NAME_PRODUCT_USER_CODE, orderItem.getProductUserCode());
 
-            long itemId = db.insert(ROSDbConstants.ReturnOrderItem.TABLE_NAME, null, values);
-            if (itemId == -1) {
-                success = false;
-                break;
+                long itemId = db.insert(ROSDbConstants.ReturnOrderItem.TABLE_NAME, null, values);
+                if (itemId == -1) {
+                    success = false;
+                    break;
+                }
             }
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            db.close();
         }
-        db.close();
 
         if (!success) {
             deleteReturnOrderItems(context, orderId);
@@ -1153,11 +1249,18 @@ public class ROSDbHelper extends SQLiteOpenHelper {
 
         ArrayList<String> productNames = new ArrayList<String>();
 
-        if (c != null) {
-            while (c.moveToNext()) {
-                productNames.add(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME)));
+        try {
+            if (c != null) {
+                while (c.moveToNext()) {
+                    productNames.add(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME)));
+                }
             }
-            c.close();
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            if (c != null && !c.isClosed()) {
+                c.close();
+            }
             db.close();
         }
 
@@ -1167,41 +1270,27 @@ public class ROSDbHelper extends SQLiteOpenHelper {
     public ArrayList<ROSStock> getProductForSale(Context context) {
         SQLiteDatabase db = getReadableDb(context);
 
-//        final String SQL_SELECT_STOCK = "SELECT * FROM " + ROSDbConstants.Stock.TABLE_NAME +
-//                " WHERE "+ ROSDbConstants.Stock.CL_NAME_AVAILABLE_QTY + " > 0 AND " + ROSDbConstants.Stock.CL_NAME_STATUS +" = 0 GROUP BY " + ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME  + ";";
-//        Cursor c = db.rawQuery(SQL_SELECT_STOCK, null);
-
         final String SQL_SELECT_STOCK = "SELECT DISTINCT " + ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME + "," + ROSDbConstants.Stock.CL_NAME_BRAND_NAME + " FROM " + ROSDbConstants.Stock.TABLE_NAME +
                 " WHERE "+ ROSDbConstants.Stock.CL_NAME_AVAILABLE_QTY + " > 0 AND " + ROSDbConstants.Stock.CL_NAME_STATUS + " = 0;";
         Cursor c = db.rawQuery(SQL_SELECT_STOCK, null);
 
         ArrayList<ROSStock> stockList = new ArrayList<ROSStock>();
 
-        if (c != null) {
-            while (c.moveToNext()) {
-                ROSStock stock = new ROSStock();
-                stock.setProductDescription(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME)));
-                //stock.setProductBatchCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BATCH_NAME)));
-                stock.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BRAND_NAME)));
-//                stock.setAgenName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_AGENCY_NAME)));
-//                stock.setQuntityInStock(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_ALLOCATED_QTY)));
-//                stock.setAvailableQuantity(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_AVAILABLE_QTY)));
-//                stock.setStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_STATUS)));
-//                stock.setAgenCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_AGENT_CODE)));
-//                stock.setBrandCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BRAND_CODE)));
-//                stock.setProductCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_CODE)));
-//                stock.setCompCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_COMP_CODE)));
-//                stock.setDistributorCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_DISTRIB_CODE)));
-//                stock.setUnitPrice(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_UNIT_PRICE)));
-//                stock.setSuppCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_SUPP_CODE)));
-//                stock.setStockLocationCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_LOCATION_CODE)));
-//                stock.setAccountYear(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_ACCOUNT_YEAR)));
-//                stock.setAccountMonth(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_ACCOUNT_MONTH)));
-//                stock.setProductUserCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_USER_CODE)));
-
-                stockList.add(stock);
+        try {
+            if (c != null) {
+                while (c.moveToNext()) {
+                    ROSStock stock = new ROSStock();
+                    stock.setProductDescription(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME)));
+                    stock.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BRAND_NAME)));
+                    stockList.add(stock);
+                }
             }
-            c.close();
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            if (c != null && !c.isClosed()) {
+                c.close();
+            }
             db.close();
         }
 
@@ -1217,11 +1306,18 @@ public class ROSDbHelper extends SQLiteOpenHelper {
 
         ArrayList<String> batchNames = new ArrayList<String>();
 
-        if (c != null) {
-            while (c.moveToNext()) {
-                batchNames.add(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BATCH_NAME)));
+        try {
+            if (c != null) {
+                while (c.moveToNext()) {
+                    batchNames.add(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BATCH_NAME)));
+                }
             }
-            c.close();
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            if (c != null && !c.isClosed()) {
+                c.close();
+            }
             db.close();
         }
 
@@ -1239,31 +1335,38 @@ public class ROSDbHelper extends SQLiteOpenHelper {
 
         ArrayList<ROSStock> stockList = new ArrayList<ROSStock>();
 
-        if (c != null) {
-            while (c.moveToNext()) {
-                ROSStock stock = new ROSStock();
-                stock.setProductDescription(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME)));
-                stock.setProductBatchCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BATCH_NAME)));
-                stock.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BRAND_NAME)));
-                stock.setAgenName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_AGENCY_NAME)));
-                stock.setQuntityInStock(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_ALLOCATED_QTY)));
-                stock.setAvailableQuantity(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_AVAILABLE_QTY)));
-                stock.setStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_STATUS)));
-                stock.setAgenCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_AGENT_CODE)));
-                stock.setBrandCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BRAND_CODE)));
-                stock.setProductCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_CODE)));
-                stock.setCompCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_COMP_CODE)));
-                stock.setDistributorCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_DISTRIB_CODE)));
-                stock.setUnitPrice(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_UNIT_PRICE)));
-                stock.setSuppCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_SUPP_CODE)));
-                stock.setStockLocationCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_LOCATION_CODE)));
-                stock.setAccountYear(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_ACCOUNT_YEAR)));
-                stock.setAccountMonth(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_ACCOUNT_MONTH)));
-                stock.setProductUserCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_USER_CODE)));
+        try {
+            if (c != null) {
+                while (c.moveToNext()) {
+                    ROSStock stock = new ROSStock();
+                    stock.setProductDescription(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME)));
+                    stock.setProductBatchCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BATCH_NAME)));
+                    stock.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BRAND_NAME)));
+                    stock.setAgenName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_AGENCY_NAME)));
+                    stock.setQuntityInStock(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_ALLOCATED_QTY)));
+                    stock.setAvailableQuantity(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_AVAILABLE_QTY)));
+                    stock.setStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_STATUS)));
+                    stock.setAgenCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_AGENT_CODE)));
+                    stock.setBrandCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BRAND_CODE)));
+                    stock.setProductCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_CODE)));
+                    stock.setCompCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_COMP_CODE)));
+                    stock.setDistributorCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_DISTRIB_CODE)));
+                    stock.setUnitPrice(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_UNIT_PRICE)));
+                    stock.setSuppCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_SUPP_CODE)));
+                    stock.setStockLocationCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_LOCATION_CODE)));
+                    stock.setAccountYear(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_ACCOUNT_YEAR)));
+                    stock.setAccountMonth(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_ACCOUNT_MONTH)));
+                    stock.setProductUserCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_USER_CODE)));
 
-                stockList.add(stock);
+                    stockList.add(stock);
+                }
             }
-            c.close();
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            if (c != null && !c.isClosed()) {
+                c.close();
+            }
             db.close();
         }
 
@@ -1281,48 +1384,11 @@ public class ROSDbHelper extends SQLiteOpenHelper {
 
         ROSStock stock = null;
 
-        if (c != null) {
-            c.moveToFirst();
-            stock = new ROSStock();
+        try {
+            if (c != null) {
+                c.moveToFirst();
+                stock = new ROSStock();
 
-            stock.setProductDescription(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME)));
-            stock.setProductBatchCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BATCH_NAME)));
-            stock.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BRAND_NAME)));
-            stock.setAgenName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_AGENCY_NAME)));
-            stock.setQuntityInStock(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_ALLOCATED_QTY)));
-            stock.setAvailableQuantity(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_AVAILABLE_QTY)));
-            stock.setStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_STATUS)));
-            stock.setAgenCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_AGENT_CODE)));
-            stock.setBrandCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BRAND_CODE)));
-            stock.setProductCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_CODE)));
-            stock.setCompCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_COMP_CODE)));
-            stock.setDistributorCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_DISTRIB_CODE)));
-            stock.setUnitPrice(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_UNIT_PRICE)));
-            stock.setSuppCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_SUPP_CODE)));
-            stock.setStockLocationCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_LOCATION_CODE)));
-            stock.setAccountYear(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_ACCOUNT_YEAR)));
-            stock.setAccountMonth(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_ACCOUNT_MONTH)));
-            stock.setProductUserCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_USER_CODE)));
-
-            c.close();
-        }
-        db.close();
-
-        return stock;
-    }
-
-    public ArrayList<ROSStock> getStocks(Context context) {
-
-        SQLiteDatabase db = getReadableDb(context);
-
-        final String SQL_SELECT_STOCK = "SELECT * FROM " + ROSDbConstants.Stock.TABLE_NAME + ";";
-        Cursor c = db.rawQuery(SQL_SELECT_STOCK, null);
-
-        ArrayList<ROSStock> stockList = new ArrayList<ROSStock>();
-
-        if (c != null) {
-            while (c.moveToNext()) {
-                ROSStock stock = new ROSStock();
                 stock.setProductDescription(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME)));
                 stock.setProductBatchCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BATCH_NAME)));
                 stock.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BRAND_NAME)));
@@ -1341,10 +1407,60 @@ public class ROSDbHelper extends SQLiteOpenHelper {
                 stock.setAccountYear(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_ACCOUNT_YEAR)));
                 stock.setAccountMonth(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_ACCOUNT_MONTH)));
                 stock.setProductUserCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_USER_CODE)));
-
-                stockList.add(stock);
             }
-            c.close();
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            if (c != null && !c.isClosed()) {
+                c.close();
+            }
+            db.close();
+        }
+
+        return stock;
+    }
+
+    public ArrayList<ROSStock> getStocks(Context context) {
+
+        SQLiteDatabase db = getReadableDb(context);
+
+        final String SQL_SELECT_STOCK = "SELECT * FROM " + ROSDbConstants.Stock.TABLE_NAME + ";";
+        Cursor c = db.rawQuery(SQL_SELECT_STOCK, null);
+
+        ArrayList<ROSStock> stockList = new ArrayList<ROSStock>();
+
+        try {
+            if (c != null) {
+                while (c.moveToNext()) {
+                    ROSStock stock = new ROSStock();
+                    stock.setProductDescription(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME)));
+                    stock.setProductBatchCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BATCH_NAME)));
+                    stock.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BRAND_NAME)));
+                    stock.setAgenName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_AGENCY_NAME)));
+                    stock.setQuntityInStock(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_ALLOCATED_QTY)));
+                    stock.setAvailableQuantity(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_AVAILABLE_QTY)));
+                    stock.setStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_STATUS)));
+                    stock.setAgenCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_AGENT_CODE)));
+                    stock.setBrandCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BRAND_CODE)));
+                    stock.setProductCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_CODE)));
+                    stock.setCompCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_COMP_CODE)));
+                    stock.setDistributorCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_DISTRIB_CODE)));
+                    stock.setUnitPrice(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_UNIT_PRICE)));
+                    stock.setSuppCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_SUPP_CODE)));
+                    stock.setStockLocationCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_LOCATION_CODE)));
+                    stock.setAccountYear(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_ACCOUNT_YEAR)));
+                    stock.setAccountMonth(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_ACCOUNT_MONTH)));
+                    stock.setProductUserCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_USER_CODE)));
+
+                    stockList.add(stock);
+                }
+            }
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            if (c != null && !c.isClosed()) {
+                c.close();
+            }
             db.close();
         }
 
@@ -1361,32 +1477,39 @@ public class ROSDbHelper extends SQLiteOpenHelper {
 
         ArrayList<ROSStock> stockList = new ArrayList<ROSStock>();
 
-        if (c != null) {
-            while (c.moveToNext()) {
-                ROSStock stock = new ROSStock();
+        try {
+            if (c != null) {
+                while (c.moveToNext()) {
+                    ROSStock stock = new ROSStock();
 
-                stock.setProductDescription(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME)));
-                stock.setProductBatchCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BATCH_NAME)));
-                stock.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BRAND_NAME)));
-                stock.setAgenName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_AGENCY_NAME)));
-                stock.setQuntityInStock(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_ALLOCATED_QTY)));
-                stock.setAvailableQuantity(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_AVAILABLE_QTY)));
-                stock.setStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_STATUS)));
-                stock.setAgenCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_AGENT_CODE)));
-                stock.setBrandCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BRAND_CODE)));
-                stock.setProductCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_CODE)));
-                stock.setCompCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_COMP_CODE)));
-                stock.setDistributorCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_DISTRIB_CODE)));
-                stock.setUnitPrice(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_UNIT_PRICE)));
-                stock.setSuppCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_SUPP_CODE)));
-                stock.setStockLocationCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_LOCATION_CODE)));
-                stock.setAccountYear(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_ACCOUNT_YEAR)));
-                stock.setAccountMonth(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_ACCOUNT_MONTH)));
-                stock.setProductUserCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_USER_CODE)));
+                    stock.setProductDescription(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME)));
+                    stock.setProductBatchCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BATCH_NAME)));
+                    stock.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BRAND_NAME)));
+                    stock.setAgenName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_AGENCY_NAME)));
+                    stock.setQuntityInStock(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_ALLOCATED_QTY)));
+                    stock.setAvailableQuantity(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_AVAILABLE_QTY)));
+                    stock.setStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_STATUS)));
+                    stock.setAgenCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_AGENT_CODE)));
+                    stock.setBrandCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BRAND_CODE)));
+                    stock.setProductCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_CODE)));
+                    stock.setCompCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_COMP_CODE)));
+                    stock.setDistributorCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_DISTRIB_CODE)));
+                    stock.setUnitPrice(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_UNIT_PRICE)));
+                    stock.setSuppCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_SUPP_CODE)));
+                    stock.setStockLocationCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_LOCATION_CODE)));
+                    stock.setAccountYear(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_ACCOUNT_YEAR)));
+                    stock.setAccountMonth(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_ACCOUNT_MONTH)));
+                    stock.setProductUserCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_USER_CODE)));
 
-                stockList.add(stock);
+                    stockList.add(stock);
+                }
             }
-            c.close();
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            if (c != null && !c.isClosed()) {
+                c.close();
+            }
             db.close();
         }
 
@@ -1396,9 +1519,44 @@ public class ROSDbHelper extends SQLiteOpenHelper {
     public void insertStocks(Context context, ArrayList<ROSStock> stocks) {
         SQLiteDatabase db = getWritableDb(context);
 
-        for (int i = 0; i < stocks.size(); i++) {
-            ROSStock stock = stocks.get(i);
+        try {
+            for (int i = 0; i < stocks.size(); i++) {
+                ROSStock stock = stocks.get(i);
 
+                ContentValues values = new ContentValues();
+
+                values.put(ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME, stock.getProductDescription());
+                values.put(ROSDbConstants.Stock.CL_NAME_BATCH_NAME, stock.getProductBatchCode());
+                values.put(ROSDbConstants.Stock.CL_NAME_BRAND_NAME, stock.getBrandName());
+                values.put(ROSDbConstants.Stock.CL_NAME_AGENCY_NAME, stock.getAgenName());
+                values.put(ROSDbConstants.Stock.CL_NAME_ALLOCATED_QTY, stock.getQuntityInStock());
+                values.put(ROSDbConstants.Stock.CL_NAME_AVAILABLE_QTY, stock.getAvailableQuantity());
+                values.put(ROSDbConstants.Stock.CL_NAME_STATUS, stock.getStatus());
+                values.put(ROSDbConstants.Stock.CL_NAME_AGENT_CODE, stock.getAgenCode());
+                values.put(ROSDbConstants.Stock.CL_NAME_BRAND_CODE, stock.getBrandCode());
+                values.put(ROSDbConstants.Stock.CL_NAME_PRODUCT_CODE, stock.getProductCode());
+                values.put(ROSDbConstants.Stock.CL_NAME_COMP_CODE, stock.getCompCode());
+                values.put(ROSDbConstants.Stock.CL_NAME_DISTRIB_CODE, stock.getDistributorCode());
+                values.put(ROSDbConstants.Stock.CL_NAME_UNIT_PRICE, stock.getUnitPrice());
+                values.put(ROSDbConstants.Stock.CL_NAME_SUPP_CODE, stock.getSuppCode());
+                values.put(ROSDbConstants.Stock.CL_NAME_LOCATION_CODE, stock.getStockLocationCode());
+                values.put(ROSDbConstants.Stock.CL_NAME_ACCOUNT_YEAR, stock.getAccountYear());
+                values.put(ROSDbConstants.Stock.CL_NAME_ACCOUNT_MONTH, stock.getAccountMonth());
+                values.put(ROSDbConstants.Stock.CL_NAME_PRODUCT_USER_CODE, stock.getProductUserCode());
+
+                db.insert(ROSDbConstants.Stock.TABLE_NAME, null, values);
+            }
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            db.close();
+        }
+    }
+
+    public void insertStock(Context context, ROSStock stock) {
+        SQLiteDatabase db = getWritableDb(context);
+
+        try {
             ContentValues values = new ContentValues();
 
             values.put(ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME, stock.getProductDescription());
@@ -1421,37 +1579,11 @@ public class ROSDbHelper extends SQLiteOpenHelper {
             values.put(ROSDbConstants.Stock.CL_NAME_PRODUCT_USER_CODE, stock.getProductUserCode());
 
             db.insert(ROSDbConstants.Stock.TABLE_NAME, null, values);
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            db.close();
         }
-
-        db.close();
-    }
-
-    public void insertStock(Context context, ROSStock stock) {
-        SQLiteDatabase db = getWritableDb(context);
-
-        ContentValues values = new ContentValues();
-
-        values.put(ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME, stock.getProductDescription());
-        values.put(ROSDbConstants.Stock.CL_NAME_BATCH_NAME, stock.getProductBatchCode());
-        values.put(ROSDbConstants.Stock.CL_NAME_BRAND_NAME, stock.getBrandName());
-        values.put(ROSDbConstants.Stock.CL_NAME_AGENCY_NAME, stock.getAgenName());
-        values.put(ROSDbConstants.Stock.CL_NAME_ALLOCATED_QTY, stock.getQuntityInStock());
-        values.put(ROSDbConstants.Stock.CL_NAME_AVAILABLE_QTY, stock.getAvailableQuantity());
-        values.put(ROSDbConstants.Stock.CL_NAME_STATUS, stock.getStatus());
-        values.put(ROSDbConstants.Stock.CL_NAME_AGENT_CODE, stock.getAgenCode());
-        values.put(ROSDbConstants.Stock.CL_NAME_BRAND_CODE, stock.getBrandCode());
-        values.put(ROSDbConstants.Stock.CL_NAME_PRODUCT_CODE, stock.getProductCode());
-        values.put(ROSDbConstants.Stock.CL_NAME_COMP_CODE, stock.getCompCode());
-        values.put(ROSDbConstants.Stock.CL_NAME_DISTRIB_CODE, stock.getDistributorCode());
-        values.put(ROSDbConstants.Stock.CL_NAME_UNIT_PRICE, stock.getUnitPrice());
-        values.put(ROSDbConstants.Stock.CL_NAME_SUPP_CODE, stock.getSuppCode());
-        values.put(ROSDbConstants.Stock.CL_NAME_LOCATION_CODE, stock.getStockLocationCode());
-        values.put(ROSDbConstants.Stock.CL_NAME_ACCOUNT_YEAR, stock.getAccountYear());
-        values.put(ROSDbConstants.Stock.CL_NAME_ACCOUNT_MONTH, stock.getAccountMonth());
-        values.put(ROSDbConstants.Stock.CL_NAME_PRODUCT_USER_CODE, stock.getProductUserCode());
-
-        db.insert(ROSDbConstants.Stock.TABLE_NAME, null, values);
-        db.close();
     }
 
     private void updateStock(Context context, ROSStock stock, int removedQuantity) {
@@ -1469,29 +1601,34 @@ public class ROSDbHelper extends SQLiteOpenHelper {
     private void insertReturnStock(Context context, ROSStock stock) {
         SQLiteDatabase db = getWritableDb(context);
 
-        ContentValues values = new ContentValues();
+        try {
+            ContentValues values = new ContentValues();
 
-        values.put(ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME, stock.getProductDescription());
-        values.put(ROSDbConstants.Stock.CL_NAME_BATCH_NAME, stock.getProductBatchCode());
-        values.put(ROSDbConstants.Stock.CL_NAME_BRAND_NAME, stock.getBrandName());
-        values.put(ROSDbConstants.Stock.CL_NAME_AGENCY_NAME, stock.getAgenName());
-        values.put(ROSDbConstants.Stock.CL_NAME_ALLOCATED_QTY, stock.getQuntityInStock());
-        values.put(ROSDbConstants.Stock.CL_NAME_AVAILABLE_QTY, stock.getAvailableQuantity());
-        values.put(ROSDbConstants.Stock.CL_NAME_STATUS, stock.getStatus());
-        values.put(ROSDbConstants.Stock.CL_NAME_AGENT_CODE, stock.getAgenCode());
-        values.put(ROSDbConstants.Stock.CL_NAME_BRAND_CODE, stock.getBrandCode());
-        values.put(ROSDbConstants.Stock.CL_NAME_PRODUCT_CODE, stock.getProductCode());
-        values.put(ROSDbConstants.Stock.CL_NAME_COMP_CODE, stock.getCompCode());
-        values.put(ROSDbConstants.Stock.CL_NAME_DISTRIB_CODE, stock.getDistributorCode());
-        values.put(ROSDbConstants.Stock.CL_NAME_UNIT_PRICE, stock.getUnitPrice());
-        values.put(ROSDbConstants.Stock.CL_NAME_SUPP_CODE, stock.getSuppCode());
-        values.put(ROSDbConstants.Stock.CL_NAME_LOCATION_CODE, stock.getStockLocationCode());
-        values.put(ROSDbConstants.Stock.CL_NAME_ACCOUNT_YEAR, stock.getAccountYear());
-        values.put(ROSDbConstants.Stock.CL_NAME_ACCOUNT_MONTH, stock.getAccountMonth());
-        values.put(ROSDbConstants.Stock.CL_NAME_PRODUCT_USER_CODE, stock.getProductUserCode());
+            values.put(ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME, stock.getProductDescription());
+            values.put(ROSDbConstants.Stock.CL_NAME_BATCH_NAME, stock.getProductBatchCode());
+            values.put(ROSDbConstants.Stock.CL_NAME_BRAND_NAME, stock.getBrandName());
+            values.put(ROSDbConstants.Stock.CL_NAME_AGENCY_NAME, stock.getAgenName());
+            values.put(ROSDbConstants.Stock.CL_NAME_ALLOCATED_QTY, stock.getQuntityInStock());
+            values.put(ROSDbConstants.Stock.CL_NAME_AVAILABLE_QTY, stock.getAvailableQuantity());
+            values.put(ROSDbConstants.Stock.CL_NAME_STATUS, stock.getStatus());
+            values.put(ROSDbConstants.Stock.CL_NAME_AGENT_CODE, stock.getAgenCode());
+            values.put(ROSDbConstants.Stock.CL_NAME_BRAND_CODE, stock.getBrandCode());
+            values.put(ROSDbConstants.Stock.CL_NAME_PRODUCT_CODE, stock.getProductCode());
+            values.put(ROSDbConstants.Stock.CL_NAME_COMP_CODE, stock.getCompCode());
+            values.put(ROSDbConstants.Stock.CL_NAME_DISTRIB_CODE, stock.getDistributorCode());
+            values.put(ROSDbConstants.Stock.CL_NAME_UNIT_PRICE, stock.getUnitPrice());
+            values.put(ROSDbConstants.Stock.CL_NAME_SUPP_CODE, stock.getSuppCode());
+            values.put(ROSDbConstants.Stock.CL_NAME_LOCATION_CODE, stock.getStockLocationCode());
+            values.put(ROSDbConstants.Stock.CL_NAME_ACCOUNT_YEAR, stock.getAccountYear());
+            values.put(ROSDbConstants.Stock.CL_NAME_ACCOUNT_MONTH, stock.getAccountMonth());
+            values.put(ROSDbConstants.Stock.CL_NAME_PRODUCT_USER_CODE, stock.getProductUserCode());
 
-        db.insert(ROSDbConstants.Stock.TABLE_NAME, null, values);
-        db.close();
+            db.insert(ROSDbConstants.Stock.TABLE_NAME, null, values);
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            db.close();
+        }
     }
 
     public void clearStockTable(Context context) {
@@ -1514,28 +1651,35 @@ public class ROSDbHelper extends SQLiteOpenHelper {
 
         ArrayList<ROSProduct> productList = new ArrayList<ROSProduct>();
 
-        if (c != null) {
-            while (c.moveToNext()) {
-                ROSProduct product = new ROSProduct();
+        try {
+            if (c != null) {
+                while (c.moveToNext()) {
+                    ROSProduct product = new ROSProduct();
 
-                product.setProductDescription(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_PRODUCT_NAME)));
-                product.setProductBatchCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BATCH_NAME)));
-                product.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BRAND_NAME)));
-                product.setAgenName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_AGENCY_NAME)));
-                product.setQuntityInStock(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_ALLOCATED_QTY)));
-                product.setAgenCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_AGENT_CODE)));
-                product.setBrandCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BRAND_CODE)));
-                product.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BRAND_NAME)));
-                product.setProductCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_PRODUCT_CODE)));
-                product.setCompCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_COMP_CODE)));
-                product.setDistributorCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_DISTRIB_CODE)));
-                product.setUnitPrice(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_UNIT_PRICE)));
-                product.setSuppCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_SUPP_CODE)));
-                product.setProductUserCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_PRODUCT_USER_CODE)));
+                    product.setProductDescription(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_PRODUCT_NAME)));
+                    product.setProductBatchCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BATCH_NAME)));
+                    product.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BRAND_NAME)));
+                    product.setAgenName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_AGENCY_NAME)));
+                    product.setQuntityInStock(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_ALLOCATED_QTY)));
+                    product.setAgenCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_AGENT_CODE)));
+                    product.setBrandCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BRAND_CODE)));
+                    product.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BRAND_NAME)));
+                    product.setProductCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_PRODUCT_CODE)));
+                    product.setCompCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_COMP_CODE)));
+                    product.setDistributorCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_DISTRIB_CODE)));
+                    product.setUnitPrice(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_UNIT_PRICE)));
+                    product.setSuppCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_SUPP_CODE)));
+                    product.setProductUserCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_PRODUCT_USER_CODE)));
 
-                productList.add(product);
+                    productList.add(product);
+                }
             }
-            c.close();
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            if (c != null && !c.isClosed()) {
+                c.close();
+            }
             db.close();
         }
 
@@ -1550,11 +1694,18 @@ public class ROSDbHelper extends SQLiteOpenHelper {
 
         ArrayList<String> productNames = new ArrayList<String>();
 
-        if (c != null) {
-            while (c.moveToNext()) {
-                productNames.add(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_PRODUCT_NAME)));
+        try {
+            if (c != null) {
+                while (c.moveToNext()) {
+                    productNames.add(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_PRODUCT_NAME)));
+                }
             }
-            c.close();
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            if (c != null && !c.isClosed()) {
+                c.close();
+            }
             db.close();
         }
 
@@ -1570,11 +1721,18 @@ public class ROSDbHelper extends SQLiteOpenHelper {
 
         ArrayList<String> batchNames = new ArrayList<String>();
 
-        if (c != null) {
-            while (c.moveToNext()) {
-                batchNames.add(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BATCH_NAME)));
+        try {
+            if (c != null) {
+                while (c.moveToNext()) {
+                    batchNames.add(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BATCH_NAME)));
+                }
             }
-            c.close();
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            if (c != null && !c.isClosed()) {
+                c.close();
+            }
             db.close();
         }
 
@@ -1590,28 +1748,35 @@ public class ROSDbHelper extends SQLiteOpenHelper {
 
         ArrayList<ROSProduct> productList = new ArrayList<ROSProduct>();
 
-        if (c != null) {
-            while (c.moveToNext()) {
-                ROSProduct product = new ROSProduct();
+        try {
+            if (c != null) {
+                while (c.moveToNext()) {
+                    ROSProduct product = new ROSProduct();
 
-                product.setProductDescription(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_PRODUCT_NAME)));
-                product.setProductBatchCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BATCH_NAME)));
-                product.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BRAND_NAME)));
-                product.setAgenName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_AGENCY_NAME)));
-                product.setQuntityInStock(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_ALLOCATED_QTY)));
-                product.setAgenCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_AGENT_CODE)));
-                product.setBrandCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BRAND_CODE)));
-                product.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BRAND_NAME)));
-                product.setProductCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_PRODUCT_CODE)));
-                product.setCompCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_COMP_CODE)));
-                product.setDistributorCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_DISTRIB_CODE)));
-                product.setUnitPrice(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_UNIT_PRICE)));
-                product.setSuppCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_SUPP_CODE)));
-                product.setProductUserCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_PRODUCT_USER_CODE)));
+                    product.setProductDescription(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_PRODUCT_NAME)));
+                    product.setProductBatchCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BATCH_NAME)));
+                    product.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BRAND_NAME)));
+                    product.setAgenName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_AGENCY_NAME)));
+                    product.setQuntityInStock(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_ALLOCATED_QTY)));
+                    product.setAgenCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_AGENT_CODE)));
+                    product.setBrandCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BRAND_CODE)));
+                    product.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BRAND_NAME)));
+                    product.setProductCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_PRODUCT_CODE)));
+                    product.setCompCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_COMP_CODE)));
+                    product.setDistributorCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_DISTRIB_CODE)));
+                    product.setUnitPrice(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_UNIT_PRICE)));
+                    product.setSuppCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_SUPP_CODE)));
+                    product.setProductUserCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_PRODUCT_USER_CODE)));
 
-                productList.add(product);
+                    productList.add(product);
+                }
             }
-            c.close();
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            if (c != null && !c.isClosed()) {
+                c.close();
+            }
             db.close();
         }
 
@@ -1629,28 +1794,34 @@ public class ROSDbHelper extends SQLiteOpenHelper {
 
         ROSProduct product = null;
 
-        if (c != null) {
-            c.moveToFirst();
-            product = new ROSProduct();
+        try {
+            if (c != null) {
+                c.moveToFirst();
+                product = new ROSProduct();
 
-            product.setProductDescription(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_PRODUCT_NAME)));
-            product.setProductBatchCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BATCH_NAME)));
-            product.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BRAND_NAME)));
-            product.setAgenName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_AGENCY_NAME)));
-            product.setQuntityInStock(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_ALLOCATED_QTY)));
-            product.setAgenCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_AGENT_CODE)));
-            product.setBrandCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BRAND_CODE)));
-            product.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BRAND_NAME)));
-            product.setProductCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_PRODUCT_CODE)));
-            product.setCompCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_COMP_CODE)));
-            product.setDistributorCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_DISTRIB_CODE)));
-            product.setUnitPrice(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_UNIT_PRICE)));
-            product.setSuppCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_SUPP_CODE)));
-            product.setProductUserCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_PRODUCT_USER_CODE)));
-
-            c.close();
+                product.setProductDescription(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_PRODUCT_NAME)));
+                product.setProductBatchCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BATCH_NAME)));
+                product.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BRAND_NAME)));
+                product.setAgenName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_AGENCY_NAME)));
+                product.setQuntityInStock(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_ALLOCATED_QTY)));
+                product.setAgenCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_AGENT_CODE)));
+                product.setBrandCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BRAND_CODE)));
+                product.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BRAND_NAME)));
+                product.setProductCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_PRODUCT_CODE)));
+                product.setCompCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_COMP_CODE)));
+                product.setDistributorCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_DISTRIB_CODE)));
+                product.setUnitPrice(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_UNIT_PRICE)));
+                product.setSuppCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_SUPP_CODE)));
+                product.setProductUserCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_PRODUCT_USER_CODE)));
+            }
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            if (c != null && !c.isClosed()) {
+                c.close();
+            }
+            db.close();
         }
-        db.close();
 
         return product;
     }
@@ -1658,29 +1829,33 @@ public class ROSDbHelper extends SQLiteOpenHelper {
     public void insertProducts(Context context, ArrayList<ROSProduct> products) {
         SQLiteDatabase db = getWritableDb(context);
 
-        for (int i = 0; i < products.size(); i++) {
-            ROSProduct product = products.get(i);
-            ContentValues values = new ContentValues();
+        try {
+            for (int i = 0; i < products.size(); i++) {
+                ROSProduct product = products.get(i);
+                ContentValues values = new ContentValues();
 
-            values.put(ROSDbConstants.Product.CL_NAME_PRODUCT_NAME, product.getProductDescription());
-            values.put(ROSDbConstants.Product.CL_NAME_BATCH_NAME, product.getProductBatchCode());
-            values.put(ROSDbConstants.Product.CL_NAME_BRAND_NAME, product.getBrandName());
-            values.put(ROSDbConstants.Product.CL_NAME_AGENCY_NAME, product.getAgenName());
-            values.put(ROSDbConstants.Product.CL_NAME_ALLOCATED_QTY, product.getQuntityInStock());
-            values.put(ROSDbConstants.Product.CL_NAME_AGENT_CODE, product.getAgenCode());
-            values.put(ROSDbConstants.Product.CL_NAME_BRAND_CODE, product.getBrandCode());
-            values.put(ROSDbConstants.Product.CL_NAME_BRAND_NAME, product.getBrandName());
-            values.put(ROSDbConstants.Product.CL_NAME_PRODUCT_CODE, product.getProductCode());
-            values.put(ROSDbConstants.Product.CL_NAME_COMP_CODE, product.getCompCode());
-            values.put(ROSDbConstants.Product.CL_NAME_DISTRIB_CODE, product.getDistributorCode());
-            values.put(ROSDbConstants.Product.CL_NAME_UNIT_PRICE, product.getUnitPrice());
-            values.put(ROSDbConstants.Product.CL_NAME_SUPP_CODE, product.getSuppCode());
-            values.put(ROSDbConstants.Product.CL_NAME_PRODUCT_USER_CODE, product.getProductUserCode());
+                values.put(ROSDbConstants.Product.CL_NAME_PRODUCT_NAME, product.getProductDescription());
+                values.put(ROSDbConstants.Product.CL_NAME_BATCH_NAME, product.getProductBatchCode());
+                values.put(ROSDbConstants.Product.CL_NAME_BRAND_NAME, product.getBrandName());
+                values.put(ROSDbConstants.Product.CL_NAME_AGENCY_NAME, product.getAgenName());
+                values.put(ROSDbConstants.Product.CL_NAME_ALLOCATED_QTY, product.getQuntityInStock());
+                values.put(ROSDbConstants.Product.CL_NAME_AGENT_CODE, product.getAgenCode());
+                values.put(ROSDbConstants.Product.CL_NAME_BRAND_CODE, product.getBrandCode());
+                values.put(ROSDbConstants.Product.CL_NAME_BRAND_NAME, product.getBrandName());
+                values.put(ROSDbConstants.Product.CL_NAME_PRODUCT_CODE, product.getProductCode());
+                values.put(ROSDbConstants.Product.CL_NAME_COMP_CODE, product.getCompCode());
+                values.put(ROSDbConstants.Product.CL_NAME_DISTRIB_CODE, product.getDistributorCode());
+                values.put(ROSDbConstants.Product.CL_NAME_UNIT_PRICE, product.getUnitPrice());
+                values.put(ROSDbConstants.Product.CL_NAME_SUPP_CODE, product.getSuppCode());
+                values.put(ROSDbConstants.Product.CL_NAME_PRODUCT_USER_CODE, product.getProductUserCode());
 
-            db.insert(ROSDbConstants.Product.TABLE_NAME, null, values);
+                db.insert(ROSDbConstants.Product.TABLE_NAME, null, values);
+            }
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            db.close();
         }
-
-        db.close();
     }
 
     public void clearProductTable(Context context) {
@@ -1697,17 +1872,21 @@ public class ROSDbHelper extends SQLiteOpenHelper {
     public void insertVisit(Context context, ROSVisit visit) {
         SQLiteDatabase db = getWritableDb(context);
 
-        ContentValues values = new ContentValues();
+        try {
+            ContentValues values = new ContentValues();
 
-        values.put(ROSDbConstants.Visit.CL_NAME_CUST_CODE, visit.getCustCode());
-        values.put(ROSDbConstants.Visit.CL_NAME_ADDED_DATE, visit.getAddedDate());
-        values.put(ROSDbConstants.Visit.CL_NAME_STATUS, visit.getVisitStatus());
-        values.put(ROSDbConstants.Visit.CL_NAME_LATITUDE, visit.getLatitude());
-        values.put(ROSDbConstants.Visit.CL_NAME_LONGITUDE, visit.getLongitude());
+            values.put(ROSDbConstants.Visit.CL_NAME_CUST_CODE, visit.getCustCode());
+            values.put(ROSDbConstants.Visit.CL_NAME_ADDED_DATE, visit.getAddedDate());
+            values.put(ROSDbConstants.Visit.CL_NAME_STATUS, visit.getVisitStatus());
+            values.put(ROSDbConstants.Visit.CL_NAME_LATITUDE, visit.getLatitude());
+            values.put(ROSDbConstants.Visit.CL_NAME_LONGITUDE, visit.getLongitude());
 
-        db.insert(ROSDbConstants.Visit.TABLE_NAME, null, values);
-
-        db.close();
+            db.insert(ROSDbConstants.Visit.TABLE_NAME, null, values);
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            db.close();
+        }
     }
 
     public ArrayList<ROSVisit> getPendingVisits(Context context) {
@@ -1719,22 +1898,28 @@ public class ROSDbHelper extends SQLiteOpenHelper {
 
         ArrayList<ROSVisit> visitList = new ArrayList<ROSVisit>();
 
-        if (c != null) {
-            while (c.moveToNext()){
+        try {
+            if (c != null) {
+                while (c.moveToNext()){
 
-                ROSVisit visit = new ROSVisit();
+                    ROSVisit visit = new ROSVisit();
 
-                visit.setCustCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Visit.CL_NAME_CUST_CODE)));
-                visit.setAddedDate(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Visit.CL_NAME_ADDED_DATE)));
-                visit.setVisitId(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Visit._ID)));
-                visit.setVisitStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Visit.CL_NAME_STATUS)));
-                visit.setLatitude(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.Visit.CL_NAME_LATITUDE)));
-                visit.setLongitude(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.Visit.CL_NAME_LONGITUDE)));
+                    visit.setCustCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Visit.CL_NAME_CUST_CODE)));
+                    visit.setAddedDate(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Visit.CL_NAME_ADDED_DATE)));
+                    visit.setVisitId(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Visit._ID)));
+                    visit.setVisitStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Visit.CL_NAME_STATUS)));
+                    visit.setLatitude(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.Visit.CL_NAME_LATITUDE)));
+                    visit.setLongitude(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.Visit.CL_NAME_LONGITUDE)));
 
-                visitList.add(visit);
+                    visitList.add(visit);
+                }
             }
-
-            c.close();
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            if (c != null && !c.isClosed()) {
+                c.close();
+            }
             db.close();
         }
 
