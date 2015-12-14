@@ -669,6 +669,7 @@ if(isFieldHasValidAmount()) {
 
 //String displayProductName="";
     final String total = itemTotalAmount.getText().toString();
+
     if (productName != null && productName.length() > 0 && batchName != null && batchName.length() > 0 &&
             quantity != null && quantity.length() > 0 && orderPrice != null && orderPrice.length() > 0) {
         itemCount++;
@@ -930,10 +931,14 @@ if(isFieldHasValidAmount()) {
         String productName="";
         String batchName="";
         if (section == Constants.Section.ADD_SALE_RETURNS){
-            if(rosProduct !=null){
-                productName = rosProduct.getProductCode();
-                batchName = rosProduct.getProductBatchCode();
+            productName = productSpinner.getSelectedItem().toString();
+            batchName = batchSpinner.getSelectedItem().toString();
+
+            if (section == Constants.Section.ADD_SALE_RETURNS && !isLoadFromInvoice) {
+                batchName=batchNumber.getText().toString();
             }
+
+
 
         }else{
             if(stock !=null){
