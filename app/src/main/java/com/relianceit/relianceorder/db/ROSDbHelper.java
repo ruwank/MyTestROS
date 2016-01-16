@@ -283,6 +283,92 @@ public class ROSDbHelper extends SQLiteOpenHelper {
         return  cusList;
     }
 
+    public ArrayList<ROSCustomer> getCustomers(Context context, int from, int count) {
+        SQLiteDatabase db = getReadableDb(context);
+
+        final String SQL_SELECT_ALL_CUSTOMERS = "SELECT * FROM " + ROSDbConstants.Customer.TABLE_NAME +
+                " ORDER BY " + ROSDbConstants.Customer.CL_NAME_FIRST_NAME + " LIMIT " + from + ", " + count + ";";
+        Cursor c = db.rawQuery(SQL_SELECT_ALL_CUSTOMERS, null);
+
+        ArrayList<ROSCustomer> cusList = new ArrayList<ROSCustomer>();
+
+        try {
+            if (c != null) {
+                while (c.moveToNext()){
+                    ROSCustomer cus = new ROSCustomer();
+                    cus.setAddress1(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_ADDRESS1)));
+                    cus.setAddress2(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_ADDRESS2)));
+                    cus.setAddress3(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_ADDRESS2)));
+                    cus.setCustomerId(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_CUSTOMER_ID)));
+                    cus.setEmail(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_EMAIL)));
+                    cus.setFirstName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_FIRST_NAME)));
+                    cus.setLastName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_LAST_NAME)));
+                    cus.setShopName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_SHOP_NAME)));
+                    cus.setTelephone(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_TELEPHONE)));
+                    cus.setTown(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_TOWN)));
+                    cus.setTownId(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_TOWN_ID)));
+                    cus.setOutstanding(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_OUTSTANDING)));
+                    cus.setCreditLimit(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_CREDIT_LIMIT)));
+
+                    cusList.add(cus);
+                }
+            }
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            if (c != null && !c.isClosed()) {
+                c.close();
+            }
+            db.close();
+        }
+
+        return  cusList;
+    }
+
+    public ArrayList<ROSCustomer> searchCustomers(Context context, String searchText) {
+        SQLiteDatabase db = getReadableDb(context);
+
+        final String SQL_SELECT_ALL_CUSTOMERS = "SELECT * FROM " + ROSDbConstants.Customer.TABLE_NAME +
+                " WHERE " + ROSDbConstants.Customer.CL_NAME_FIRST_NAME + " LIKE '" + searchText + "%' OR " +
+                ROSDbConstants.Customer.CL_NAME_LAST_NAME + " LIKE '" + searchText + "%'" +
+                " ORDER BY " + ROSDbConstants.Customer.CL_NAME_FIRST_NAME + " LIMIT 100;";
+        Cursor c = db.rawQuery(SQL_SELECT_ALL_CUSTOMERS, null);
+
+        ArrayList<ROSCustomer> cusList = new ArrayList<ROSCustomer>();
+
+        try {
+            if (c != null) {
+                while (c.moveToNext()){
+                    ROSCustomer cus = new ROSCustomer();
+                    cus.setAddress1(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_ADDRESS1)));
+                    cus.setAddress2(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_ADDRESS2)));
+                    cus.setAddress3(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_ADDRESS2)));
+                    cus.setCustomerId(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_CUSTOMER_ID)));
+                    cus.setEmail(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_EMAIL)));
+                    cus.setFirstName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_FIRST_NAME)));
+                    cus.setLastName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_LAST_NAME)));
+                    cus.setShopName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_SHOP_NAME)));
+                    cus.setTelephone(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_TELEPHONE)));
+                    cus.setTown(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_TOWN)));
+                    cus.setTownId(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_TOWN_ID)));
+                    cus.setOutstanding(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_OUTSTANDING)));
+                    cus.setCreditLimit(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.Customer.CL_NAME_CREDIT_LIMIT)));
+
+                    cusList.add(cus);
+                }
+            }
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            if (c != null && !c.isClosed()) {
+                c.close();
+            }
+            db.close();
+        }
+
+        return  cusList;
+    }
+
     public void updateCustomerOutstanding(Context context, String customerId, double value) {
         SQLiteDatabase db = getWritableDb(context);
 
@@ -1297,6 +1383,37 @@ public class ROSDbHelper extends SQLiteOpenHelper {
         return stockList;
     }
 
+    public ArrayList<ROSStock> searchProductForSale(Context context, String searchText) {
+        SQLiteDatabase db = getReadableDb(context);
+
+        final String SQL_SELECT_STOCK = "SELECT DISTINCT " + ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME + "," + ROSDbConstants.Stock.CL_NAME_BRAND_NAME + " FROM " + ROSDbConstants.Stock.TABLE_NAME +
+                " WHERE "+ ROSDbConstants.Stock.CL_NAME_AVAILABLE_QTY + " > 0 AND " + ROSDbConstants.Stock.CL_NAME_STATUS + " = 0" +
+                " AND " + ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME + " LIKE '" + searchText + "%';";
+        Cursor c = db.rawQuery(SQL_SELECT_STOCK, null);
+
+        ArrayList<ROSStock> stockList = new ArrayList<ROSStock>();
+
+        try {
+            if (c != null) {
+                while (c.moveToNext()) {
+                    ROSStock stock = new ROSStock();
+                    stock.setProductDescription(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME)));
+                    stock.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BRAND_NAME)));
+                    stockList.add(stock);
+                }
+            }
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            if (c != null && !c.isClosed()) {
+                c.close();
+            }
+            db.close();
+        }
+
+        return stockList;
+    }
+
     public ArrayList<String> getBatchNamesForSale(Context context, String productName) {
         SQLiteDatabase db = getReadableDb(context);
 
@@ -1425,6 +1542,53 @@ public class ROSDbHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDb(context);
 
         final String SQL_SELECT_STOCK = "SELECT * FROM " + ROSDbConstants.Stock.TABLE_NAME + ";";
+        Cursor c = db.rawQuery(SQL_SELECT_STOCK, null);
+
+        ArrayList<ROSStock> stockList = new ArrayList<ROSStock>();
+
+        try {
+            if (c != null) {
+                while (c.moveToNext()) {
+                    ROSStock stock = new ROSStock();
+                    stock.setProductDescription(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_NAME)));
+                    stock.setProductBatchCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BATCH_NAME)));
+                    stock.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BRAND_NAME)));
+                    stock.setAgenName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_AGENCY_NAME)));
+                    stock.setQuntityInStock(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_ALLOCATED_QTY)));
+                    stock.setAvailableQuantity(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_AVAILABLE_QTY)));
+                    stock.setStatus(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_STATUS)));
+                    stock.setAgenCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_AGENT_CODE)));
+                    stock.setBrandCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_BRAND_CODE)));
+                    stock.setProductCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_CODE)));
+                    stock.setCompCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_COMP_CODE)));
+                    stock.setDistributorCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_DISTRIB_CODE)));
+                    stock.setUnitPrice(c.getDouble(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_UNIT_PRICE)));
+                    stock.setSuppCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_SUPP_CODE)));
+                    stock.setStockLocationCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_LOCATION_CODE)));
+                    stock.setAccountYear(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_ACCOUNT_YEAR)));
+                    stock.setAccountMonth(c.getInt(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_ACCOUNT_MONTH)));
+                    stock.setProductUserCode(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Stock.CL_NAME_PRODUCT_USER_CODE)));
+
+                    stockList.add(stock);
+                }
+            }
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            if (c != null && !c.isClosed()) {
+                c.close();
+            }
+            db.close();
+        }
+
+        return stockList;
+    }
+
+    public ArrayList<ROSStock> getStocks(Context context, int from, int count) {
+
+        SQLiteDatabase db = getReadableDb(context);
+
+        final String SQL_SELECT_STOCK = "SELECT * FROM " + ROSDbConstants.Stock.TABLE_NAME  + " LIMIT " + from + ", " + count + ";";
         Cursor c = db.rawQuery(SQL_SELECT_STOCK, null);
 
         ArrayList<ROSStock> stockList = new ArrayList<ROSStock>();
@@ -1646,9 +1810,38 @@ public class ROSDbHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = getReadableDb(context);
 
-        //final String SQL_SELECT_PRODUCT = "SELECT * FROM " + ROSDbConstants.Product.TABLE_NAME + " GROUP BY " + ROSDbConstants.Product.CL_NAME_PRODUCT_NAME + ";";
-
         final String SQL_SELECT_PRODUCT = "SELECT DISTINCT " + ROSDbConstants.Product.CL_NAME_PRODUCT_NAME + "," + ROSDbConstants.Product.CL_NAME_BRAND_NAME + " FROM " + ROSDbConstants.Product.TABLE_NAME + ";";
+        Cursor c = db.rawQuery(SQL_SELECT_PRODUCT, null);
+
+        ArrayList<ROSProduct> productList = new ArrayList<ROSProduct>();
+
+        try {
+            if (c != null) {
+                while (c.moveToNext()) {
+                    ROSProduct product = new ROSProduct();
+                    product.setProductDescription(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_PRODUCT_NAME)));
+                    product.setBrandName(c.getString(c.getColumnIndexOrThrow(ROSDbConstants.Product.CL_NAME_BRAND_NAME)));
+                    productList.add(product);
+                }
+            }
+        }catch (Exception ex) {
+            ex.printStackTrace();
+        }finally {
+            if (c != null && !c.isClosed()) {
+                c.close();
+            }
+            db.close();
+        }
+
+        return productList;
+    }
+
+    public ArrayList<ROSProduct> searchProductsForReturns(Context context, String searchText) {
+
+        SQLiteDatabase db = getReadableDb(context);
+
+        final String SQL_SELECT_PRODUCT = "SELECT DISTINCT " + ROSDbConstants.Product.CL_NAME_PRODUCT_NAME + "," + ROSDbConstants.Product.CL_NAME_BRAND_NAME + " FROM " + ROSDbConstants.Product.TABLE_NAME +
+                " WHERE " + ROSDbConstants.Product.CL_NAME_PRODUCT_NAME + " LIKE '" + searchText + "%';";
         Cursor c = db.rawQuery(SQL_SELECT_PRODUCT, null);
 
         ArrayList<ROSProduct> productList = new ArrayList<ROSProduct>();
