@@ -4,10 +4,10 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <!--<include-->
-        <!--android:id="@+id/tool_bar"-->
-        <!--layout="@layout/tool_bar"-->
-        <!--></include>-->
+    <include
+        android:id="@+id/tool_bar"
+        layout="@layout/tool_bar"
+        ></include>
 
     <com.relianceit.relianceorder.appsupport.tab.SlidingTabLayout
         android:id="@+id/sliding_tabs"

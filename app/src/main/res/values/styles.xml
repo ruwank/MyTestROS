@@ -15,6 +15,9 @@
         <item name="android:textColorPrimary">@android:color/white</item>
         <item name="android:spinnerItemStyle">@style/MooSpinnerItem</item>
         <item name="actionOverflowMenuStyle">@style/CMOptionsMenu</item>
+        <item name="windowNoTitle">true</item>
+    <item name="windowActionBar">false</item>
+    <item name="android:windowActionBarOverlay">false</item>
 
     </style>
 
