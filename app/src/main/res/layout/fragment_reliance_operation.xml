@@ -4,15 +4,32 @@
     android:layout_height="match_parent"
     android:background="@color/app_bg_color"
     android:orientation="vertical" >
-
-    <ListView
-        android:id="@+id/customerListView"
+    <LinearLayout
+        android:id="@+id/customer_list"
         android:layout_width="280dp"
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
         android:background="@color/app_base_color"
-        android:layout_alignParentTop="true" >
+        android:orientation="vertical">
+        <EditText android:id="@+id/inputSearch"
+            android:layout_margin="2dp"
+            android:padding="@dimen/table_horizontal_margin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/white"
+            android:hint="Search customer.."
+            android:textColor="@android:color/black"
+            android:inputType="textVisiblePassword"/>
+
+        <ListView
+        android:id="@+id/customerListView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/app_base_color"
+         >
     </ListView>
+    </LinearLayout>
 
    
 
@@ -23,7 +40,7 @@
         android:layout_alignParentTop="true"
         android:layout_marginLeft="56dp"
         android:layout_marginTop="27dp"
-        android:layout_toRightOf="@+id/customerListView"
+        android:layout_toRightOf="@+id/customer_list"
         android:textColor="@android:color/black"
         android:text="Customer:"
         android:textSize="@dimen/tb_header_text_size" />
