@@ -10,7 +10,7 @@ public class AppURLs {
 
     private static final String TAG = AppUtils.class.getSimpleName();
 
-    private static String BASE_URL = "http://reliancereldiz.com.lk";
+    private static String BASE_URL = "http://kfdtab.ecnailer.net";
 
 //    private static String LOGIN_ENDPOINT = BASE_URL + "/api/authenticate/authenticate";
 //    private static String CUSTOMER_LIST_ENDPOINT = BASE_URL + "/api/customer/get";

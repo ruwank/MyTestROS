@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -158,12 +159,21 @@ public class HomeActivity extends RelianceBaseActivity {
         actionBar.setDisplayShowCustomEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);
         */
+
+        String version = "";
+        try {
+            PackageInfo pInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+            version = pInfo.versionName;
+        }catch (Exception ex) {
+
+        }
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
         setSupportActionBar(toolbar);
         TextView textViewTitle = (TextView) toolbar.findViewById(R.id.title);
         textViewTitle.setText(R.string.app_name);
         TextView info = (TextView) toolbar.findViewById(R.id.info);
-        String infoText="COMPANY NAME \nDistributer Name \nSale Rep Name \nUser Level \nBuild Version";
+        String infoText="COMPANY NAME \nDistributer Name \nSale Rep Name \nUser Level \nEcnailer " + version;
         info.setText(infoText);
 
 
