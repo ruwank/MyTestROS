@@ -7,6 +7,7 @@ import android.location.Location;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -411,6 +412,7 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
         batchSpinner.performClick();
     }
     private void customizeActionBar(){
+        /*
         final ActionBar actionBar = getSupportActionBar();
         ActionBar.LayoutParams params = new ActionBar.LayoutParams(//Center the textview in the ActionBar !
                 ActionBar.LayoutParams.WRAP_CONTENT,
@@ -431,6 +433,21 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
         actionBar.setCustomView(viewActionBar,params);
         actionBar.setDisplayShowCustomEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeButtonEnabled(true);
+        */
+        Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
+        setSupportActionBar(toolbar);
+        TextView textViewTitle = (TextView) toolbar.findViewById(R.id.title);
+        String titleText=getString(R.string.app_name);
+        if(section == Constants.Section.ADD_SALE_RETURNS){
+            titleText=titleText+" - "+getString(R.string.section_sales_return);
+        }else{
+            titleText=titleText+" - "+getString(R.string.section_new_order);
+
+        }
+        textViewTitle.setText(titleText);
+        final ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
 

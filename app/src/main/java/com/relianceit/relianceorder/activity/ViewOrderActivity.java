@@ -4,10 +4,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TableLayout;
 import android.widget.TableRow;
@@ -67,6 +67,7 @@ public class ViewOrderActivity extends ActionBarActivity {
     }
 
     private void customizeActionBar(){
+        /*
         final ActionBar actionBar = getSupportActionBar();
         ActionBar.LayoutParams params = new ActionBar.LayoutParams(//Center the textview in the ActionBar !
                 ActionBar.LayoutParams.WRAP_CONTENT,
@@ -87,6 +88,21 @@ public class ViewOrderActivity extends ActionBarActivity {
         actionBar.setCustomView(viewActionBar,params);
         actionBar.setDisplayShowCustomEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeButtonEnabled(true);
+        */
+        Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
+        setSupportActionBar(toolbar);
+        TextView textViewTitle = (TextView) toolbar.findViewById(R.id.title);
+        String titleText=getString(R.string.app_name);
+        if(section == Constants.Section.VIEW_SALE_RETURNS){
+            titleText=titleText+" - "+getString(R.string.section_view_return);
+        }else{
+            titleText=titleText+" - "+getString(R.string.section_order_view);
+
+        }
+        textViewTitle.setText(titleText);
+        final ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
     }

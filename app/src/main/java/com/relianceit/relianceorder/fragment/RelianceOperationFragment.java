@@ -10,12 +10,15 @@ import android.location.Location;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -53,7 +56,8 @@ public class RelianceOperationFragment extends Fragment{
     ROSVisit visit;
 
     private AlertDialog locationAlertDialog = null;
-
+    // Search EditText
+    EditText inputSearch;
 
     @Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -113,8 +117,32 @@ public class RelianceOperationFragment extends Fragment{
             }
         });
 
-        getActivity().registerReceiver(localDataChangeReceiver, new IntentFilter(Constants.LocalDataChange.ACTION_DAILY_SYNCED));
+        inputSearch = (EditText) rootView.findViewById(R.id.inputSearch);
+        inputSearch.addTextChangedListener(new TextWatcher() {
 
+            @Override
+            public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
+                // When user changed the Text
+                //RelianceOperationFragment.this.customerListAdapter.getFilter().filter(cs);
+                filterCustomerList(cs.toString());
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,
+                                          int arg3) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable arg0) {
+                // TODO Auto-generated method stub
+            }
+        });
+
+        getActivity().registerReceiver(localDataChangeReceiver, new IntentFilter(Constants.LocalDataChange.ACTION_DAILY_SYNCED));
+        ROSDbHelper dbHelper = new ROSDbHelper(getActivity().getApplicationContext());
+        customers = dbHelper.getCustomers(getActivity().getApplicationContext());
         loadCustomerList();
 		return rootView;
 	}
@@ -124,11 +152,15 @@ public class RelianceOperationFragment extends Fragment{
         AppController.getInstance().cancelPendingRequests(TAG);
         getActivity().unregisterReceiver(localDataChangeReceiver);
     }
+    private void filterCustomerList(String searchText){
+        ROSDbHelper dbHelper = new ROSDbHelper(getActivity().getApplicationContext());
+        customers = dbHelper.searchCustomers(getActivity().getApplicationContext(),searchText);
+        loadCustomerList();
+    }
 
     private void loadCustomerList(){
         selectedCustomerIndex=0;
-        ROSDbHelper dbHelper = new ROSDbHelper(getActivity().getApplicationContext());
-        customers = dbHelper.getCustomers(getActivity().getApplicationContext());
+
         if(customers !=null && customers.size()>0) {
             newOrderBtn.setVisibility(View.VISIBLE);
             orderListBtn.setVisibility(View.VISIBLE);
@@ -191,6 +223,9 @@ public class RelianceOperationFragment extends Fragment{
     private BroadcastReceiver localDataChangeReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+
+            ROSDbHelper dbHelper = new ROSDbHelper(context);
+            customers = dbHelper.getCustomers(context);
                 loadCustomerList();
         }
     };

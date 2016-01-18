@@ -6,18 +6,10 @@ import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.android.volley.VolleyError;
 import com.relianceit.relianceorder.AppController;
 import com.relianceit.relianceorder.R;
-import com.relianceit.relianceorder.db.ROSDbHelper;
-import com.relianceit.relianceorder.services.GeneralServiceHandler;
 import com.relianceit.relianceorder.util.AppDataManager;
-import com.relianceit.relianceorder.util.AppUtils;
-import com.relianceit.relianceorder.util.ConnectionDetector;
 import com.relianceit.relianceorder.util.Constants;
-
-import java.util.Calendar;
-import java.util.Date;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -39,7 +31,8 @@ public class MainActivity extends ActionBarActivity {
         if (logged != null && logged.equalsIgnoreCase("yes")) {
             loadHome();
         }else {
-            loadLogin();
+            loadHome();
+           // loadLogin();
         }
     }
 

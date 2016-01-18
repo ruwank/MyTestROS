@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
@@ -243,6 +244,7 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
     }
 
     private void customizeActionBar(){
+        /*
         final ActionBar actionBar = getSupportActionBar();
         ActionBar.LayoutParams params = new ActionBar.LayoutParams(//Center the textview in the ActionBar !
                 ActionBar.LayoutParams.WRAP_CONTENT,
@@ -263,6 +265,21 @@ public class ListOfOrderActivity extends ActionBarActivity implements  DatePicke
         actionBar.setCustomView(viewActionBar,params);
         actionBar.setDisplayShowCustomEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeButtonEnabled(true);
+        */
+        Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
+        setSupportActionBar(toolbar);
+        TextView textViewTitle = (TextView) toolbar.findViewById(R.id.title);
+        String titleText=getString(R.string.app_name);
+        if(section == Constants.Section.VIEW_SALE_RETURNS_LIST){
+            titleText=titleText+" - "+getString(R.string.section_sales_return_list);
+        }else{
+            titleText=titleText+" - "+getString(R.string.section_order_list);
+
+        }
+        textViewTitle.setText(titleText);
+        final ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeButtonEnabled(true);
 

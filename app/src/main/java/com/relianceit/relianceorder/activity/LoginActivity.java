@@ -4,11 +4,10 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -76,11 +75,13 @@ public class LoginActivity extends ActionBarActivity {
         customizeActionBar();
     }
     private void customizeActionBar(){
+/*
         final ActionBar actionBar = getSupportActionBar();
         ActionBar.LayoutParams params = new ActionBar.LayoutParams(//Center the textview in the ActionBar !
                 ActionBar.LayoutParams.WRAP_CONTENT,
                 ActionBar.LayoutParams.MATCH_PARENT,
                 Gravity.CENTER);
+
         View viewActionBar = getLayoutInflater().inflate(R.layout.action_bar_custom_layout, null);
         TextView textViewTitle = (TextView) viewActionBar.findViewById(R.id.actionbar_textview);
 
@@ -91,6 +92,17 @@ public class LoginActivity extends ActionBarActivity {
         actionBar.setCustomView(viewActionBar,params);
         actionBar.setDisplayShowCustomEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);
+        */
+        Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
+        setSupportActionBar(toolbar);
+        TextView textViewTitle = (TextView) toolbar.findViewById(R.id.title);
+        textViewTitle.setText(R.string.app_name);
+//        TextView info = (TextView) toolbar.findViewById(R.id.info);
+//        String infoText="COMPANY NAME \nDistributer Name \nSale Rep Name \nUser Level \nBuild Version";
+//        info.setText(infoText);
+
+
+
     }
 
     private void cancelButtonTapped() {

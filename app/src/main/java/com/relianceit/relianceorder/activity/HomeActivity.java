@@ -11,13 +11,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.TextView;
 
 import com.android.volley.AuthFailureError;
@@ -142,6 +139,7 @@ public class HomeActivity extends RelianceBaseActivity {
     }
 
     private void customizeActionBar(int section){
+        /*
         final ActionBar actionBar = getSupportActionBar();
         ActionBar.LayoutParams params = new ActionBar.LayoutParams(//Center the textview in the ActionBar !
                 ActionBar.LayoutParams.WRAP_CONTENT,
@@ -152,23 +150,6 @@ public class HomeActivity extends RelianceBaseActivity {
 
         String titleText=getString(R.string.app_name);
 
-        switch (section) {
-            case 0:
-            {
-            }
-            break;
-            case 1:
-            {
-            }
-            break;
-            case 2:
-            {
-            }
-            break;
-            default:
-                //titleText=titleText;
-                break;
-        }
 
 
         textViewTitle.setText(titleText);
@@ -176,8 +157,15 @@ public class HomeActivity extends RelianceBaseActivity {
         actionBar.setCustomView(viewActionBar,params);
         actionBar.setDisplayShowCustomEnabled(true);
         actionBar.setDisplayShowTitleEnabled(false);
-       // actionBar.setDisplayHomeAsUpEnabled(true);
-       // actionBar.setHomeButtonEnabled(true);
+        */
+        Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
+        setSupportActionBar(toolbar);
+        TextView textViewTitle = (TextView) toolbar.findViewById(R.id.title);
+        textViewTitle.setText(R.string.app_name);
+        TextView info = (TextView) toolbar.findViewById(R.id.info);
+        String infoText="COMPANY NAME \nDistributer Name \nSale Rep Name \nUser Level \nBuild Version";
+        info.setText(infoText);
+
 
     }
 
@@ -332,7 +320,7 @@ public class HomeActivity extends RelianceBaseActivity {
     private void dailyDownloadFailed(int errorCode) {
         AppUtils.dismissProgressDialog();
         if (errorCode == 401) {
-            logout();
+           // logout();
         }else {
             setPendingSyncButtonStatus(true);
             AppUtils.showAlertDialog(this, "Sync Failed!", "Daily syncing failed due to Server error. Please try again to update your daily stock.");
