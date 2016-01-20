@@ -23,6 +23,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TableLayout;
@@ -56,12 +58,14 @@ import java.util.Iterator;
 
 public class NewOrderActivity extends RelianceBaseActivity implements OnItemSelectedListener{
 
+    public static final String TAG = NewOrderActivity.class.getSimpleName();
+
     TableLayout orderTableLayout;
-    Spinner productSpinner,batchSpinner;
+    Spinner batchSpinner;//productSpinner
     EditText quantityText,orderPriceText,orderDiscountText,freeItemText,
             invoiceValueText,overallDisPreText,batchNumber;
     TextView customerName,topSecondLabel,totalOutstanding,itemTotalAmount,
-            totalAmountTextLabel,grossValueLabel,discountValueText,orderValue;
+            totalAmountTextLabel,grossValueLabel,discountValueText,orderValue,productName;
     ImageButton selectReturnBatch,addOrderButton;
     Button btnSaveOrder;
     int itemCount;
@@ -85,6 +89,9 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
 
     private AlertDialog locationAlertDialog = null;
     private final int locationReqCode = 200;
+    ListView productListView;
+    ArrayAdapter<String> productDataAdapter;
+    LinearLayout productLayout;
 
     @Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -125,6 +132,7 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
         topSecondLabel=(TextView)findViewById(R.id.top_second_label);
         totalOutstanding=(TextView)findViewById(R.id.total_outstanding);
         invoiceValueText=(EditText)findViewById(R.id.invoice_value);
+        productName=(TextView)findViewById(R.id.product_name);
 
 //        invoiceValueText.setOnKeyListener(new View.OnKeyListener() {
 //            public boolean onKey(View v, int keyCode, KeyEvent event) {
@@ -165,10 +173,71 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
         });
 */
         orderTableLayout=(TableLayout)findViewById(R.id.new_order_table);
+        productLayout=(LinearLayout)findViewById(R.id.productLayout);
+
+        RelativeLayout product=(RelativeLayout)findViewById(R.id.product);
+        product.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+if(productLayout.getVisibility()==View.VISIBLE){
+    productLayout.setVisibility(View.GONE);
+}else{
+    productLayout.setVisibility(View.VISIBLE);
+
+}
 
 
-        productSpinner=(Spinner)findViewById(R.id.product_spinner);
-        productSpinner.setOnItemSelectedListener(this);
+            }
+        });
+
+        productListView=(ListView)findViewById(R.id.productListView);
+
+        productListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+               // selectedCustomerIndex = position;
+               // productDataAdapter.setSelectedIndex(position);
+               // updateCustomerData();
+             String selectedProduct= productDataAdapter.getItem(position);
+                productName.setText(selectedProduct);
+                if(productLayout.getVisibility()==View.VISIBLE){
+                    productLayout.setVisibility(View.GONE);
+                }
+                Log.v(TAG,selectedProduct);
+                if(section == Constants.Section.ADD_SALE_RETURNS){
+                    loadProductBatchForReturnOrder(position);
+
+                }else{
+                    loadProductBatchForSale();
+
+                }
+
+            }
+        });
+        EditText inputSearch = (EditText) findViewById(R.id.inputSearch);
+        inputSearch.addTextChangedListener(new TextWatcher() {
+
+            @Override
+            public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
+                // When user changed the Text
+                productDataAdapter.getFilter().filter(cs);
+            }
+
+            @Override
+            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,
+                                          int arg3) {
+                // TODO Auto-generated method stub
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable arg0) {
+                // TODO Auto-generated method stub
+            }
+        });
+
+        // productSpinner=(Spinner)findViewById(R.id.product_spinner);
+       // productSpinner.setOnItemSelectedListener(this);
         batchSpinner=(Spinner)findViewById(R.id.batch_spinner);
         batchSpinner.setOnItemSelectedListener(this);
 
@@ -405,6 +474,10 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
             batchNumber.setVisibility(View.VISIBLE);
 
         }
+        if(productLayout.getVisibility()==View.VISIBLE){
+            productLayout.setVisibility(View.GONE);
+        }
+
     }
     private void showProductBatch() {
         batchNumber.setVisibility(View.INVISIBLE);
@@ -466,13 +539,14 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
             products.add(productName);
         }
 
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
+        productDataAdapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, products);
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        productSpinner.setAdapter(dataAdapter);
+        productDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // productSpinner.setAdapter(dataAdapter);
+        productListView.setAdapter(productDataAdapter);
     }
     private void loadProductBatchForSale(){
-        String productSpinnerText= productSpinner.getSelectedItem().toString();
+        String productSpinnerText= productName.getText().toString();
         String[] separated = productSpinnerText.split("-");
         if (separated.length >= 2) {
             String brandName = separated[0].trim();
@@ -510,10 +584,11 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
             products.add(productName);
         }
 
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
+        productDataAdapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, products);
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        productSpinner.setAdapter(dataAdapter);
+        productDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        //productSpinner.setAdapter(dataAdapter);
+        productListView.setAdapter(productDataAdapter);
     }
 
     private void loadInvoiceProductNamesForReturns(){
@@ -530,14 +605,15 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
             products.add(productName);
         }
 
-        ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
+        productDataAdapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_item, products);
-        dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        productSpinner.setAdapter(dataAdapter);
+        productDataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // productSpinner.setAdapter(dataAdapter);
+        productListView.setAdapter(productDataAdapter);
     }
 
     private void loadProductBatchForReturnOrder(int position){
-        String productSpinnerText = productSpinner.getSelectedItem().toString();
+        String productSpinnerText = productName.getText().toString();
         String[] separated = productSpinnerText.split("-");
         if (separated.length >= 2) {
             String brandName = separated[0].trim();
@@ -563,7 +639,7 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
     }
 
     private void loadProductForReturns(int position){
-        String productSpinnerText= productSpinner.getSelectedItem().toString();
+        String productSpinnerText= productName.getText().toString();
 
         String[] separated = productSpinnerText.split("-");
         if (separated.length >= 2) {
@@ -596,7 +672,7 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
     }
 
     private void loadProductForReturnsForBatch(){
-        String productSpinnerText= productSpinner.getSelectedItem().toString();
+        String productSpinnerText= productName.getText().toString();
 
         String[] separated = productSpinnerText.split("-");
         if (separated.length >= 2) {
@@ -671,7 +747,7 @@ public class NewOrderActivity extends RelianceBaseActivity implements OnItemSele
 
     private void addNewOrder(){
 if(isFieldHasValidAmount()) {
-    String displayProductName = productSpinner.getSelectedItem().toString();
+    String displayProductName = productName.getText().toString();
     String batchName = batchSpinner.getSelectedItem().toString();
 
     if (section == Constants.Section.ADD_SALE_RETURNS && !isLoadFromInvoice) {
@@ -945,10 +1021,10 @@ if(isFieldHasValidAmount()) {
     }
 
     private void updateItemTotalAmount(){
-        String productName="";
+        String product="";
         String batchName="";
         if (section == Constants.Section.ADD_SALE_RETURNS){
-            productName = productSpinner.getSelectedItem().toString();
+            product = productName.getText().toString();
             batchName = batchSpinner.getSelectedItem().toString();
 
             if (section == Constants.Section.ADD_SALE_RETURNS && !isLoadFromInvoice) {
@@ -959,7 +1035,7 @@ if(isFieldHasValidAmount()) {
 
         }else{
             if(stock !=null){
-                productName = stock.getProductCode();
+                product = stock.getProductCode();
                 batchName = stock.getProductBatchCode();
             }
         }
@@ -969,7 +1045,7 @@ if(isFieldHasValidAmount()) {
             String orderDiscount = orderDiscountText.getText().toString();
             double total = 0.00f;
 
-            if (productName != null && productName.length() > 0 && batchName != null && batchName.length() > 0 &&
+            if (product != null && product.length() > 0 && batchName != null && batchName.length() > 0 &&
                     quantity != null && quantity.length() > 0 && orderPrice != null && orderPrice.length() > 0) {
 
                 int quantityValue = Integer.parseInt(quantity);
@@ -1228,16 +1304,16 @@ if(isFieldHasValidAmount()) {
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
 
         switch (parent.getId()) {
-            case R.id.product_spinner:
-
-                if(section == Constants.Section.ADD_SALE_RETURNS){
-                    loadProductBatchForReturnOrder(position);
-
-                }else{
-                    loadProductBatchForSale();
-
-                }
-                break;
+//            case R.id.product_spinner:
+//
+//                if(section == Constants.Section.ADD_SALE_RETURNS){
+//                    loadProductBatchForReturnOrder(position);
+//
+//                }else{
+//                    loadProductBatchForSale();
+//
+//                }
+//                break;
             case R.id.batch_spinner:
 
                 if(section == Constants.Section.ADD_SALE_RETURNS){
@@ -1255,9 +1331,9 @@ if(isFieldHasValidAmount()) {
     @Override
     public void onNothingSelected(AdapterView<?> parent) {
         switch (parent.getId()) {
-            case R.id.product_spinner:
-
-                break;
+//            case R.id.product_spinner:
+//
+//                break;
             case R.id.batch_spinner:
                 if(section == Constants.Section.ADD_SALE_RETURNS) {
                     batchSpinner.setVisibility(View.INVISIBLE);
