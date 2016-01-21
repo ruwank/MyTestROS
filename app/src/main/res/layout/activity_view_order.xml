@@ -25,7 +25,6 @@
             android:paddingTop="10dp"
             android:orientation="vertical"
             android:id="@+id/order_table_header_top"
-            android:layout_below="@+id/tool_bar"
             >
 
             <TableRow
