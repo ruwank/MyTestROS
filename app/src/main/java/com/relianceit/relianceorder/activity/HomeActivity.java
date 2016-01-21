@@ -168,12 +168,20 @@ public class HomeActivity extends RelianceBaseActivity {
 
         }
 
+        String distributerName = AppDataManager.getData(getApplicationContext(), Constants.DM_DISTRIBUTER_KEY);
+        String salesRepName = AppDataManager.getData(getApplicationContext(), Constants.DM_SALES_REP_NAME_KEY);
+        String userLevel = AppDataManager.getData(getApplicationContext(), Constants.DM_USER_LEVEL_KEY);
+        if (distributerName == null) distributerName = "";
+        if (salesRepName == null) salesRepName = "";
+        if (userLevel == null) userLevel = "";
+
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.tool_bar);
         setSupportActionBar(toolbar);
         TextView textViewTitle = (TextView) toolbar.findViewById(R.id.title);
         textViewTitle.setText(R.string.app_name);
         TextView info = (TextView) toolbar.findViewById(R.id.info);
-        String infoText="COMPANY NAME \nDistributer Name \nSale Rep Name \nUser Level \nEcnailer " + version;
+        String infoText = "COMPANY NAME\n" + distributerName + "\n" + salesRepName + "\n" + userLevel + "\nEcnailer " + version;
         info.setText(infoText);
 
 
@@ -330,7 +338,7 @@ public class HomeActivity extends RelianceBaseActivity {
     private void dailyDownloadFailed(int errorCode) {
         AppUtils.dismissProgressDialog();
         if (errorCode == 401) {
-           // logout();
+           logout();
         }else {
             setPendingSyncButtonStatus(true);
             AppUtils.showAlertDialog(this, "Sync Failed!", "Daily syncing failed due to Server error. Please try again to update your daily stock.");

@@ -17,6 +17,11 @@ public class Constants {
     public static final String DM_LOGGED_KEY = "com.relianceit.relianceorder.already_logged_key";
     public static final String DM_ACCESS_TOKEN_KEY = "com.relianceit.relianceorder.token_key";
     public static final String DM_USERNAME_KEY = "com.relianceit.relianceorder.username_key";
+
+    public static final String DM_DISTRIBUTER_KEY = "com.relianceit.relianceorder.distributer_key";
+    public static final String DM_SALES_REP_NAME_KEY = "com.relianceit.relianceorder.sales_rep_name_key";
+    public static final String DM_USER_LEVEL_KEY = "com.relianceit.relianceorder.user_level_key";
+
     public static final String DM_PASSWORD_KEY = "com.relianceit.relianceorder.password_key";
     public static final String DM_DAILY_SYNC_TIME_KEY = "com.relianceit.relianceorder.daily_sync_time_key";
     public static final String DM_DAILY_SYNC_PRODUCT_KEY = "com.relianceit.relianceorder.daily_sync_product_time_key";
