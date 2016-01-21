@@ -1179,6 +1179,7 @@ if(isFieldHasValidAmount()) {
                                 dbHelper.updateReturnOrderStatusToSynced(getApplicationContext(), orderIdStr);
                                 AppUtils.showAlertDialog(NewOrderActivity.this, "Return Order update Success", "Successfully updated return order ");
                                 AppUtils.dismissProgressDialog();
+                                finish();
                             }
 
                             @Override
@@ -1239,6 +1240,7 @@ if(isFieldHasValidAmount()) {
                                 dbHelper.updateNewOrderStatusToSynced(getApplicationContext(), orderIdStr);
                                 AppUtils.showAlertDialog(NewOrderActivity.this, "Order update Success", "Successfully updated order ");
                                 AppUtils.dismissProgressDialog();
+                                finish();
                             }
 
                             @Override

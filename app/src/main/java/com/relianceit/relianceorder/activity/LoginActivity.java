@@ -144,13 +144,20 @@ public class LoginActivity extends ActionBarActivity {
                     public void onResponse(JSONObject jsonObject) {
                         Log.i(TAG, "Login success " + jsonObject.toString());
                         String token = "";
+                        String distributerName = "";
+                        String salesRepName = "";
+                        String userLevel = "";
+
                         try {
                             token = jsonObject.getString("AuthToken");
                             Log.i(TAG, "Access token " + token);
+                            userLevel = jsonObject.getString("UserLevel");
+                            distributerName = jsonObject.getString("DistributoreName");
+                            salesRepName = jsonObject.getString("SalesRepName");
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        loginCompleted(token);
+                        loginCompleted(token, distributerName, salesRepName, userLevel);
                     }
                 },
                 new Response.ErrorListener() {
@@ -189,7 +196,8 @@ public class LoginActivity extends ActionBarActivity {
         }
     }
 
-    private void loginCompleted(String accessToken) {
+    private void loginCompleted(String accessToken, String distributerName, String salesRepName, String userLevel) {
+
         ROSUser user = ROSUser.getInstance();
         user.setUsername(username);
         user.setPassword(password);
@@ -205,6 +213,9 @@ public class LoginActivity extends ActionBarActivity {
         }
 
         AppDataManager.saveData(getApplicationContext(), Constants.DM_ACCESS_TOKEN_KEY, encodedToken);
+        AppDataManager.saveData(getApplicationContext(), Constants.DM_DISTRIBUTER_KEY, distributerName);
+        AppDataManager.saveData(getApplicationContext(), Constants.DM_SALES_REP_NAME_KEY, salesRepName);
+        AppDataManager.saveData(getApplicationContext(), Constants.DM_USER_LEVEL_KEY, userLevel);
         AppDataManager.saveData(getApplicationContext(), Constants.DM_USERNAME_KEY, username);
         AppDataManager.saveData(getApplicationContext(), Constants.DM_LOGGED_KEY, "yes");
         AppDataManager.saveDataInt(getApplicationContext(), Constants.DM_OFFLINE_LOGOUT_KEY, 0);

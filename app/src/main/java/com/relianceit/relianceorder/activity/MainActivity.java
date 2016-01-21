@@ -31,8 +31,8 @@ public class MainActivity extends ActionBarActivity {
         if (logged != null && logged.equalsIgnoreCase("yes")) {
             loadHome();
         }else {
-            loadHome();
-           // loadLogin();
+            //loadHome();
+           loadLogin();
         }
     }
 
